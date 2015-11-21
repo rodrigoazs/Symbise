@@ -1,0 +1,39 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MathSym</title>
+	<link rel="stylesheet" href="themes/Mathsym.min.css" />
+	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" />
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
+	<link rel="stylesheet" href="src/mathscribe/jqmath-0.4.3.css">
+	<script src="src/mathscribe/jquery-1.4.3.min.js"></script>
+	<script src="src/mathscribe/jqmath-etc-0.4.3.min.js" charset="utf-8"></script>
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+	<div data-role="page" data-theme="a">
+		<div data-role="header" data-position="inline">
+			<h1>MathSym</h1>
+		</div>
+		<div data-role="content" data-theme="a">
+			<form onSubmit="return false;"><table style="width:100%"><tr>
+			    <td>
+			        <input name="text-basic" id="textinpt" value="" autocapitalize="none" type="text">
+			    </td>
+			    <td style="font-size:50%; width:7em;">
+			         <input id="equalbtn" value="=" type="submit">
+			    </td>
+			</tr></table>
+			<div id="console" class="ui-body ui-body-a ui-corner-all" style="visibility: hidden;">
+          		<p>ssss</p>
+      		</div>
+		</div>
+	</div>
+<script src="src/symbolic.js"></script>
+<script src="src/parser.js"></script>
+<script src="src/system.js"></script>
+</body>
+</html>
