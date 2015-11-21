@@ -240,9 +240,10 @@ function toTex( node )
         case OP_MUL:
           if(node.children[0].type == NODE_CONST && node.children[1].type == NODE_CONST)
             ret = toTex( node.children[0] ) +"·"+ toTex( node.children[1] );
-          else if(node.children[1].type == NODE_VAR)
-            ret = toTex( node.children[0] ) +"\\,"+ toTex( node.children[1] );
-          else{
+          else if(node.children[1].type == NODE_VAR){
+            left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+            ret = left +"\\,"+ toTex( node.children[1] );
+          }else{
             left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
             right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + toTex( node.children[1] ) + ")" : toTex( node.children[1] );
             ret = left + "\\," + right;
