@@ -32,8 +32,6 @@ function symbolicSubtractor( nodel, noder )
     return createNode ( NODE_CONST, 0 );
   else if ( nodel.type == NODE_CONST && nodel.value == 0 )
     return symbolicNegation( noder );
-  else if ( noder.type == NODE_CONST && noder.value == 0 )
-    return symbolicNegation( nodel );
   else if ( nodel.type == NODE_CONST && noder.type == NODE_CONST )
     return createNode( NODE_CONST, Number( nodel.value ) - Number( noder.value ) );
   else
@@ -118,13 +116,19 @@ function symbolicDiff( node )
           ret = symbolicNegation(symbolicDiff(node.children[0]));
           break;
         case OP_POW:
-          ret = symbolicAdder(symbolicMultiplier(symbolicMultiplier(node.children[1], symbolicPower(node.children[0], symbolicSubtractor(node.children[1], createNode(NODE_CONST, 1)))), symbolicDiff(node.children[0])), symbolicMultiplier(symbolicMultiplier(symbolicPower(node.children[0], node.children[1]), createNode(NODE_OP, OP_LOG, node.children[0])), symbolicDiff(node.children[1])));
+          ret = symbolicAdder(symbolicMultiplier(symbolicMultiplier(node.children[1], symbolicPower(node.children[0], symbolicSubtractor(node.children[1], createNode(NODE_CONST, 1)))), symbolicDiff(node.children[0])), symbolicMultiplier(symbolicMultiplier(symbolicPower(node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolicDiff(node.children[1])));
           break;
-        case OP_SIN:
-          ret = symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_OP, OP_COS, node.children[0]) );
+      }
+      break;
+
+    case NODE_FUNC:
+      switch( node.value )
+      {
+        case FUNC_SIN:
+          ret = symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]) );
           break;
-        case OP_COS:
-          ret = symbolicNegation(symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_OP, OP_SIN, node.children[0]) ));
+        case FUNC_COS:
+          ret = symbolicNegation(symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0]) ));
           break;  
       }
       break;
@@ -180,15 +184,21 @@ function stringEquation( node )
           right = node.children[1].type == NODE_OP ? "(" + stringEquation( node.children[1] ) + ")" : stringEquation( node.children[1] );
           ret = left +"^"+ right;
           break;
-        case OP_SIN:
+      }
+      break;
+
+    case NODE_FUNC:
+      switch( node.value )
+      {
+        case FUNC_SIN:
           ret = "sin(" + stringEquation( node.children[0] ) + ")";
           break;
-        case OP_COS:
+        case FUNC_COS:
           ret = "cos(" + stringEquation( node.children[0] ) + ")";
           break;  
-        case OP_LOG:
+        case FUNC_NLOG:
           ret = "log(" + stringEquation( node.children[0] ) + ")";
-          break;
+          break;  
       }
       break;
 
@@ -245,13 +255,19 @@ function toTex( node )
           left = node.children[0].type == NODE_OP ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
           ret = left +"^{"+ toTex(node.children[1]) +"}";
           break;
-        case OP_SIN:
+      }
+      break;
+
+    case NODE_FUNC:
+      switch( node.value )
+      {
+        case FUNC_SIN:
           ret = "sin(" + toTex( node.children[0] ) + ")";
           break;
-        case OP_COS:
+        case FUNC_COS:
           ret = "cos(" + toTex( node.children[0] ) + ")";
           break;  
-        case OP_LOG:
+        case FUNC_NLOG:
           ret = "log(" + toTex( node.children[0] ) + ")";
           break;
       }
@@ -274,6 +290,6 @@ function initparser( node )
   var func = stringEquation( node );
   var diff = symbolicDiff( node );
   //alert(toMathML( diff ) );
-  $("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff ));
+  $("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
   M.parseMath(document.getElementById("console"));
 }

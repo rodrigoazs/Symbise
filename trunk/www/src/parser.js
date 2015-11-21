@@ -10,17 +10,43 @@ var children;
 var NODE_OP = 0;
 var NODE_VAR = 1;
 var NODE_CONST = 2;
+var NODE_FUNC = 3;
 
-var OP_ADD = 16;
-var OP_SUB = 17;
-var OP_DIV = 18;
-var OP_MUL = 19;
-var OP_NEG = 20;
+var OP_ADD = 10;
+var OP_SUB = 11;
+var OP_DIV = 12;
+var OP_MUL = 13;
+var OP_NEG = 14;
 var OP_POW = 15;
 
-var OP_SIN = 21;
-var OP_COS = 22;
-var OP_LOG = 23;
+var FUNC_SIN = 16;
+var FUNC_SINH = 17;
+var FUNC_ASIN = 18;
+var FUNC_ASINH = 19;
+var FUNC_COS = 20;
+var FUNC_COSH = 21;
+var FUNC_ACOS = 22;
+var FUNC_ACOSH = 23;
+var FUNC_TAN = 24;
+var FUNC_TANH = 25;
+var FUNC_ATAN = 26;
+var FUNC_ATANH = 27;
+var FUNC_SEC = 28;
+var FUNC_SECH = 29;
+var FUNC_ASEC = 30;
+var FUNC_ASECH = 31;
+var FUNC_CSC = 32;
+var FUNC_CSCH = 33;
+var FUNC_ACSC = 34;
+var FUNC_ACSCH = 35;
+var FUNC_COT = 36;
+var FUNC_COTH = 37;
+var FUNC_ACOT = 38;
+var FUNC_ACOTH = 39;
+var FUNC_SQRT = 40;
+var FUNC_EXP = 41;
+var FUNC_NLOG = 42;
+var FUNC_BLOG = 43;
 
 //Management functions
 function createNode( type, value, childs )
@@ -65,17 +91,104 @@ ret = execute( node.children[0] ) * -1;
 break;
 case OP_POW:
 ret = Math.pow(execute( node.children[0] ), execute( node.children[1] ));
-case OP_SIN:
+}
+break;
+
+case NODE_FUNC:
+switch( node.value )
+{
+case FUNC_SIN:
 ret = Math.sin( execute( node.children[0] ) );
 break;
-case OP_COS:
+case FUNC_COS:
 ret = Math.cos( execute( node.children[0] ) );
+break;
+case FUNC_TAN:
+ret = Math.tan( execute( node.children[0] ) );
+break;
+case FUNC_SINH:
+ret = Math.sinh( execute( node.children[0] ) );
+break;
+case FUNC_COSH:
+ret = Math.cosh( execute( node.children[0] ) );
+break;
+case FUNC_TANH:
+ret = Math.tanh( execute( node.children[0] ) );
+break;
+case FUNC_ASIN:
+ret = Math.asin( execute( node.children[0] ) );
+break;
+case FUNC_ACOS:
+ret = Math.acos( execute( node.children[0] ) );
+break;
+case FUNC_ATAN:
+ret = Math.atan( execute( node.children[0] ) );
+break;
+case FUNC_ASINH:
+ret = Math.asin( execute( node.children[0] ) );
+break;
+case FUNC_ACOSH:
+ret = Math.acosh( execute( node.children[0] ) );
+break;
+case FUNC_ATANH:
+ret = Math.atanh( execute( node.children[0] ) );
+break;
+case FUNC_CSC:
+ret = 1 / Math.sin( execute( node.children[0] ) );
+break;
+case FUNC_SEC:
+ret = 1 / Math.cos( execute( node.children[0] ) );
+break;
+case FUNC_COT:
+ret = 1 / Math.tan( execute( node.children[0] ) );
+break;
+case FUNC_CSCH:
+ret = 1 / Math.sin( execute( node.children[0] ) );
+break;
+case FUNC_SECH:
+ret = 1 / Math.cos( execute( node.children[0] ) );
+break;
+case FUNC_COTH:
+ret = 1 / Math.tan( execute( node.children[0] ) );
+break;
+case FUNC_ACSC:
+ret = Math.asin(1 / execute( node.children[0] ) );
+break;
+case FUNC_ASEC:
+ret = Math.acos(1 / execute( node.children[0] ) );
+break;
+case FUNC_ACOT:
+ret = Math.atan(1 / execute( node.children[0] )) ;
+break;
+case FUNC_ACSCH:
+var func_executed = execute( node.children[0] );
+ret = Math.log(1/ func_executed + Maths.qrt(1/Math.pow( func_executed ,2) + 1));
+break;
+case FUNC_ASECH:
+var func_executed = execute( node.children[0] );
+ret = Math.log(Math.sqrt(1/Math.pow(func_executed, 2) - 1) + 1/ func_executed);
+break;
+case FUNC_ACOTH:
+var func_executed = execute( node.children[0] );
+ret = (Math.log((func_executed+ 1) / func_executed) + Math.log(func_executed/(func_executed-1))) / 2;
+break;
+case FUNC_SQRT:
+ret = Math.sqrt( execute( node.children[0] ) );
+break;
+case FUNC_EXP:
+ret = Math.exp( execute( node.children[0] ) );
+break;
+case FUNC_NLOG:
+ret = Math.log( execute( node.children[0] ) );
+break;
+case FUNC_BLOG:
+ret = Math.log( execute( node.children[1] ) ) / Math.log( execute( node.children[0] ) );
 break;
 }
 break;
 
 case NODE_VAR:
-ret = "TESTE";
+ret = "x";
 break;
 
 case NODE_CONST:
@@ -128,7 +241,7 @@ function __lex( info )
         start = pos;
 
         if( info.src.length <= start )
-            return 21;
+            return 47;
 
         do
         {
@@ -144,12 +257,15 @@ switch( state )
         else if( info.src.charCodeAt( pos ) == 45 ) state = 6;
         else if( info.src.charCodeAt( pos ) == 47 ) state = 7;
         else if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) ) state = 8;
-        else if( ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 98 ) || ( info.src.charCodeAt( pos ) >= 100 && info.src.charCodeAt( pos ) <= 107 ) || ( info.src.charCodeAt( pos ) >= 109 && info.src.charCodeAt( pos ) <= 114 ) || ( info.src.charCodeAt( pos ) >= 116 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
+        else if( ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || info.src.charCodeAt( pos ) == 98 || info.src.charCodeAt( pos ) == 100 || ( info.src.charCodeAt( pos ) >= 102 && info.src.charCodeAt( pos ) <= 107 ) || ( info.src.charCodeAt( pos ) >= 109 && info.src.charCodeAt( pos ) <= 114 ) || ( info.src.charCodeAt( pos ) >= 117 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
         else if( info.src.charCodeAt( pos ) == 94 ) state = 10;
-        else if( info.src.charCodeAt( pos ) == 46 ) state = 15;
-        else if( info.src.charCodeAt( pos ) == 99 ) state = 19;
-        else if( info.src.charCodeAt( pos ) == 108 ) state = 20;
-        else if( info.src.charCodeAt( pos ) == 115 ) state = 21;
+        else if( info.src.charCodeAt( pos ) == 46 ) state = 39;
+        else if( info.src.charCodeAt( pos ) == 97 ) state = 40;
+        else if( info.src.charCodeAt( pos ) == 99 ) state = 42;
+        else if( info.src.charCodeAt( pos ) == 101 ) state = 44;
+        else if( info.src.charCodeAt( pos ) == 108 ) state = 46;
+        else if( info.src.charCodeAt( pos ) == 115 ) state = 48;
+        else if( info.src.charCodeAt( pos ) == 116 ) state = 50;
         else state = -1;
         break;
 
@@ -161,13 +277,13 @@ switch( state )
 
     case 2:
         state = -1;
-        match = 10;
+        match = 34;
         match_pos = pos;
         break;
 
     case 3:
         state = -1;
-        match = 11;
+        match = 35;
         match_pos = pos;
         break;
 
@@ -199,14 +315,13 @@ switch( state )
         if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) ) state = 8;
         else if( info.src.charCodeAt( pos ) == 46 ) state = 11;
         else state = -1;
-        match = 13;
+        match = 37;
         match_pos = pos;
         break;
 
     case 9:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else state = -1;
-        match = 12;
+        state = -1;
+        match = 36;
         match_pos = pos;
         break;
 
@@ -219,82 +334,323 @@ switch( state )
     case 11:
         if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) ) state = 11;
         else state = -1;
-        match = 14;
+        match = 38;
         match_pos = pos;
         break;
 
     case 12:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 26;
         else state = -1;
         match = 8;
         match_pos = pos;
         break;
 
     case 13:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 27;
         else state = -1;
-        match = 9;
+        match = 27;
         match_pos = pos;
         break;
 
     case 14:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 28;
+        else state = -1;
+        match = 23;
+        match_pos = pos;
+        break;
+
+    case 15:
+        state = -1;
+        match = 32;
+        match_pos = pos;
+        break;
+
+    case 16:
+        state = -1;
+        match = 33;
+        match_pos = pos;
+        break;
+
+    case 17:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 29;
+        else state = -1;
+        match = 19;
+        match_pos = pos;
+        break;
+
+    case 18:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 30;
         else state = -1;
         match = 7;
         match_pos = pos;
         break;
 
-    case 15:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) ) state = 11;
-        else state = -1;
-        break;
-
-    case 16:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 114 ) || ( info.src.charCodeAt( pos ) >= 116 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 115 ) state = 12;
-        else state = -1;
-        match = 12;
-        match_pos = pos;
-        break;
-
-    case 17:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 102 ) || ( info.src.charCodeAt( pos ) >= 104 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 103 ) state = 13;
-        else state = -1;
-        match = 12;
-        match_pos = pos;
-        break;
-
-    case 18:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 109 ) || ( info.src.charCodeAt( pos ) >= 111 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 110 ) state = 14;
-        else state = -1;
-        match = 12;
-        match_pos = pos;
-        break;
-
     case 19:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 110 ) || ( info.src.charCodeAt( pos ) >= 112 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 111 ) state = 16;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 32;
         else state = -1;
-        match = 12;
+        match = 9;
         match_pos = pos;
         break;
 
     case 20:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 110 ) || ( info.src.charCodeAt( pos ) >= 112 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 111 ) state = 17;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 33;
         else state = -1;
-        match = 12;
+        match = 14;
         match_pos = pos;
         break;
 
     case 21:
-        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) || ( info.src.charCodeAt( pos ) >= 65 && info.src.charCodeAt( pos ) <= 90 ) || info.src.charCodeAt( pos ) == 95 || ( info.src.charCodeAt( pos ) >= 97 && info.src.charCodeAt( pos ) <= 104 ) || ( info.src.charCodeAt( pos ) >= 106 && info.src.charCodeAt( pos ) <= 122 ) ) state = 9;
-        else if( info.src.charCodeAt( pos ) == 105 ) state = 18;
+        if( info.src.charCodeAt( pos ) == 104 ) state = 34;
         else state = -1;
+        match = 28;
+        match_pos = pos;
+        break;
+
+    case 22:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 35;
+        else state = -1;
+        match = 24;
+        match_pos = pos;
+        break;
+
+    case 23:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 36;
+        else state = -1;
+        match = 20;
+        match_pos = pos;
+        break;
+
+    case 24:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 37;
+        else state = -1;
+        match = 13;
+        match_pos = pos;
+        break;
+
+    case 25:
+        if( info.src.charCodeAt( pos ) == 104 ) state = 38;
+        else state = -1;
+        match = 15;
+        match_pos = pos;
+        break;
+
+    case 26:
+        state = -1;
+        match = 11;
+        match_pos = pos;
+        break;
+
+    case 27:
+        state = -1;
+        match = 29;
+        match_pos = pos;
+        break;
+
+    case 28:
+        state = -1;
+        match = 25;
+        match_pos = pos;
+        break;
+
+    case 29:
+        state = -1;
+        match = 21;
+        match_pos = pos;
+        break;
+
+    case 30:
+        state = -1;
+        match = 10;
+        match_pos = pos;
+        break;
+
+    case 31:
+        state = -1;
+        match = 31;
+        match_pos = pos;
+        break;
+
+    case 32:
+        state = -1;
         match = 12;
         match_pos = pos;
+        break;
+
+    case 33:
+        state = -1;
+        match = 17;
+        match_pos = pos;
+        break;
+
+    case 34:
+        state = -1;
+        match = 30;
+        match_pos = pos;
+        break;
+
+    case 35:
+        state = -1;
+        match = 26;
+        match_pos = pos;
+        break;
+
+    case 36:
+        state = -1;
+        match = 22;
+        match_pos = pos;
+        break;
+
+    case 37:
+        state = -1;
+        match = 16;
+        match_pos = pos;
+        break;
+
+    case 38:
+        state = -1;
+        match = 18;
+        match_pos = pos;
+        break;
+
+    case 39:
+        if( ( info.src.charCodeAt( pos ) >= 48 && info.src.charCodeAt( pos ) <= 57 ) ) state = 11;
+        else state = -1;
+        break;
+
+    case 40:
+        if( info.src.charCodeAt( pos ) == 99 ) state = 41;
+        else if( info.src.charCodeAt( pos ) == 115 ) state = 43;
+        else if( info.src.charCodeAt( pos ) == 116 ) state = 45;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 41:
+        if( info.src.charCodeAt( pos ) == 111 ) state = 57;
+        else if( info.src.charCodeAt( pos ) == 115 ) state = 58;
+        else state = -1;
+        break;
+
+    case 42:
+        if( info.src.charCodeAt( pos ) == 111 ) state = 47;
+        else if( info.src.charCodeAt( pos ) == 115 ) state = 49;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 43:
+        if( info.src.charCodeAt( pos ) == 101 ) state = 59;
+        else if( info.src.charCodeAt( pos ) == 105 ) state = 60;
+        else state = -1;
+        break;
+
+    case 44:
+        if( info.src.charCodeAt( pos ) == 120 ) state = 51;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 45:
+        if( info.src.charCodeAt( pos ) == 97 ) state = 61;
+        else state = -1;
+        break;
+
+    case 46:
+        if( info.src.charCodeAt( pos ) == 111 ) state = 52;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 47:
+        if( info.src.charCodeAt( pos ) == 115 ) state = 12;
+        else if( info.src.charCodeAt( pos ) == 116 ) state = 13;
+        else state = -1;
+        break;
+
+    case 48:
+        if( info.src.charCodeAt( pos ) == 101 ) state = 53;
+        else if( info.src.charCodeAt( pos ) == 105 ) state = 54;
+        else if( info.src.charCodeAt( pos ) == 113 ) state = 55;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 49:
+        if( info.src.charCodeAt( pos ) == 99 ) state = 14;
+        else state = -1;
+        break;
+
+    case 50:
+        if( info.src.charCodeAt( pos ) == 97 ) state = 56;
+        else state = -1;
+        match = 36;
+        match_pos = pos;
+        break;
+
+    case 51:
+        if( info.src.charCodeAt( pos ) == 112 ) state = 15;
+        else state = -1;
+        break;
+
+    case 52:
+        if( info.src.charCodeAt( pos ) == 103 ) state = 16;
+        else state = -1;
+        break;
+
+    case 53:
+        if( info.src.charCodeAt( pos ) == 99 ) state = 17;
+        else state = -1;
+        break;
+
+    case 54:
+        if( info.src.charCodeAt( pos ) == 110 ) state = 18;
+        else state = -1;
+        break;
+
+    case 55:
+        if( info.src.charCodeAt( pos ) == 114 ) state = 62;
+        else state = -1;
+        break;
+
+    case 56:
+        if( info.src.charCodeAt( pos ) == 110 ) state = 19;
+        else state = -1;
+        break;
+
+    case 57:
+        if( info.src.charCodeAt( pos ) == 115 ) state = 20;
+        else if( info.src.charCodeAt( pos ) == 116 ) state = 21;
+        else state = -1;
+        break;
+
+    case 58:
+        if( info.src.charCodeAt( pos ) == 99 ) state = 22;
+        else state = -1;
+        break;
+
+    case 59:
+        if( info.src.charCodeAt( pos ) == 99 ) state = 23;
+        else state = -1;
+        break;
+
+    case 60:
+        if( info.src.charCodeAt( pos ) == 110 ) state = 24;
+        else state = -1;
+        break;
+
+    case 61:
+        if( info.src.charCodeAt( pos ) == 110 ) state = 25;
+        else state = -1;
+        break;
+
+    case 62:
+        if( info.src.charCodeAt( pos ) == 116 ) state = 31;
+        else state = -1;
         break;
 
 }
@@ -315,13 +671,13 @@ switch( state )
         
 switch( match )
 {
-    case 13:
+    case 37:
         {
          info.att = parseInt( info.att );
         }
         break;
 
-    case 14:
+    case 38:
         {
          info.att = parseFloat( info.att );
         }
@@ -356,104 +712,243 @@ function __parse( src, err_off, err_la )
 /* Pop-Table */
 var pop_tab = new Array(
     new Array( 0/* p' */, 1 ),
-    new Array( 16/* p */, 1 ),
-    new Array( 15/* e */, 3 ),
-    new Array( 15/* e */, 3 ),
-    new Array( 15/* e */, 1 ),
-    new Array( 17/* MulDivExp */, 3 ),
-    new Array( 17/* MulDivExp */, 2 ),
-    new Array( 17/* MulDivExp */, 2 ),
-    new Array( 17/* MulDivExp */, 3 ),
-    new Array( 17/* MulDivExp */, 1 ),
-    new Array( 18/* PowExp */, 3 ),
-    new Array( 18/* PowExp */, 1 ),
-    new Array( 19/* NegExp */, 2 ),
-    new Array( 19/* NegExp */, 1 ),
-    new Array( 20/* Value */, 1 ),
-    new Array( 20/* Value */, 1 ),
-    new Array( 20/* Value */, 1 ),
-    new Array( 20/* Value */, 3 ),
-    new Array( 20/* Value */, 4 ),
-    new Array( 20/* Value */, 4 ),
-    new Array( 20/* Value */, 4 )
+    new Array( 40/* p */, 1 ),
+    new Array( 39/* e */, 3 ),
+    new Array( 39/* e */, 3 ),
+    new Array( 39/* e */, 1 ),
+    new Array( 41/* MulDivExp */, 3 ),
+    new Array( 41/* MulDivExp */, 3 ),
+    new Array( 41/* MulDivExp */, 1 ),
+    new Array( 41/* MulDivExp */, 2 ),
+    new Array( 41/* MulDivExp */, 2 ),
+    new Array( 42/* PowExp */, 3 ),
+    new Array( 42/* PowExp */, 1 ),
+    new Array( 45/* NegExp */, 2 ),
+    new Array( 45/* NegExp */, 1 ),
+    new Array( 43/* Value */, 1 ),
+    new Array( 43/* Value */, 1 ),
+    new Array( 43/* Value */, 1 ),
+    new Array( 46/* NumericValue */, 1 ),
+    new Array( 46/* NumericValue */, 1 ),
+    new Array( 44/* ParenExp */, 3 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 4 ),
+    new Array( 44/* ParenExp */, 5 ),
+    new Array( 44/* ParenExp */, 5 ),
+    new Array( 44/* ParenExp */, 5 )
 );
 
 /* Action-Table */
 var act_tab = new Array(
-    /* State 0 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 1 */ new Array( 21/* "$" */,0 ),
-    /* State 2 */ new Array( 2/* "+" */,15 , 3/* "-" */,16 , 21/* "$" */,-1 ),
-    /* State 3 */ new Array( 5/* "/" */,17 , 4/* "*" */,18 , 21/* "$" */,-4 , 3/* "-" */,-4 , 2/* "+" */,-4 , 11/* ")" */,-4 ),
-    /* State 4 */ new Array( 12/* "IDENTIFIER" */,19 , 21/* "$" */,-14 , 3/* "-" */,-14 , 2/* "+" */,-14 , 4/* "*" */,-14 , 5/* "/" */,-14 , 6/* "^" */,-14 , 11/* ")" */,-14 ),
-    /* State 5 */ new Array( 12/* "IDENTIFIER" */,20 , 21/* "$" */,-15 , 3/* "-" */,-15 , 2/* "+" */,-15 , 4/* "*" */,-15 , 5/* "/" */,-15 , 6/* "^" */,-15 , 11/* ")" */,-15 ),
-    /* State 6 */ new Array( 6/* "^" */,21 , 21/* "$" */,-9 , 3/* "-" */,-9 , 2/* "+" */,-9 , 4/* "*" */,-9 , 5/* "/" */,-9 , 11/* ")" */,-9 ),
-    /* State 7 */ new Array( 21/* "$" */,-11 , 3/* "-" */,-11 , 2/* "+" */,-11 , 4/* "*" */,-11 , 5/* "/" */,-11 , 6/* "^" */,-11 , 11/* ")" */,-11 ),
-    /* State 8 */ new Array( 13/* "INT" */,23 , 14/* "FLOAT" */,24 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 9 */ new Array( 21/* "$" */,-13 , 3/* "-" */,-13 , 2/* "+" */,-13 , 4/* "*" */,-13 , 5/* "/" */,-13 , 6/* "^" */,-13 , 11/* ")" */,-13 ),
-    /* State 10 */ new Array( 21/* "$" */,-16 , 3/* "-" */,-16 , 2/* "+" */,-16 , 4/* "*" */,-16 , 5/* "/" */,-16 , 6/* "^" */,-16 , 11/* ")" */,-16 ),
-    /* State 11 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 12 */ new Array( 10/* "(" */,26 ),
-    /* State 13 */ new Array( 10/* "(" */,27 ),
-    /* State 14 */ new Array( 10/* "(" */,28 ),
-    /* State 15 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 16 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 17 */ new Array( 3/* "-" */,8 , 13/* "INT" */,23 , 14/* "FLOAT" */,24 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 18 */ new Array( 3/* "-" */,8 , 13/* "INT" */,23 , 14/* "FLOAT" */,24 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 19 */ new Array( 21/* "$" */,-6 , 3/* "-" */,-6 , 2/* "+" */,-6 , 4/* "*" */,-6 , 5/* "/" */,-6 , 11/* ")" */,-6 ),
-    /* State 20 */ new Array( 21/* "$" */,-7 , 3/* "-" */,-7 , 2/* "+" */,-7 , 4/* "*" */,-7 , 5/* "/" */,-7 , 11/* ")" */,-7 ),
-    /* State 21 */ new Array( 3/* "-" */,8 , 13/* "INT" */,23 , 14/* "FLOAT" */,24 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 22 */ new Array( 21/* "$" */,-12 , 3/* "-" */,-12 , 2/* "+" */,-12 , 4/* "*" */,-12 , 5/* "/" */,-12 , 6/* "^" */,-12 , 11/* ")" */,-12 ),
-    /* State 23 */ new Array( 21/* "$" */,-14 , 3/* "-" */,-14 , 2/* "+" */,-14 , 4/* "*" */,-14 , 5/* "/" */,-14 , 6/* "^" */,-14 , 11/* ")" */,-14 ),
-    /* State 24 */ new Array( 21/* "$" */,-15 , 3/* "-" */,-15 , 2/* "+" */,-15 , 4/* "*" */,-15 , 5/* "/" */,-15 , 6/* "^" */,-15 , 11/* ")" */,-15 ),
-    /* State 25 */ new Array( 2/* "+" */,15 , 3/* "-" */,16 , 11/* ")" */,34 ),
-    /* State 26 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 27 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 28 */ new Array( 13/* "INT" */,4 , 14/* "FLOAT" */,5 , 3/* "-" */,8 , 12/* "IDENTIFIER" */,10 , 10/* "(" */,11 , 7/* "sin" */,12 , 8/* "cos" */,13 , 9/* "log" */,14 ),
-    /* State 29 */ new Array( 5/* "/" */,17 , 4/* "*" */,18 , 21/* "$" */,-3 , 3/* "-" */,-3 , 2/* "+" */,-3 , 11/* ")" */,-3 ),
-    /* State 30 */ new Array( 5/* "/" */,17 , 4/* "*" */,18 , 21/* "$" */,-2 , 3/* "-" */,-2 , 2/* "+" */,-2 , 11/* ")" */,-2 ),
-    /* State 31 */ new Array( 6/* "^" */,21 , 21/* "$" */,-8 , 3/* "-" */,-8 , 2/* "+" */,-8 , 4/* "*" */,-8 , 5/* "/" */,-8 , 11/* ")" */,-8 ),
-    /* State 32 */ new Array( 6/* "^" */,21 , 21/* "$" */,-5 , 3/* "-" */,-5 , 2/* "+" */,-5 , 4/* "*" */,-5 , 5/* "/" */,-5 , 11/* ")" */,-5 ),
-    /* State 33 */ new Array( 21/* "$" */,-10 , 3/* "-" */,-10 , 2/* "+" */,-10 , 4/* "*" */,-10 , 5/* "/" */,-10 , 6/* "^" */,-10 , 11/* ")" */,-10 ),
-    /* State 34 */ new Array( 21/* "$" */,-17 , 3/* "-" */,-17 , 2/* "+" */,-17 , 4/* "*" */,-17 , 5/* "/" */,-17 , 6/* "^" */,-17 , 11/* ")" */,-17 ),
-    /* State 35 */ new Array( 2/* "+" */,15 , 3/* "-" */,16 , 11/* ")" */,38 ),
-    /* State 36 */ new Array( 2/* "+" */,15 , 3/* "-" */,16 , 11/* ")" */,39 ),
-    /* State 37 */ new Array( 2/* "+" */,15 , 3/* "-" */,16 , 11/* ")" */,40 ),
-    /* State 38 */ new Array( 21/* "$" */,-18 , 3/* "-" */,-18 , 2/* "+" */,-18 , 4/* "*" */,-18 , 5/* "/" */,-18 , 6/* "^" */,-18 , 11/* ")" */,-18 ),
-    /* State 39 */ new Array( 21/* "$" */,-19 , 3/* "-" */,-19 , 2/* "+" */,-19 , 4/* "*" */,-19 , 5/* "/" */,-19 , 6/* "^" */,-19 , 11/* ")" */,-19 ),
-    /* State 40 */ new Array( 21/* "$" */,-20 , 3/* "-" */,-20 , 2/* "+" */,-20 , 4/* "*" */,-20 , 5/* "/" */,-20 , 6/* "^" */,-20 , 11/* ")" */,-20 )
+    /* State 0 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 1 */ new Array( 47/* "$" */,0 ),
+    /* State 2 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 47/* "$" */,-1 ),
+    /* State 3 */ new Array( 5/* "/" */,43 , 4/* "*" */,44 , 47/* "$" */,-4 , 3/* "-" */,-4 , 2/* "+" */,-4 , 35/* ")" */,-4 ),
+    /* State 4 */ new Array( 6/* "^" */,45 , 47/* "$" */,-7 , 3/* "-" */,-7 , 2/* "+" */,-7 , 4/* "*" */,-7 , 5/* "/" */,-7 , 35/* ")" */,-7 ),
+    /* State 5 */ new Array( 36/* "IDENTIFIER" */,46 , 47/* "$" */,-13 , 3/* "-" */,-13 , 2/* "+" */,-13 , 4/* "*" */,-13 , 5/* "/" */,-13 , 6/* "^" */,-13 , 35/* ")" */,-13 ),
+    /* State 6 */ new Array( 36/* "IDENTIFIER" */,9 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 47/* "$" */,-16 , 3/* "-" */,-16 , 2/* "+" */,-16 , 4/* "*" */,-16 , 5/* "/" */,-16 , 6/* "^" */,-16 , 35/* ")" */,-16 ),
+    /* State 7 */ new Array( 47/* "$" */,-11 , 3/* "-" */,-11 , 2/* "+" */,-11 , 4/* "*" */,-11 , 5/* "/" */,-11 , 6/* "^" */,-11 , 35/* ")" */,-11 ),
+    /* State 8 */ new Array( 36/* "IDENTIFIER" */,-14 , 47/* "$" */,-14 , 3/* "-" */,-14 , 2/* "+" */,-14 , 4/* "*" */,-14 , 5/* "/" */,-14 , 6/* "^" */,-14 , 35/* ")" */,-14 ),
+    /* State 9 */ new Array( 36/* "IDENTIFIER" */,-15 , 47/* "$" */,-15 , 3/* "-" */,-15 , 2/* "+" */,-15 , 4/* "*" */,-15 , 5/* "/" */,-15 , 6/* "^" */,-15 , 35/* ")" */,-15 ),
+    /* State 10 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 11 */ new Array( 34/* "(" */,50 ),
+    /* State 12 */ new Array( 34/* "(" */,51 ),
+    /* State 13 */ new Array( 34/* "(" */,52 ),
+    /* State 14 */ new Array( 34/* "(" */,53 ),
+    /* State 15 */ new Array( 34/* "(" */,54 ),
+    /* State 16 */ new Array( 34/* "(" */,55 ),
+    /* State 17 */ new Array( 34/* "(" */,56 ),
+    /* State 18 */ new Array( 34/* "(" */,57 ),
+    /* State 19 */ new Array( 34/* "(" */,58 ),
+    /* State 20 */ new Array( 34/* "(" */,59 ),
+    /* State 21 */ new Array( 34/* "(" */,60 ),
+    /* State 22 */ new Array( 34/* "(" */,61 ),
+    /* State 23 */ new Array( 34/* "(" */,62 ),
+    /* State 24 */ new Array( 34/* "(" */,63 ),
+    /* State 25 */ new Array( 34/* "(" */,64 ),
+    /* State 26 */ new Array( 34/* "(" */,65 ),
+    /* State 27 */ new Array( 34/* "(" */,66 ),
+    /* State 28 */ new Array( 34/* "(" */,67 ),
+    /* State 29 */ new Array( 34/* "(" */,68 ),
+    /* State 30 */ new Array( 34/* "(" */,69 ),
+    /* State 31 */ new Array( 34/* "(" */,70 ),
+    /* State 32 */ new Array( 34/* "(" */,71 ),
+    /* State 33 */ new Array( 34/* "(" */,72 ),
+    /* State 34 */ new Array( 34/* "(" */,73 ),
+    /* State 35 */ new Array( 34/* "(" */,74 ),
+    /* State 36 */ new Array( 34/* "(" */,75 ),
+    /* State 37 */ new Array( 36/* "IDENTIFIER" */,76 , 38/* "FLOAT" */,77 , 37/* "INT" */,78 , 34/* "(" */,79 ),
+    /* State 38 */ new Array( 36/* "IDENTIFIER" */,9 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 ),
+    /* State 39 */ new Array( 36/* "IDENTIFIER" */,-17 , 47/* "$" */,-17 , 3/* "-" */,-17 , 2/* "+" */,-17 , 4/* "*" */,-17 , 5/* "/" */,-17 , 6/* "^" */,-17 , 35/* ")" */,-17 ),
+    /* State 40 */ new Array( 36/* "IDENTIFIER" */,-18 , 47/* "$" */,-18 , 3/* "-" */,-18 , 2/* "+" */,-18 , 4/* "*" */,-18 , 5/* "/" */,-18 , 6/* "^" */,-18 , 35/* ")" */,-18 ),
+    /* State 41 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 42 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 43 */ new Array( 3/* "-" */,38 , 36/* "IDENTIFIER" */,9 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 ),
+    /* State 44 */ new Array( 3/* "-" */,38 , 36/* "IDENTIFIER" */,9 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 ),
+    /* State 45 */ new Array( 3/* "-" */,38 , 36/* "IDENTIFIER" */,9 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 ),
+    /* State 46 */ new Array( 47/* "$" */,-8 , 3/* "-" */,-8 , 2/* "+" */,-8 , 4/* "*" */,-8 , 5/* "/" */,-8 , 35/* ")" */,-8 ),
+    /* State 47 */ new Array( 47/* "$" */,-9 , 3/* "-" */,-9 , 2/* "+" */,-9 , 4/* "*" */,-9 , 5/* "/" */,-9 , 35/* ")" */,-9 ),
+    /* State 48 */ new Array( 47/* "$" */,-16 , 3/* "-" */,-16 , 2/* "+" */,-16 , 4/* "*" */,-16 , 5/* "/" */,-16 , 35/* ")" */,-16 , 6/* "^" */,-16 ),
+    /* State 49 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,87 ),
+    /* State 50 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 51 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 52 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 53 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 54 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 55 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 56 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 57 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 58 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 59 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 60 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 61 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 62 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 63 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 64 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 65 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 66 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 67 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 68 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 69 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 70 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 71 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 72 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 73 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 74 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 75 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 76 */ new Array( 34/* "(" */,114 ),
+    /* State 77 */ new Array( 34/* "(" */,115 ),
+    /* State 78 */ new Array( 34/* "(" */,116 ),
+    /* State 79 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 80 */ new Array( 47/* "$" */,-12 , 3/* "-" */,-12 , 2/* "+" */,-12 , 4/* "*" */,-12 , 5/* "/" */,-12 , 6/* "^" */,-12 , 35/* ")" */,-12 ),
+    /* State 81 */ new Array( 5/* "/" */,43 , 4/* "*" */,44 , 47/* "$" */,-3 , 3/* "-" */,-3 , 2/* "+" */,-3 , 35/* ")" */,-3 ),
+    /* State 82 */ new Array( 5/* "/" */,43 , 4/* "*" */,44 , 47/* "$" */,-2 , 3/* "-" */,-2 , 2/* "+" */,-2 , 35/* ")" */,-2 ),
+    /* State 83 */ new Array( 6/* "^" */,45 , 47/* "$" */,-6 , 3/* "-" */,-6 , 2/* "+" */,-6 , 4/* "*" */,-6 , 5/* "/" */,-6 , 35/* ")" */,-6 ),
+    /* State 84 */ new Array( 47/* "$" */,-13 , 3/* "-" */,-13 , 2/* "+" */,-13 , 4/* "*" */,-13 , 5/* "/" */,-13 , 35/* ")" */,-13 , 6/* "^" */,-13 ),
+    /* State 85 */ new Array( 6/* "^" */,45 , 47/* "$" */,-5 , 3/* "-" */,-5 , 2/* "+" */,-5 , 4/* "*" */,-5 , 5/* "/" */,-5 , 35/* ")" */,-5 ),
+    /* State 86 */ new Array( 47/* "$" */,-10 , 3/* "-" */,-10 , 2/* "+" */,-10 , 4/* "*" */,-10 , 5/* "/" */,-10 , 6/* "^" */,-10 , 35/* ")" */,-10 ),
+    /* State 87 */ new Array( 36/* "IDENTIFIER" */,-19 , 37/* "INT" */,-19 , 38/* "FLOAT" */,-19 , 34/* "(" */,-19 , 7/* "sin" */,-19 , 10/* "sinh" */,-19 , 13/* "asin" */,-19 , 16/* "asinh" */,-19 , 8/* "cos" */,-19 , 11/* "cosh" */,-19 , 14/* "acos" */,-19 , 17/* "acosh" */,-19 , 9/* "tan" */,-19 , 12/* "tanh" */,-19 , 15/* "atan" */,-19 , 18/* "atanh" */,-19 , 19/* "sec" */,-19 , 21/* "sech" */,-19 , 20/* "asec" */,-19 , 22/* "asech" */,-19 , 23/* "csc" */,-19 , 25/* "csch" */,-19 , 24/* "acsc" */,-19 , 26/* "acsch" */,-19 , 27/* "cot" */,-19 , 29/* "coth" */,-19 , 28/* "acot" */,-19 , 30/* "acoth" */,-19 , 31/* "sqrt" */,-19 , 32/* "exp" */,-19 , 33/* "log" */,-19 , 47/* "$" */,-19 , 3/* "-" */,-19 , 2/* "+" */,-19 , 4/* "*" */,-19 , 5/* "/" */,-19 , 6/* "^" */,-19 , 35/* ")" */,-19 ),
+    /* State 88 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,118 ),
+    /* State 89 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,119 ),
+    /* State 90 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,120 ),
+    /* State 91 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,121 ),
+    /* State 92 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,122 ),
+    /* State 93 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,123 ),
+    /* State 94 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,124 ),
+    /* State 95 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,125 ),
+    /* State 96 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,126 ),
+    /* State 97 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,127 ),
+    /* State 98 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,128 ),
+    /* State 99 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,129 ),
+    /* State 100 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,130 ),
+    /* State 101 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,131 ),
+    /* State 102 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,132 ),
+    /* State 103 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,133 ),
+    /* State 104 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,134 ),
+    /* State 105 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,135 ),
+    /* State 106 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,136 ),
+    /* State 107 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,137 ),
+    /* State 108 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,138 ),
+    /* State 109 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,139 ),
+    /* State 110 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,140 ),
+    /* State 111 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,141 ),
+    /* State 112 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,142 ),
+    /* State 113 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,143 ),
+    /* State 114 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 115 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 116 */ new Array( 36/* "IDENTIFIER" */,9 , 34/* "(" */,10 , 7/* "sin" */,11 , 10/* "sinh" */,12 , 13/* "asin" */,13 , 16/* "asinh" */,14 , 8/* "cos" */,15 , 11/* "cosh" */,16 , 14/* "acos" */,17 , 17/* "acosh" */,18 , 9/* "tan" */,19 , 12/* "tanh" */,20 , 15/* "atan" */,21 , 18/* "atanh" */,22 , 19/* "sec" */,23 , 21/* "sech" */,24 , 20/* "asec" */,25 , 22/* "asech" */,26 , 23/* "csc" */,27 , 25/* "csch" */,28 , 24/* "acsc" */,29 , 26/* "acsch" */,30 , 27/* "cot" */,31 , 29/* "coth" */,32 , 28/* "acot" */,33 , 30/* "acoth" */,34 , 31/* "sqrt" */,35 , 32/* "exp" */,36 , 33/* "log" */,37 , 3/* "-" */,38 , 37/* "INT" */,39 , 38/* "FLOAT" */,40 ),
+    /* State 117 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,147 ),
+    /* State 118 */ new Array( 36/* "IDENTIFIER" */,-20 , 37/* "INT" */,-20 , 38/* "FLOAT" */,-20 , 34/* "(" */,-20 , 7/* "sin" */,-20 , 10/* "sinh" */,-20 , 13/* "asin" */,-20 , 16/* "asinh" */,-20 , 8/* "cos" */,-20 , 11/* "cosh" */,-20 , 14/* "acos" */,-20 , 17/* "acosh" */,-20 , 9/* "tan" */,-20 , 12/* "tanh" */,-20 , 15/* "atan" */,-20 , 18/* "atanh" */,-20 , 19/* "sec" */,-20 , 21/* "sech" */,-20 , 20/* "asec" */,-20 , 22/* "asech" */,-20 , 23/* "csc" */,-20 , 25/* "csch" */,-20 , 24/* "acsc" */,-20 , 26/* "acsch" */,-20 , 27/* "cot" */,-20 , 29/* "coth" */,-20 , 28/* "acot" */,-20 , 30/* "acoth" */,-20 , 31/* "sqrt" */,-20 , 32/* "exp" */,-20 , 33/* "log" */,-20 , 47/* "$" */,-20 , 3/* "-" */,-20 , 2/* "+" */,-20 , 4/* "*" */,-20 , 5/* "/" */,-20 , 6/* "^" */,-20 , 35/* ")" */,-20 ),
+    /* State 119 */ new Array( 36/* "IDENTIFIER" */,-21 , 37/* "INT" */,-21 , 38/* "FLOAT" */,-21 , 34/* "(" */,-21 , 7/* "sin" */,-21 , 10/* "sinh" */,-21 , 13/* "asin" */,-21 , 16/* "asinh" */,-21 , 8/* "cos" */,-21 , 11/* "cosh" */,-21 , 14/* "acos" */,-21 , 17/* "acosh" */,-21 , 9/* "tan" */,-21 , 12/* "tanh" */,-21 , 15/* "atan" */,-21 , 18/* "atanh" */,-21 , 19/* "sec" */,-21 , 21/* "sech" */,-21 , 20/* "asec" */,-21 , 22/* "asech" */,-21 , 23/* "csc" */,-21 , 25/* "csch" */,-21 , 24/* "acsc" */,-21 , 26/* "acsch" */,-21 , 27/* "cot" */,-21 , 29/* "coth" */,-21 , 28/* "acot" */,-21 , 30/* "acoth" */,-21 , 31/* "sqrt" */,-21 , 32/* "exp" */,-21 , 33/* "log" */,-21 , 47/* "$" */,-21 , 3/* "-" */,-21 , 2/* "+" */,-21 , 4/* "*" */,-21 , 5/* "/" */,-21 , 6/* "^" */,-21 , 35/* ")" */,-21 ),
+    /* State 120 */ new Array( 36/* "IDENTIFIER" */,-22 , 37/* "INT" */,-22 , 38/* "FLOAT" */,-22 , 34/* "(" */,-22 , 7/* "sin" */,-22 , 10/* "sinh" */,-22 , 13/* "asin" */,-22 , 16/* "asinh" */,-22 , 8/* "cos" */,-22 , 11/* "cosh" */,-22 , 14/* "acos" */,-22 , 17/* "acosh" */,-22 , 9/* "tan" */,-22 , 12/* "tanh" */,-22 , 15/* "atan" */,-22 , 18/* "atanh" */,-22 , 19/* "sec" */,-22 , 21/* "sech" */,-22 , 20/* "asec" */,-22 , 22/* "asech" */,-22 , 23/* "csc" */,-22 , 25/* "csch" */,-22 , 24/* "acsc" */,-22 , 26/* "acsch" */,-22 , 27/* "cot" */,-22 , 29/* "coth" */,-22 , 28/* "acot" */,-22 , 30/* "acoth" */,-22 , 31/* "sqrt" */,-22 , 32/* "exp" */,-22 , 33/* "log" */,-22 , 47/* "$" */,-22 , 3/* "-" */,-22 , 2/* "+" */,-22 , 4/* "*" */,-22 , 5/* "/" */,-22 , 6/* "^" */,-22 , 35/* ")" */,-22 ),
+    /* State 121 */ new Array( 36/* "IDENTIFIER" */,-23 , 37/* "INT" */,-23 , 38/* "FLOAT" */,-23 , 34/* "(" */,-23 , 7/* "sin" */,-23 , 10/* "sinh" */,-23 , 13/* "asin" */,-23 , 16/* "asinh" */,-23 , 8/* "cos" */,-23 , 11/* "cosh" */,-23 , 14/* "acos" */,-23 , 17/* "acosh" */,-23 , 9/* "tan" */,-23 , 12/* "tanh" */,-23 , 15/* "atan" */,-23 , 18/* "atanh" */,-23 , 19/* "sec" */,-23 , 21/* "sech" */,-23 , 20/* "asec" */,-23 , 22/* "asech" */,-23 , 23/* "csc" */,-23 , 25/* "csch" */,-23 , 24/* "acsc" */,-23 , 26/* "acsch" */,-23 , 27/* "cot" */,-23 , 29/* "coth" */,-23 , 28/* "acot" */,-23 , 30/* "acoth" */,-23 , 31/* "sqrt" */,-23 , 32/* "exp" */,-23 , 33/* "log" */,-23 , 47/* "$" */,-23 , 3/* "-" */,-23 , 2/* "+" */,-23 , 4/* "*" */,-23 , 5/* "/" */,-23 , 6/* "^" */,-23 , 35/* ")" */,-23 ),
+    /* State 122 */ new Array( 36/* "IDENTIFIER" */,-24 , 37/* "INT" */,-24 , 38/* "FLOAT" */,-24 , 34/* "(" */,-24 , 7/* "sin" */,-24 , 10/* "sinh" */,-24 , 13/* "asin" */,-24 , 16/* "asinh" */,-24 , 8/* "cos" */,-24 , 11/* "cosh" */,-24 , 14/* "acos" */,-24 , 17/* "acosh" */,-24 , 9/* "tan" */,-24 , 12/* "tanh" */,-24 , 15/* "atan" */,-24 , 18/* "atanh" */,-24 , 19/* "sec" */,-24 , 21/* "sech" */,-24 , 20/* "asec" */,-24 , 22/* "asech" */,-24 , 23/* "csc" */,-24 , 25/* "csch" */,-24 , 24/* "acsc" */,-24 , 26/* "acsch" */,-24 , 27/* "cot" */,-24 , 29/* "coth" */,-24 , 28/* "acot" */,-24 , 30/* "acoth" */,-24 , 31/* "sqrt" */,-24 , 32/* "exp" */,-24 , 33/* "log" */,-24 , 47/* "$" */,-24 , 3/* "-" */,-24 , 2/* "+" */,-24 , 4/* "*" */,-24 , 5/* "/" */,-24 , 6/* "^" */,-24 , 35/* ")" */,-24 ),
+    /* State 123 */ new Array( 36/* "IDENTIFIER" */,-25 , 37/* "INT" */,-25 , 38/* "FLOAT" */,-25 , 34/* "(" */,-25 , 7/* "sin" */,-25 , 10/* "sinh" */,-25 , 13/* "asin" */,-25 , 16/* "asinh" */,-25 , 8/* "cos" */,-25 , 11/* "cosh" */,-25 , 14/* "acos" */,-25 , 17/* "acosh" */,-25 , 9/* "tan" */,-25 , 12/* "tanh" */,-25 , 15/* "atan" */,-25 , 18/* "atanh" */,-25 , 19/* "sec" */,-25 , 21/* "sech" */,-25 , 20/* "asec" */,-25 , 22/* "asech" */,-25 , 23/* "csc" */,-25 , 25/* "csch" */,-25 , 24/* "acsc" */,-25 , 26/* "acsch" */,-25 , 27/* "cot" */,-25 , 29/* "coth" */,-25 , 28/* "acot" */,-25 , 30/* "acoth" */,-25 , 31/* "sqrt" */,-25 , 32/* "exp" */,-25 , 33/* "log" */,-25 , 47/* "$" */,-25 , 3/* "-" */,-25 , 2/* "+" */,-25 , 4/* "*" */,-25 , 5/* "/" */,-25 , 6/* "^" */,-25 , 35/* ")" */,-25 ),
+    /* State 124 */ new Array( 36/* "IDENTIFIER" */,-26 , 37/* "INT" */,-26 , 38/* "FLOAT" */,-26 , 34/* "(" */,-26 , 7/* "sin" */,-26 , 10/* "sinh" */,-26 , 13/* "asin" */,-26 , 16/* "asinh" */,-26 , 8/* "cos" */,-26 , 11/* "cosh" */,-26 , 14/* "acos" */,-26 , 17/* "acosh" */,-26 , 9/* "tan" */,-26 , 12/* "tanh" */,-26 , 15/* "atan" */,-26 , 18/* "atanh" */,-26 , 19/* "sec" */,-26 , 21/* "sech" */,-26 , 20/* "asec" */,-26 , 22/* "asech" */,-26 , 23/* "csc" */,-26 , 25/* "csch" */,-26 , 24/* "acsc" */,-26 , 26/* "acsch" */,-26 , 27/* "cot" */,-26 , 29/* "coth" */,-26 , 28/* "acot" */,-26 , 30/* "acoth" */,-26 , 31/* "sqrt" */,-26 , 32/* "exp" */,-26 , 33/* "log" */,-26 , 47/* "$" */,-26 , 3/* "-" */,-26 , 2/* "+" */,-26 , 4/* "*" */,-26 , 5/* "/" */,-26 , 6/* "^" */,-26 , 35/* ")" */,-26 ),
+    /* State 125 */ new Array( 36/* "IDENTIFIER" */,-27 , 37/* "INT" */,-27 , 38/* "FLOAT" */,-27 , 34/* "(" */,-27 , 7/* "sin" */,-27 , 10/* "sinh" */,-27 , 13/* "asin" */,-27 , 16/* "asinh" */,-27 , 8/* "cos" */,-27 , 11/* "cosh" */,-27 , 14/* "acos" */,-27 , 17/* "acosh" */,-27 , 9/* "tan" */,-27 , 12/* "tanh" */,-27 , 15/* "atan" */,-27 , 18/* "atanh" */,-27 , 19/* "sec" */,-27 , 21/* "sech" */,-27 , 20/* "asec" */,-27 , 22/* "asech" */,-27 , 23/* "csc" */,-27 , 25/* "csch" */,-27 , 24/* "acsc" */,-27 , 26/* "acsch" */,-27 , 27/* "cot" */,-27 , 29/* "coth" */,-27 , 28/* "acot" */,-27 , 30/* "acoth" */,-27 , 31/* "sqrt" */,-27 , 32/* "exp" */,-27 , 33/* "log" */,-27 , 47/* "$" */,-27 , 3/* "-" */,-27 , 2/* "+" */,-27 , 4/* "*" */,-27 , 5/* "/" */,-27 , 6/* "^" */,-27 , 35/* ")" */,-27 ),
+    /* State 126 */ new Array( 36/* "IDENTIFIER" */,-28 , 37/* "INT" */,-28 , 38/* "FLOAT" */,-28 , 34/* "(" */,-28 , 7/* "sin" */,-28 , 10/* "sinh" */,-28 , 13/* "asin" */,-28 , 16/* "asinh" */,-28 , 8/* "cos" */,-28 , 11/* "cosh" */,-28 , 14/* "acos" */,-28 , 17/* "acosh" */,-28 , 9/* "tan" */,-28 , 12/* "tanh" */,-28 , 15/* "atan" */,-28 , 18/* "atanh" */,-28 , 19/* "sec" */,-28 , 21/* "sech" */,-28 , 20/* "asec" */,-28 , 22/* "asech" */,-28 , 23/* "csc" */,-28 , 25/* "csch" */,-28 , 24/* "acsc" */,-28 , 26/* "acsch" */,-28 , 27/* "cot" */,-28 , 29/* "coth" */,-28 , 28/* "acot" */,-28 , 30/* "acoth" */,-28 , 31/* "sqrt" */,-28 , 32/* "exp" */,-28 , 33/* "log" */,-28 , 47/* "$" */,-28 , 3/* "-" */,-28 , 2/* "+" */,-28 , 4/* "*" */,-28 , 5/* "/" */,-28 , 6/* "^" */,-28 , 35/* ")" */,-28 ),
+    /* State 127 */ new Array( 36/* "IDENTIFIER" */,-29 , 37/* "INT" */,-29 , 38/* "FLOAT" */,-29 , 34/* "(" */,-29 , 7/* "sin" */,-29 , 10/* "sinh" */,-29 , 13/* "asin" */,-29 , 16/* "asinh" */,-29 , 8/* "cos" */,-29 , 11/* "cosh" */,-29 , 14/* "acos" */,-29 , 17/* "acosh" */,-29 , 9/* "tan" */,-29 , 12/* "tanh" */,-29 , 15/* "atan" */,-29 , 18/* "atanh" */,-29 , 19/* "sec" */,-29 , 21/* "sech" */,-29 , 20/* "asec" */,-29 , 22/* "asech" */,-29 , 23/* "csc" */,-29 , 25/* "csch" */,-29 , 24/* "acsc" */,-29 , 26/* "acsch" */,-29 , 27/* "cot" */,-29 , 29/* "coth" */,-29 , 28/* "acot" */,-29 , 30/* "acoth" */,-29 , 31/* "sqrt" */,-29 , 32/* "exp" */,-29 , 33/* "log" */,-29 , 47/* "$" */,-29 , 3/* "-" */,-29 , 2/* "+" */,-29 , 4/* "*" */,-29 , 5/* "/" */,-29 , 6/* "^" */,-29 , 35/* ")" */,-29 ),
+    /* State 128 */ new Array( 36/* "IDENTIFIER" */,-30 , 37/* "INT" */,-30 , 38/* "FLOAT" */,-30 , 34/* "(" */,-30 , 7/* "sin" */,-30 , 10/* "sinh" */,-30 , 13/* "asin" */,-30 , 16/* "asinh" */,-30 , 8/* "cos" */,-30 , 11/* "cosh" */,-30 , 14/* "acos" */,-30 , 17/* "acosh" */,-30 , 9/* "tan" */,-30 , 12/* "tanh" */,-30 , 15/* "atan" */,-30 , 18/* "atanh" */,-30 , 19/* "sec" */,-30 , 21/* "sech" */,-30 , 20/* "asec" */,-30 , 22/* "asech" */,-30 , 23/* "csc" */,-30 , 25/* "csch" */,-30 , 24/* "acsc" */,-30 , 26/* "acsch" */,-30 , 27/* "cot" */,-30 , 29/* "coth" */,-30 , 28/* "acot" */,-30 , 30/* "acoth" */,-30 , 31/* "sqrt" */,-30 , 32/* "exp" */,-30 , 33/* "log" */,-30 , 47/* "$" */,-30 , 3/* "-" */,-30 , 2/* "+" */,-30 , 4/* "*" */,-30 , 5/* "/" */,-30 , 6/* "^" */,-30 , 35/* ")" */,-30 ),
+    /* State 129 */ new Array( 36/* "IDENTIFIER" */,-31 , 37/* "INT" */,-31 , 38/* "FLOAT" */,-31 , 34/* "(" */,-31 , 7/* "sin" */,-31 , 10/* "sinh" */,-31 , 13/* "asin" */,-31 , 16/* "asinh" */,-31 , 8/* "cos" */,-31 , 11/* "cosh" */,-31 , 14/* "acos" */,-31 , 17/* "acosh" */,-31 , 9/* "tan" */,-31 , 12/* "tanh" */,-31 , 15/* "atan" */,-31 , 18/* "atanh" */,-31 , 19/* "sec" */,-31 , 21/* "sech" */,-31 , 20/* "asec" */,-31 , 22/* "asech" */,-31 , 23/* "csc" */,-31 , 25/* "csch" */,-31 , 24/* "acsc" */,-31 , 26/* "acsch" */,-31 , 27/* "cot" */,-31 , 29/* "coth" */,-31 , 28/* "acot" */,-31 , 30/* "acoth" */,-31 , 31/* "sqrt" */,-31 , 32/* "exp" */,-31 , 33/* "log" */,-31 , 47/* "$" */,-31 , 3/* "-" */,-31 , 2/* "+" */,-31 , 4/* "*" */,-31 , 5/* "/" */,-31 , 6/* "^" */,-31 , 35/* ")" */,-31 ),
+    /* State 130 */ new Array( 36/* "IDENTIFIER" */,-32 , 37/* "INT" */,-32 , 38/* "FLOAT" */,-32 , 34/* "(" */,-32 , 7/* "sin" */,-32 , 10/* "sinh" */,-32 , 13/* "asin" */,-32 , 16/* "asinh" */,-32 , 8/* "cos" */,-32 , 11/* "cosh" */,-32 , 14/* "acos" */,-32 , 17/* "acosh" */,-32 , 9/* "tan" */,-32 , 12/* "tanh" */,-32 , 15/* "atan" */,-32 , 18/* "atanh" */,-32 , 19/* "sec" */,-32 , 21/* "sech" */,-32 , 20/* "asec" */,-32 , 22/* "asech" */,-32 , 23/* "csc" */,-32 , 25/* "csch" */,-32 , 24/* "acsc" */,-32 , 26/* "acsch" */,-32 , 27/* "cot" */,-32 , 29/* "coth" */,-32 , 28/* "acot" */,-32 , 30/* "acoth" */,-32 , 31/* "sqrt" */,-32 , 32/* "exp" */,-32 , 33/* "log" */,-32 , 47/* "$" */,-32 , 3/* "-" */,-32 , 2/* "+" */,-32 , 4/* "*" */,-32 , 5/* "/" */,-32 , 6/* "^" */,-32 , 35/* ")" */,-32 ),
+    /* State 131 */ new Array( 36/* "IDENTIFIER" */,-33 , 37/* "INT" */,-33 , 38/* "FLOAT" */,-33 , 34/* "(" */,-33 , 7/* "sin" */,-33 , 10/* "sinh" */,-33 , 13/* "asin" */,-33 , 16/* "asinh" */,-33 , 8/* "cos" */,-33 , 11/* "cosh" */,-33 , 14/* "acos" */,-33 , 17/* "acosh" */,-33 , 9/* "tan" */,-33 , 12/* "tanh" */,-33 , 15/* "atan" */,-33 , 18/* "atanh" */,-33 , 19/* "sec" */,-33 , 21/* "sech" */,-33 , 20/* "asec" */,-33 , 22/* "asech" */,-33 , 23/* "csc" */,-33 , 25/* "csch" */,-33 , 24/* "acsc" */,-33 , 26/* "acsch" */,-33 , 27/* "cot" */,-33 , 29/* "coth" */,-33 , 28/* "acot" */,-33 , 30/* "acoth" */,-33 , 31/* "sqrt" */,-33 , 32/* "exp" */,-33 , 33/* "log" */,-33 , 47/* "$" */,-33 , 3/* "-" */,-33 , 2/* "+" */,-33 , 4/* "*" */,-33 , 5/* "/" */,-33 , 6/* "^" */,-33 , 35/* ")" */,-33 ),
+    /* State 132 */ new Array( 36/* "IDENTIFIER" */,-34 , 37/* "INT" */,-34 , 38/* "FLOAT" */,-34 , 34/* "(" */,-34 , 7/* "sin" */,-34 , 10/* "sinh" */,-34 , 13/* "asin" */,-34 , 16/* "asinh" */,-34 , 8/* "cos" */,-34 , 11/* "cosh" */,-34 , 14/* "acos" */,-34 , 17/* "acosh" */,-34 , 9/* "tan" */,-34 , 12/* "tanh" */,-34 , 15/* "atan" */,-34 , 18/* "atanh" */,-34 , 19/* "sec" */,-34 , 21/* "sech" */,-34 , 20/* "asec" */,-34 , 22/* "asech" */,-34 , 23/* "csc" */,-34 , 25/* "csch" */,-34 , 24/* "acsc" */,-34 , 26/* "acsch" */,-34 , 27/* "cot" */,-34 , 29/* "coth" */,-34 , 28/* "acot" */,-34 , 30/* "acoth" */,-34 , 31/* "sqrt" */,-34 , 32/* "exp" */,-34 , 33/* "log" */,-34 , 47/* "$" */,-34 , 3/* "-" */,-34 , 2/* "+" */,-34 , 4/* "*" */,-34 , 5/* "/" */,-34 , 6/* "^" */,-34 , 35/* ")" */,-34 ),
+    /* State 133 */ new Array( 36/* "IDENTIFIER" */,-35 , 37/* "INT" */,-35 , 38/* "FLOAT" */,-35 , 34/* "(" */,-35 , 7/* "sin" */,-35 , 10/* "sinh" */,-35 , 13/* "asin" */,-35 , 16/* "asinh" */,-35 , 8/* "cos" */,-35 , 11/* "cosh" */,-35 , 14/* "acos" */,-35 , 17/* "acosh" */,-35 , 9/* "tan" */,-35 , 12/* "tanh" */,-35 , 15/* "atan" */,-35 , 18/* "atanh" */,-35 , 19/* "sec" */,-35 , 21/* "sech" */,-35 , 20/* "asec" */,-35 , 22/* "asech" */,-35 , 23/* "csc" */,-35 , 25/* "csch" */,-35 , 24/* "acsc" */,-35 , 26/* "acsch" */,-35 , 27/* "cot" */,-35 , 29/* "coth" */,-35 , 28/* "acot" */,-35 , 30/* "acoth" */,-35 , 31/* "sqrt" */,-35 , 32/* "exp" */,-35 , 33/* "log" */,-35 , 47/* "$" */,-35 , 3/* "-" */,-35 , 2/* "+" */,-35 , 4/* "*" */,-35 , 5/* "/" */,-35 , 6/* "^" */,-35 , 35/* ")" */,-35 ),
+    /* State 134 */ new Array( 36/* "IDENTIFIER" */,-36 , 37/* "INT" */,-36 , 38/* "FLOAT" */,-36 , 34/* "(" */,-36 , 7/* "sin" */,-36 , 10/* "sinh" */,-36 , 13/* "asin" */,-36 , 16/* "asinh" */,-36 , 8/* "cos" */,-36 , 11/* "cosh" */,-36 , 14/* "acos" */,-36 , 17/* "acosh" */,-36 , 9/* "tan" */,-36 , 12/* "tanh" */,-36 , 15/* "atan" */,-36 , 18/* "atanh" */,-36 , 19/* "sec" */,-36 , 21/* "sech" */,-36 , 20/* "asec" */,-36 , 22/* "asech" */,-36 , 23/* "csc" */,-36 , 25/* "csch" */,-36 , 24/* "acsc" */,-36 , 26/* "acsch" */,-36 , 27/* "cot" */,-36 , 29/* "coth" */,-36 , 28/* "acot" */,-36 , 30/* "acoth" */,-36 , 31/* "sqrt" */,-36 , 32/* "exp" */,-36 , 33/* "log" */,-36 , 47/* "$" */,-36 , 3/* "-" */,-36 , 2/* "+" */,-36 , 4/* "*" */,-36 , 5/* "/" */,-36 , 6/* "^" */,-36 , 35/* ")" */,-36 ),
+    /* State 135 */ new Array( 36/* "IDENTIFIER" */,-37 , 37/* "INT" */,-37 , 38/* "FLOAT" */,-37 , 34/* "(" */,-37 , 7/* "sin" */,-37 , 10/* "sinh" */,-37 , 13/* "asin" */,-37 , 16/* "asinh" */,-37 , 8/* "cos" */,-37 , 11/* "cosh" */,-37 , 14/* "acos" */,-37 , 17/* "acosh" */,-37 , 9/* "tan" */,-37 , 12/* "tanh" */,-37 , 15/* "atan" */,-37 , 18/* "atanh" */,-37 , 19/* "sec" */,-37 , 21/* "sech" */,-37 , 20/* "asec" */,-37 , 22/* "asech" */,-37 , 23/* "csc" */,-37 , 25/* "csch" */,-37 , 24/* "acsc" */,-37 , 26/* "acsch" */,-37 , 27/* "cot" */,-37 , 29/* "coth" */,-37 , 28/* "acot" */,-37 , 30/* "acoth" */,-37 , 31/* "sqrt" */,-37 , 32/* "exp" */,-37 , 33/* "log" */,-37 , 47/* "$" */,-37 , 3/* "-" */,-37 , 2/* "+" */,-37 , 4/* "*" */,-37 , 5/* "/" */,-37 , 6/* "^" */,-37 , 35/* ")" */,-37 ),
+    /* State 136 */ new Array( 36/* "IDENTIFIER" */,-38 , 37/* "INT" */,-38 , 38/* "FLOAT" */,-38 , 34/* "(" */,-38 , 7/* "sin" */,-38 , 10/* "sinh" */,-38 , 13/* "asin" */,-38 , 16/* "asinh" */,-38 , 8/* "cos" */,-38 , 11/* "cosh" */,-38 , 14/* "acos" */,-38 , 17/* "acosh" */,-38 , 9/* "tan" */,-38 , 12/* "tanh" */,-38 , 15/* "atan" */,-38 , 18/* "atanh" */,-38 , 19/* "sec" */,-38 , 21/* "sech" */,-38 , 20/* "asec" */,-38 , 22/* "asech" */,-38 , 23/* "csc" */,-38 , 25/* "csch" */,-38 , 24/* "acsc" */,-38 , 26/* "acsch" */,-38 , 27/* "cot" */,-38 , 29/* "coth" */,-38 , 28/* "acot" */,-38 , 30/* "acoth" */,-38 , 31/* "sqrt" */,-38 , 32/* "exp" */,-38 , 33/* "log" */,-38 , 47/* "$" */,-38 , 3/* "-" */,-38 , 2/* "+" */,-38 , 4/* "*" */,-38 , 5/* "/" */,-38 , 6/* "^" */,-38 , 35/* ")" */,-38 ),
+    /* State 137 */ new Array( 36/* "IDENTIFIER" */,-39 , 37/* "INT" */,-39 , 38/* "FLOAT" */,-39 , 34/* "(" */,-39 , 7/* "sin" */,-39 , 10/* "sinh" */,-39 , 13/* "asin" */,-39 , 16/* "asinh" */,-39 , 8/* "cos" */,-39 , 11/* "cosh" */,-39 , 14/* "acos" */,-39 , 17/* "acosh" */,-39 , 9/* "tan" */,-39 , 12/* "tanh" */,-39 , 15/* "atan" */,-39 , 18/* "atanh" */,-39 , 19/* "sec" */,-39 , 21/* "sech" */,-39 , 20/* "asec" */,-39 , 22/* "asech" */,-39 , 23/* "csc" */,-39 , 25/* "csch" */,-39 , 24/* "acsc" */,-39 , 26/* "acsch" */,-39 , 27/* "cot" */,-39 , 29/* "coth" */,-39 , 28/* "acot" */,-39 , 30/* "acoth" */,-39 , 31/* "sqrt" */,-39 , 32/* "exp" */,-39 , 33/* "log" */,-39 , 47/* "$" */,-39 , 3/* "-" */,-39 , 2/* "+" */,-39 , 4/* "*" */,-39 , 5/* "/" */,-39 , 6/* "^" */,-39 , 35/* ")" */,-39 ),
+    /* State 138 */ new Array( 36/* "IDENTIFIER" */,-40 , 37/* "INT" */,-40 , 38/* "FLOAT" */,-40 , 34/* "(" */,-40 , 7/* "sin" */,-40 , 10/* "sinh" */,-40 , 13/* "asin" */,-40 , 16/* "asinh" */,-40 , 8/* "cos" */,-40 , 11/* "cosh" */,-40 , 14/* "acos" */,-40 , 17/* "acosh" */,-40 , 9/* "tan" */,-40 , 12/* "tanh" */,-40 , 15/* "atan" */,-40 , 18/* "atanh" */,-40 , 19/* "sec" */,-40 , 21/* "sech" */,-40 , 20/* "asec" */,-40 , 22/* "asech" */,-40 , 23/* "csc" */,-40 , 25/* "csch" */,-40 , 24/* "acsc" */,-40 , 26/* "acsch" */,-40 , 27/* "cot" */,-40 , 29/* "coth" */,-40 , 28/* "acot" */,-40 , 30/* "acoth" */,-40 , 31/* "sqrt" */,-40 , 32/* "exp" */,-40 , 33/* "log" */,-40 , 47/* "$" */,-40 , 3/* "-" */,-40 , 2/* "+" */,-40 , 4/* "*" */,-40 , 5/* "/" */,-40 , 6/* "^" */,-40 , 35/* ")" */,-40 ),
+    /* State 139 */ new Array( 36/* "IDENTIFIER" */,-41 , 37/* "INT" */,-41 , 38/* "FLOAT" */,-41 , 34/* "(" */,-41 , 7/* "sin" */,-41 , 10/* "sinh" */,-41 , 13/* "asin" */,-41 , 16/* "asinh" */,-41 , 8/* "cos" */,-41 , 11/* "cosh" */,-41 , 14/* "acos" */,-41 , 17/* "acosh" */,-41 , 9/* "tan" */,-41 , 12/* "tanh" */,-41 , 15/* "atan" */,-41 , 18/* "atanh" */,-41 , 19/* "sec" */,-41 , 21/* "sech" */,-41 , 20/* "asec" */,-41 , 22/* "asech" */,-41 , 23/* "csc" */,-41 , 25/* "csch" */,-41 , 24/* "acsc" */,-41 , 26/* "acsch" */,-41 , 27/* "cot" */,-41 , 29/* "coth" */,-41 , 28/* "acot" */,-41 , 30/* "acoth" */,-41 , 31/* "sqrt" */,-41 , 32/* "exp" */,-41 , 33/* "log" */,-41 , 47/* "$" */,-41 , 3/* "-" */,-41 , 2/* "+" */,-41 , 4/* "*" */,-41 , 5/* "/" */,-41 , 6/* "^" */,-41 , 35/* ")" */,-41 ),
+    /* State 140 */ new Array( 36/* "IDENTIFIER" */,-42 , 37/* "INT" */,-42 , 38/* "FLOAT" */,-42 , 34/* "(" */,-42 , 7/* "sin" */,-42 , 10/* "sinh" */,-42 , 13/* "asin" */,-42 , 16/* "asinh" */,-42 , 8/* "cos" */,-42 , 11/* "cosh" */,-42 , 14/* "acos" */,-42 , 17/* "acosh" */,-42 , 9/* "tan" */,-42 , 12/* "tanh" */,-42 , 15/* "atan" */,-42 , 18/* "atanh" */,-42 , 19/* "sec" */,-42 , 21/* "sech" */,-42 , 20/* "asec" */,-42 , 22/* "asech" */,-42 , 23/* "csc" */,-42 , 25/* "csch" */,-42 , 24/* "acsc" */,-42 , 26/* "acsch" */,-42 , 27/* "cot" */,-42 , 29/* "coth" */,-42 , 28/* "acot" */,-42 , 30/* "acoth" */,-42 , 31/* "sqrt" */,-42 , 32/* "exp" */,-42 , 33/* "log" */,-42 , 47/* "$" */,-42 , 3/* "-" */,-42 , 2/* "+" */,-42 , 4/* "*" */,-42 , 5/* "/" */,-42 , 6/* "^" */,-42 , 35/* ")" */,-42 ),
+    /* State 141 */ new Array( 36/* "IDENTIFIER" */,-43 , 37/* "INT" */,-43 , 38/* "FLOAT" */,-43 , 34/* "(" */,-43 , 7/* "sin" */,-43 , 10/* "sinh" */,-43 , 13/* "asin" */,-43 , 16/* "asinh" */,-43 , 8/* "cos" */,-43 , 11/* "cosh" */,-43 , 14/* "acos" */,-43 , 17/* "acosh" */,-43 , 9/* "tan" */,-43 , 12/* "tanh" */,-43 , 15/* "atan" */,-43 , 18/* "atanh" */,-43 , 19/* "sec" */,-43 , 21/* "sech" */,-43 , 20/* "asec" */,-43 , 22/* "asech" */,-43 , 23/* "csc" */,-43 , 25/* "csch" */,-43 , 24/* "acsc" */,-43 , 26/* "acsch" */,-43 , 27/* "cot" */,-43 , 29/* "coth" */,-43 , 28/* "acot" */,-43 , 30/* "acoth" */,-43 , 31/* "sqrt" */,-43 , 32/* "exp" */,-43 , 33/* "log" */,-43 , 47/* "$" */,-43 , 3/* "-" */,-43 , 2/* "+" */,-43 , 4/* "*" */,-43 , 5/* "/" */,-43 , 6/* "^" */,-43 , 35/* ")" */,-43 ),
+    /* State 142 */ new Array( 36/* "IDENTIFIER" */,-44 , 37/* "INT" */,-44 , 38/* "FLOAT" */,-44 , 34/* "(" */,-44 , 7/* "sin" */,-44 , 10/* "sinh" */,-44 , 13/* "asin" */,-44 , 16/* "asinh" */,-44 , 8/* "cos" */,-44 , 11/* "cosh" */,-44 , 14/* "acos" */,-44 , 17/* "acosh" */,-44 , 9/* "tan" */,-44 , 12/* "tanh" */,-44 , 15/* "atan" */,-44 , 18/* "atanh" */,-44 , 19/* "sec" */,-44 , 21/* "sech" */,-44 , 20/* "asec" */,-44 , 22/* "asech" */,-44 , 23/* "csc" */,-44 , 25/* "csch" */,-44 , 24/* "acsc" */,-44 , 26/* "acsch" */,-44 , 27/* "cot" */,-44 , 29/* "coth" */,-44 , 28/* "acot" */,-44 , 30/* "acoth" */,-44 , 31/* "sqrt" */,-44 , 32/* "exp" */,-44 , 33/* "log" */,-44 , 47/* "$" */,-44 , 3/* "-" */,-44 , 2/* "+" */,-44 , 4/* "*" */,-44 , 5/* "/" */,-44 , 6/* "^" */,-44 , 35/* ")" */,-44 ),
+    /* State 143 */ new Array( 36/* "IDENTIFIER" */,-45 , 37/* "INT" */,-45 , 38/* "FLOAT" */,-45 , 34/* "(" */,-45 , 7/* "sin" */,-45 , 10/* "sinh" */,-45 , 13/* "asin" */,-45 , 16/* "asinh" */,-45 , 8/* "cos" */,-45 , 11/* "cosh" */,-45 , 14/* "acos" */,-45 , 17/* "acosh" */,-45 , 9/* "tan" */,-45 , 12/* "tanh" */,-45 , 15/* "atan" */,-45 , 18/* "atanh" */,-45 , 19/* "sec" */,-45 , 21/* "sech" */,-45 , 20/* "asec" */,-45 , 22/* "asech" */,-45 , 23/* "csc" */,-45 , 25/* "csch" */,-45 , 24/* "acsc" */,-45 , 26/* "acsch" */,-45 , 27/* "cot" */,-45 , 29/* "coth" */,-45 , 28/* "acot" */,-45 , 30/* "acoth" */,-45 , 31/* "sqrt" */,-45 , 32/* "exp" */,-45 , 33/* "log" */,-45 , 47/* "$" */,-45 , 3/* "-" */,-45 , 2/* "+" */,-45 , 4/* "*" */,-45 , 5/* "/" */,-45 , 6/* "^" */,-45 , 35/* ")" */,-45 ),
+    /* State 144 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,148 ),
+    /* State 145 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,149 ),
+    /* State 146 */ new Array( 2/* "+" */,41 , 3/* "-" */,42 , 35/* ")" */,150 ),
+    /* State 147 */ new Array( 36/* "IDENTIFIER" */,-46 , 37/* "INT" */,-46 , 38/* "FLOAT" */,-46 , 34/* "(" */,-46 , 7/* "sin" */,-46 , 10/* "sinh" */,-46 , 13/* "asin" */,-46 , 16/* "asinh" */,-46 , 8/* "cos" */,-46 , 11/* "cosh" */,-46 , 14/* "acos" */,-46 , 17/* "acosh" */,-46 , 9/* "tan" */,-46 , 12/* "tanh" */,-46 , 15/* "atan" */,-46 , 18/* "atanh" */,-46 , 19/* "sec" */,-46 , 21/* "sech" */,-46 , 20/* "asec" */,-46 , 22/* "asech" */,-46 , 23/* "csc" */,-46 , 25/* "csch" */,-46 , 24/* "acsc" */,-46 , 26/* "acsch" */,-46 , 27/* "cot" */,-46 , 29/* "coth" */,-46 , 28/* "acot" */,-46 , 30/* "acoth" */,-46 , 31/* "sqrt" */,-46 , 32/* "exp" */,-46 , 33/* "log" */,-46 , 47/* "$" */,-46 , 3/* "-" */,-46 , 2/* "+" */,-46 , 4/* "*" */,-46 , 5/* "/" */,-46 , 6/* "^" */,-46 , 35/* ")" */,-46 ),
+    /* State 148 */ new Array( 36/* "IDENTIFIER" */,-49 , 37/* "INT" */,-49 , 38/* "FLOAT" */,-49 , 34/* "(" */,-49 , 7/* "sin" */,-49 , 10/* "sinh" */,-49 , 13/* "asin" */,-49 , 16/* "asinh" */,-49 , 8/* "cos" */,-49 , 11/* "cosh" */,-49 , 14/* "acos" */,-49 , 17/* "acosh" */,-49 , 9/* "tan" */,-49 , 12/* "tanh" */,-49 , 15/* "atan" */,-49 , 18/* "atanh" */,-49 , 19/* "sec" */,-49 , 21/* "sech" */,-49 , 20/* "asec" */,-49 , 22/* "asech" */,-49 , 23/* "csc" */,-49 , 25/* "csch" */,-49 , 24/* "acsc" */,-49 , 26/* "acsch" */,-49 , 27/* "cot" */,-49 , 29/* "coth" */,-49 , 28/* "acot" */,-49 , 30/* "acoth" */,-49 , 31/* "sqrt" */,-49 , 32/* "exp" */,-49 , 33/* "log" */,-49 , 47/* "$" */,-49 , 3/* "-" */,-49 , 2/* "+" */,-49 , 4/* "*" */,-49 , 5/* "/" */,-49 , 6/* "^" */,-49 , 35/* ")" */,-49 ),
+    /* State 149 */ new Array( 36/* "IDENTIFIER" */,-48 , 37/* "INT" */,-48 , 38/* "FLOAT" */,-48 , 34/* "(" */,-48 , 7/* "sin" */,-48 , 10/* "sinh" */,-48 , 13/* "asin" */,-48 , 16/* "asinh" */,-48 , 8/* "cos" */,-48 , 11/* "cosh" */,-48 , 14/* "acos" */,-48 , 17/* "acosh" */,-48 , 9/* "tan" */,-48 , 12/* "tanh" */,-48 , 15/* "atan" */,-48 , 18/* "atanh" */,-48 , 19/* "sec" */,-48 , 21/* "sech" */,-48 , 20/* "asec" */,-48 , 22/* "asech" */,-48 , 23/* "csc" */,-48 , 25/* "csch" */,-48 , 24/* "acsc" */,-48 , 26/* "acsch" */,-48 , 27/* "cot" */,-48 , 29/* "coth" */,-48 , 28/* "acot" */,-48 , 30/* "acoth" */,-48 , 31/* "sqrt" */,-48 , 32/* "exp" */,-48 , 33/* "log" */,-48 , 47/* "$" */,-48 , 3/* "-" */,-48 , 2/* "+" */,-48 , 4/* "*" */,-48 , 5/* "/" */,-48 , 6/* "^" */,-48 , 35/* ")" */,-48 ),
+    /* State 150 */ new Array( 36/* "IDENTIFIER" */,-47 , 37/* "INT" */,-47 , 38/* "FLOAT" */,-47 , 34/* "(" */,-47 , 7/* "sin" */,-47 , 10/* "sinh" */,-47 , 13/* "asin" */,-47 , 16/* "asinh" */,-47 , 8/* "cos" */,-47 , 11/* "cosh" */,-47 , 14/* "acos" */,-47 , 17/* "acosh" */,-47 , 9/* "tan" */,-47 , 12/* "tanh" */,-47 , 15/* "atan" */,-47 , 18/* "atanh" */,-47 , 19/* "sec" */,-47 , 21/* "sech" */,-47 , 20/* "asec" */,-47 , 22/* "asech" */,-47 , 23/* "csc" */,-47 , 25/* "csch" */,-47 , 24/* "acsc" */,-47 , 26/* "acsch" */,-47 , 27/* "cot" */,-47 , 29/* "coth" */,-47 , 28/* "acot" */,-47 , 30/* "acoth" */,-47 , 31/* "sqrt" */,-47 , 32/* "exp" */,-47 , 33/* "log" */,-47 , 47/* "$" */,-47 , 3/* "-" */,-47 , 2/* "+" */,-47 , 4/* "*" */,-47 , 5/* "/" */,-47 , 6/* "^" */,-47 , 35/* ")" */,-47 )
 );
 
 /* Goto-Table */
 var goto_tab = new Array(
-    /* State 0 */ new Array( 16/* p */,1 , 15/* e */,2 , 17/* MulDivExp */,3 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
+    /* State 0 */ new Array( 40/* p */,1 , 39/* e */,2 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
     /* State 1 */ new Array( ),
     /* State 2 */ new Array( ),
     /* State 3 */ new Array( ),
     /* State 4 */ new Array( ),
     /* State 5 */ new Array( ),
-    /* State 6 */ new Array( ),
+    /* State 6 */ new Array( 43/* Value */,47 , 46/* NumericValue */,8 , 44/* ParenExp */,48 ),
     /* State 7 */ new Array( ),
-    /* State 8 */ new Array( 20/* Value */,22 ),
+    /* State 8 */ new Array( ),
     /* State 9 */ new Array( ),
-    /* State 10 */ new Array( ),
-    /* State 11 */ new Array( 15/* e */,25 , 17/* MulDivExp */,3 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
+    /* State 10 */ new Array( 39/* e */,49 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 11 */ new Array( ),
     /* State 12 */ new Array( ),
     /* State 13 */ new Array( ),
     /* State 14 */ new Array( ),
-    /* State 15 */ new Array( 17/* MulDivExp */,29 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
-    /* State 16 */ new Array( 17/* MulDivExp */,30 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
-    /* State 17 */ new Array( 18/* PowExp */,31 , 19/* NegExp */,7 , 20/* Value */,9 ),
-    /* State 18 */ new Array( 18/* PowExp */,32 , 19/* NegExp */,7 , 20/* Value */,9 ),
+    /* State 15 */ new Array( ),
+    /* State 16 */ new Array( ),
+    /* State 17 */ new Array( ),
+    /* State 18 */ new Array( ),
     /* State 19 */ new Array( ),
     /* State 20 */ new Array( ),
-    /* State 21 */ new Array( 19/* NegExp */,33 , 20/* Value */,9 ),
+    /* State 21 */ new Array( ),
     /* State 22 */ new Array( ),
     /* State 23 */ new Array( ),
     /* State 24 */ new Array( ),
     /* State 25 */ new Array( ),
-    /* State 26 */ new Array( 15/* e */,35 , 17/* MulDivExp */,3 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
-    /* State 27 */ new Array( 15/* e */,36 , 17/* MulDivExp */,3 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
-    /* State 28 */ new Array( 15/* e */,37 , 17/* MulDivExp */,3 , 18/* PowExp */,6 , 19/* NegExp */,7 , 20/* Value */,9 ),
+    /* State 26 */ new Array( ),
+    /* State 27 */ new Array( ),
+    /* State 28 */ new Array( ),
     /* State 29 */ new Array( ),
     /* State 30 */ new Array( ),
     /* State 31 */ new Array( ),
@@ -463,9 +958,119 @@ var goto_tab = new Array(
     /* State 35 */ new Array( ),
     /* State 36 */ new Array( ),
     /* State 37 */ new Array( ),
-    /* State 38 */ new Array( ),
+    /* State 38 */ new Array( 43/* Value */,80 , 46/* NumericValue */,8 , 44/* ParenExp */,48 ),
     /* State 39 */ new Array( ),
-    /* State 40 */ new Array( )
+    /* State 40 */ new Array( ),
+    /* State 41 */ new Array( 41/* MulDivExp */,81 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 42 */ new Array( 41/* MulDivExp */,82 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 43 */ new Array( 42/* PowExp */,83 , 45/* NegExp */,7 , 43/* Value */,84 , 46/* NumericValue */,8 , 44/* ParenExp */,48 ),
+    /* State 44 */ new Array( 42/* PowExp */,85 , 45/* NegExp */,7 , 43/* Value */,84 , 46/* NumericValue */,8 , 44/* ParenExp */,48 ),
+    /* State 45 */ new Array( 45/* NegExp */,86 , 43/* Value */,84 , 46/* NumericValue */,8 , 44/* ParenExp */,48 ),
+    /* State 46 */ new Array( ),
+    /* State 47 */ new Array( ),
+    /* State 48 */ new Array( ),
+    /* State 49 */ new Array( ),
+    /* State 50 */ new Array( 39/* e */,88 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 51 */ new Array( 39/* e */,89 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 52 */ new Array( 39/* e */,90 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 53 */ new Array( 39/* e */,91 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 54 */ new Array( 39/* e */,92 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 55 */ new Array( 39/* e */,93 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 56 */ new Array( 39/* e */,94 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 57 */ new Array( 39/* e */,95 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 58 */ new Array( 39/* e */,96 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 59 */ new Array( 39/* e */,97 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 60 */ new Array( 39/* e */,98 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 61 */ new Array( 39/* e */,99 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 62 */ new Array( 39/* e */,100 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 63 */ new Array( 39/* e */,101 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 64 */ new Array( 39/* e */,102 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 65 */ new Array( 39/* e */,103 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 66 */ new Array( 39/* e */,104 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 67 */ new Array( 39/* e */,105 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 68 */ new Array( 39/* e */,106 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 69 */ new Array( 39/* e */,107 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 70 */ new Array( 39/* e */,108 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 71 */ new Array( 39/* e */,109 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 72 */ new Array( 39/* e */,110 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 73 */ new Array( 39/* e */,111 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 74 */ new Array( 39/* e */,112 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 75 */ new Array( 39/* e */,113 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 76 */ new Array( ),
+    /* State 77 */ new Array( ),
+    /* State 78 */ new Array( ),
+    /* State 79 */ new Array( 39/* e */,117 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 80 */ new Array( ),
+    /* State 81 */ new Array( ),
+    /* State 82 */ new Array( ),
+    /* State 83 */ new Array( ),
+    /* State 84 */ new Array( ),
+    /* State 85 */ new Array( ),
+    /* State 86 */ new Array( ),
+    /* State 87 */ new Array( ),
+    /* State 88 */ new Array( ),
+    /* State 89 */ new Array( ),
+    /* State 90 */ new Array( ),
+    /* State 91 */ new Array( ),
+    /* State 92 */ new Array( ),
+    /* State 93 */ new Array( ),
+    /* State 94 */ new Array( ),
+    /* State 95 */ new Array( ),
+    /* State 96 */ new Array( ),
+    /* State 97 */ new Array( ),
+    /* State 98 */ new Array( ),
+    /* State 99 */ new Array( ),
+    /* State 100 */ new Array( ),
+    /* State 101 */ new Array( ),
+    /* State 102 */ new Array( ),
+    /* State 103 */ new Array( ),
+    /* State 104 */ new Array( ),
+    /* State 105 */ new Array( ),
+    /* State 106 */ new Array( ),
+    /* State 107 */ new Array( ),
+    /* State 108 */ new Array( ),
+    /* State 109 */ new Array( ),
+    /* State 110 */ new Array( ),
+    /* State 111 */ new Array( ),
+    /* State 112 */ new Array( ),
+    /* State 113 */ new Array( ),
+    /* State 114 */ new Array( 39/* e */,144 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 115 */ new Array( 39/* e */,145 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 116 */ new Array( 39/* e */,146 , 41/* MulDivExp */,3 , 42/* PowExp */,4 , 43/* Value */,5 , 44/* ParenExp */,6 , 45/* NegExp */,7 , 46/* NumericValue */,8 ),
+    /* State 117 */ new Array( ),
+    /* State 118 */ new Array( ),
+    /* State 119 */ new Array( ),
+    /* State 120 */ new Array( ),
+    /* State 121 */ new Array( ),
+    /* State 122 */ new Array( ),
+    /* State 123 */ new Array( ),
+    /* State 124 */ new Array( ),
+    /* State 125 */ new Array( ),
+    /* State 126 */ new Array( ),
+    /* State 127 */ new Array( ),
+    /* State 128 */ new Array( ),
+    /* State 129 */ new Array( ),
+    /* State 130 */ new Array( ),
+    /* State 131 */ new Array( ),
+    /* State 132 */ new Array( ),
+    /* State 133 */ new Array( ),
+    /* State 134 */ new Array( ),
+    /* State 135 */ new Array( ),
+    /* State 136 */ new Array( ),
+    /* State 137 */ new Array( ),
+    /* State 138 */ new Array( ),
+    /* State 139 */ new Array( ),
+    /* State 140 */ new Array( ),
+    /* State 141 */ new Array( ),
+    /* State 142 */ new Array( ),
+    /* State 143 */ new Array( ),
+    /* State 144 */ new Array( ),
+    /* State 145 */ new Array( ),
+    /* State 146 */ new Array( ),
+    /* State 147 */ new Array( ),
+    /* State 148 */ new Array( ),
+    /* State 149 */ new Array( ),
+    /* State 150 */ new Array( )
 );
 
 
@@ -481,6 +1086,30 @@ var labels = new Array(
     "^" /* Terminal symbol */,
     "sin" /* Terminal symbol */,
     "cos" /* Terminal symbol */,
+    "tan" /* Terminal symbol */,
+    "sinh" /* Terminal symbol */,
+    "cosh" /* Terminal symbol */,
+    "tanh" /* Terminal symbol */,
+    "asin" /* Terminal symbol */,
+    "acos" /* Terminal symbol */,
+    "atan" /* Terminal symbol */,
+    "asinh" /* Terminal symbol */,
+    "acosh" /* Terminal symbol */,
+    "atanh" /* Terminal symbol */,
+    "sec" /* Terminal symbol */,
+    "asec" /* Terminal symbol */,
+    "sech" /* Terminal symbol */,
+    "asech" /* Terminal symbol */,
+    "csc" /* Terminal symbol */,
+    "acsc" /* Terminal symbol */,
+    "csch" /* Terminal symbol */,
+    "acsch" /* Terminal symbol */,
+    "cot" /* Terminal symbol */,
+    "acot" /* Terminal symbol */,
+    "coth" /* Terminal symbol */,
+    "acoth" /* Terminal symbol */,
+    "sqrt" /* Terminal symbol */,
+    "exp" /* Terminal symbol */,
     "log" /* Terminal symbol */,
     "(" /* Terminal symbol */,
     ")" /* Terminal symbol */,
@@ -491,8 +1120,10 @@ var labels = new Array(
     "p" /* Non-terminal symbol */,
     "MulDivExp" /* Non-terminal symbol */,
     "PowExp" /* Non-terminal symbol */,
-    "NegExp" /* Non-terminal symbol */,
     "Value" /* Non-terminal symbol */,
+    "ParenExp" /* Non-terminal symbol */,
+    "NegExp" /* Non-terminal symbol */,
+    "NumericValue" /* Non-terminal symbol */,
     "$" /* Terminal symbol */
 );
 
@@ -514,7 +1145,7 @@ var labels = new Array(
 
     while( true )
     {
-        act = 42;
+        act = 152;
         for( var i = 0; i < act_tab[sstack[sstack.length-1]].length; i+=2 )
         {
             if( act_tab[sstack[sstack.length-1]][i] == la )
@@ -537,7 +1168,7 @@ var labels = new Array(
         
             
         //Panic-mode: Try recovery when parse-error occurs!
-        if( act == 42 )
+        if( act == 152 )
         {
             if( _dbg_withtrace )
                 __dbg_print( "Error detected: There is no reduce or shift on the symbol " + labels[la] );
@@ -557,7 +1188,7 @@ var labels = new Array(
                 rvstack[i] = vstack[i];
             }
             
-            while( act == 42 && la != 21 )
+            while( act == 152 && la != 47 )
             {
                 if( _dbg_withtrace )
                     __dbg_print( "\tError recovery\n" +
@@ -566,7 +1197,7 @@ var labels = new Array(
                 if( la == -1 )
                     info.offset++;
                     
-                while( act == 42 && sstack.length > 0 )
+                while( act == 152 && sstack.length > 0 )
                 {
                     sstack.pop();
                     vstack.pop();
@@ -574,7 +1205,7 @@ var labels = new Array(
                     if( sstack.length == 0 )
                         break;
                         
-                    act = 42;
+                    act = 152;
                     for( var i = 0; i < act_tab[sstack[sstack.length-1]].length; i+=2 )
                     {
                         if( act_tab[sstack[sstack.length-1]][i] == la )
@@ -585,7 +1216,7 @@ var labels = new Array(
                     }
                 }
                 
-                if( act != 42 )
+                if( act != 152 )
                     break;
                 
                 for( var i = 0; i < rsstack.length; i++ )
@@ -597,7 +1228,7 @@ var labels = new Array(
                 la = __lex( info );
             }
             
-            if( act == 42 )
+            if( act == 152 )
             {
                 if( _dbg_withtrace )
                     __dbg_print( "\tError recovery failed, terminating parse process..." );
@@ -610,7 +1241,7 @@ var labels = new Array(
         }
         
         /*
-        if( act == 42 )
+        if( act == 152 )
             break;
         */
         
@@ -676,22 +1307,22 @@ switch( act )
     break;
     case 6:
     {
-         rval = createNode( NODE_OP, OP_MUL, vstack[ vstack.length - 2 ], vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_OP, OP_DIV, vstack[ vstack.length - 3 ], vstack[ vstack.length - 1 ] );
     }
     break;
     case 7:
     {
-         rval = createNode( NODE_OP, OP_MUL, vstack[ vstack.length - 2 ], vstack[ vstack.length - 1 ] );
+        rval = vstack[ vstack.length - 1 ];
     }
     break;
     case 8:
     {
-         rval = createNode( NODE_OP, OP_DIV, vstack[ vstack.length - 3 ], vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_OP, OP_MUL, vstack[ vstack.length - 2 ], createNode( NODE_VAR, vstack[ vstack.length - 1 ] ) );
     }
     break;
     case 9:
     {
-        rval = vstack[ vstack.length - 1 ];
+         rval = createNode( NODE_OP, OP_MUL, vstack[ vstack.length - 2 ], vstack[ vstack.length - 1 ] );
     }
     break;
     case 10:
@@ -716,37 +1347,182 @@ switch( act )
     break;
     case 14:
     {
-         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
+        rval = vstack[ vstack.length - 1 ];
     }
     break;
     case 15:
     {
-         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_VAR, vstack[ vstack.length - 1 ] );
     }
     break;
     case 16:
     {
-         rval = createNode( NODE_VAR, vstack[ vstack.length - 1 ] );
+        rval = vstack[ vstack.length - 1 ];
     }
     break;
     case 17:
     {
-         rval = vstack[ vstack.length - 2 ];
+         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
     }
     break;
     case 18:
     {
-         rval = createNode( NODE_OP, OP_SIN, vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
     }
     break;
     case 19:
     {
-         rval = createNode( NODE_OP, OP_COS, vstack[ vstack.length - 2 ] );
+         rval = vstack[ vstack.length - 2 ];
     }
     break;
     case 20:
     {
-         rval = createNode( NODE_OP, OP_LOG, vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_FUNC, FUNC_SIN, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 21:
+    {
+         rval = createNode( NODE_FUNC, FUNC_SINH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 22:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ASIN, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 23:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ASINH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 24:
+    {
+         rval = createNode( NODE_FUNC, FUNC_COS, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 25:
+    {
+         rval = createNode( NODE_FUNC, FUNC_COSH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 26:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACOS, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 27:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACOSH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 28:
+    {
+         rval = createNode( NODE_FUNC, FUNC_TAN, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 29:
+    {
+         rval = createNode( NODE_FUNC, FUNC_TANH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 30:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ATAN, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 31:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ATANH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 32:
+    {
+         rval = createNode( NODE_FUNC, FUNC_SEC, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 33:
+    {
+         rval = createNode( NODE_FUNC, FUNC_SECH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 34:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ASEC, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 35:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ASECH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 36:
+    {
+         rval = createNode( NODE_FUNC, FUNC_CSC, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 37:
+    {
+         rval = createNode( NODE_FUNC, FUNC_CSCH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 38:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACSC, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 39:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACSCH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 40:
+    {
+         rval = createNode( NODE_FUNC, FUNC_COT, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 41:
+    {
+         rval = createNode( NODE_FUNC, FUNC_COTH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 42:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACOT, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 43:
+    {
+         rval = createNode( NODE_FUNC, FUNC_ACOTH, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 44:
+    {
+         rval = createNode( NODE_FUNC, FUNC_SQRT, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 45:
+    {
+         rval = createNode( NODE_FUNC, FUNC_EXP, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 46:
+    {
+         rval = createNode( NODE_FUNC, FUNC_NLOG, vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 47:
+    {
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_CONST, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 48:
+    {
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_CONST, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
+    }
+    break;
+    case 49:
+    {
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_VAR, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
     }
     break;
 }
@@ -797,7 +1573,6 @@ switch( act )
     
     return err_cnt;
 }
-
 
 var error_offsets = new Array();
 var error_lookaheads = new Array();
