@@ -238,7 +238,7 @@ function toTex( node )
           ret = "{" + toTex( node.children[0] ) + "}/{" + toTex( node.children[1] ) +"}";
           break;
         case OP_MUL:
-          if(node.children[0].type == NODE_CONST && node.children[1].type == NODE_CONST)
+          if(node.children[0].type == NODE_CONST || node.children[1].type == NODE_CONST)
             ret = toTex( node.children[0] ) +"·"+ toTex( node.children[1] );
           else if(node.children[1].type == NODE_VAR){
             left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
