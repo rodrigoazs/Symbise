@@ -129,7 +129,85 @@ function symbolicDiff( node )
           break;
         case FUNC_COS:
           ret = symbolicNegation(symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0]) ));
-          break;  
+          break; 
+        case FUNC_ASINH:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicAdder(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2)))));
+          break;
+        case FUNC_SINH:
+          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_COSH, node.children[0]));
+          break;
+        case FUNC_ASIN:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2)))));
+          break;
+        case FUNC_ACOSH:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_CONST, 2)), createNode(NODE_CONST, 1))));
+          break;
+        case FUNC_COSH:
+          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SINH, node.children[0]));
+          break;
+        case FUNC_ACOS:
+          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2)))));
+          break;
+        case FUNC_ATANH:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          break;
+        case FUNC_TANH:
+          ret = symbolicMultiplier(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_CONST, 2)));
+          break;
+        case FUNC_ATAN:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicAdder(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          break;
+        case FUNC_TAN:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_CONST, 2)));
+          break;
+        case FUNC_ASECH:
+          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(symbolicMultiplier(node.children[0], creteNode(NODE_FUNC, FUNC_SQRT, symbolicDivisor(symbolicSubtractor(1, node.children[0]), symbolicAdder(1, node.children[0])))), symbolicAdder(1, node.children[0])));
+          break;
+        case FUNC_SECH:
+          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_FUNC, FUNC_TANH, node.children[0])));
+          break;
+        case FUNC_ASEC:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicMultiplier(node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_CONST, 2)), createNode(NODE_CONST, 1)))));
+          break;
+        case FUNC_SEC:
+          ret = symbolicMultiplier(symbolicDiff(node.children[0]), symbolicMultiplier(createNode(NODE_FUNC, FUNC_TAN, node.children[0]), createNode(NODE_FUNC, FUNC_SEC, node.children[0])));
+          break;
+        case FUNC_ACSCH:
+          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(createNode(NODE_FUNC, FUNC_SQRT, symbolicAdder(createNode(NODE_CONST, 1), symbolicDivisor(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2))))), symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          break;
+        case FUNC_CSCH:
+          ret = symbolicMultiplier(symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_COTH, node.children[0])), createNode(NODE_FUNC, FUNC_CSCH, node.children[0]));
+          break;
+		case FUNC_ACSC:
+          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_CONST, 2)), createNode(NODE_CONST, 1)))));
+          break;
+        case FUNC_CSC:
+          ret = symbolicMultiplier(symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_COT, node.children[0])), createNode(NODE_FUNC, FUNC_CSC, node.children[0]));
+          break;
+        case FUNC_ACOTH:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          break;
+        case FUNC_COTH:
+          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_CONST, 2)));
+          break;
+        case FUNC_ACOT:
+          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicAdder(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          break;
+        case FUNC_COT:
+          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_CONST, 2)));
+          break;
+        case FUNC_SQRT:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicMultiplier(createNode(NODE_CONST, 2), createNode(NODE_FUNC, FUNC_SQRT, node.children[0])));
+          break;
+        case FUNC_EXP:
+          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_EXP, node.children[0]));
+          break;
+        case FUNC_NLOG:
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), node.children[0]);
+          break;
+        case FUNC_BLOG:
+          ret = symbolicDivisor(symbolicDiff(node.children[1]), symbolicMultiplier(node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
+          break;
       }
       break;
 
@@ -195,10 +273,85 @@ function stringEquation( node )
           break;
         case FUNC_COS:
           ret = "cos(" + stringEquation( node.children[0] ) + ")";
-          break;  
+          break;
+        case FUNC_ASINH:
+          ret = "asinh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_SINH:
+          ret = "sinh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ASIN:
+          ret = "asin(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOSH:
+          ret = "acosh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_COSH:
+          ret = "cosh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOS:
+          ret = "acos(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ATANH:
+          ret = "atanh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_TANH:
+          ret = "tanh(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ATAN:
+          ret = "atan(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_TAN:
+          ret = "tan(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ASECH:
+          ret = "asech(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_SECH:
+          ret = "sech(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ASEC:
+          ret = "asec(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_SEC:
+          ret = "sec(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ACSCH:
+          ret = "acsch(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_CSCH:
+          ret = "csch(" + stringEquation( node.children[0] ) + ")";
+          break;
+		case FUNC_ACSC:
+          ret = "acsc(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_CSC:
+          ret = "csc(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOTH:
+          ret = "acoth(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_COTH:
+          ret = "coth(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOT:
+          ret = "acot(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_COT:
+          ret = "cot(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_SQRT:
+          ret = "sqrt(" + stringEquation( node.children[0] ) + ")";
+          break;
+        case FUNC_EXP:
+          ret = "exp(" + stringEquation( node.children[0] ) + ")";
+          break;
         case FUNC_NLOG:
           ret = "log(" + stringEquation( node.children[0] ) + ")";
-          break;  
+          break;
+        case FUNC_BLOG:
+          ret = "log" + stringEquation( node.children[0] ) + "(" + stringEquation( node.children[1] ) + ")";
+          break;
       }
       break;
 
@@ -267,9 +420,84 @@ function toTex( node )
           break;
         case FUNC_COS:
           ret = "cos(" + toTex( node.children[0] ) + ")";
-          break;  
+          break;
+         case FUNC_ASINH:
+          ret = "asinh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_SINH:
+          ret = "sinh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ASIN:
+          ret = "asin(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOSH:
+          ret = "acosh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_COSH:
+          ret = "cosh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOS:
+          ret = "acos(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ATANH:
+          ret = "atanh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_TANH:
+          ret = "tanh(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ATAN:
+          ret = "atan(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_TAN:
+          ret = "tan(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ASECH:
+          ret = "asech(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_SECH:
+          ret = "sech(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ASEC:
+          ret = "asec(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_SEC:
+          ret = "sec(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ACSCH:
+          ret = "acsch(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_CSCH:
+          ret = "csch(" + toTex( node.children[0] ) + ")";
+          break;
+		case FUNC_ACSC:
+          ret = "acsc(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_CSC:
+          ret = "csc(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOTH:
+          ret = "acoth(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_COTH:
+          ret = "coth(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_ACOT:
+          ret = "acot(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_COT:
+          ret = "cot(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_SQRT:
+          ret = "sqrt(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_EXP:
+          ret = "exp(" + toTex( node.children[0] ) + ")";
+          break;
         case FUNC_NLOG:
           ret = "log(" + toTex( node.children[0] ) + ")";
+          break;
+        case FUNC_BLOG:
+          ret = "log_{" + toTex( node.children[0] ) + "}(" + toTex( node.children[1] ) + ")";
           break;
       }
       break;
