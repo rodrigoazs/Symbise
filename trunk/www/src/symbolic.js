@@ -28,12 +28,27 @@ function symbolicMultiplier( nodel, noder )
 
 function symbolicSubtractor( nodel, noder )
 {
+  // case both are consts 0
   if( nodel.type == NODE_CONST && noder.type == NODE_CONST && nodel.value == 0 && noder.value == 0 )
     return createNode ( NODE_CONST, 0 );
+  // case left is const 0
   else if ( nodel.type == NODE_CONST && nodel.value == 0 )
     return symbolicNegation( noder );
+  // case both are consts 0 and left is smaller than right
+  else if ( nodel.type == NODE_CONST && noder.type == NODE_CONST  && Number( nodel.value ) < Number( noder.value ))
+  	return symbolicNegation(createNode( NODE_CONST, -(Number( nodel.value ) - Number( noder.value ))));
+  // case both are consts 0 and rifht is smaller than left or equal
   else if ( nodel.type == NODE_CONST && noder.type == NODE_CONST )
     return createNode( NODE_CONST, Number( nodel.value ) - Number( noder.value ) );
+  // case both sides are negations
+  else if ( nodel.type == NODE_OP && nodel.value == OP_NEG && noder.type == NODE_OP && noder.value == OP_NEG )
+  	return symbolicSubtractor( noder.children[0], nodel.children[0]);
+  // case right side is a negation
+  else if ( noder.type == NODE_OP && noder.value == OP_NEG )
+  	return symbolicAdder( nodel.children[0], noder);
+  // case left sides is a negation and both sides are consts
+  else if ( nodel.type == NODE_OP && nodel.value == OP_NEG && nodel.children[0].type == NODE_CONST && noder.type == NODE_CONST )
+  	return symbolicNegation( createNode(NODE_CONST, Number( nodel.children[0].value ) + Number( noder.value )) );
   else
     return createNode( NODE_OP, OP_SUB, nodel, noder );
 }
@@ -149,13 +164,13 @@ function symbolicDiff( node )
           ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2)))));
           break;
         case FUNC_ATANH:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
           break;
         case FUNC_TANH:
           ret = symbolicMultiplier(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_CONST, 2)));
           break;
         case FUNC_ATAN:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicAdder(1, symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
+          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicAdder(createNode(NODE_CONST, 1), symbolicPower(node.children[0], createNode(NODE_CONST, 2))));
           break;
         case FUNC_TAN:
           ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_CONST, 2)));
@@ -488,7 +503,7 @@ function toTex( node )
           ret = "cot(" + toTex( node.children[0] ) + ")";
           break;
         case FUNC_SQRT:
-          ret = "sqrt(" + toTex( node.children[0] ) + ")";
+          ret = "√{" + toTex( node.children[0] ) + "}";
           break;
         case FUNC_EXP:
           ret = "exp(" + toTex( node.children[0] ) + ")";
