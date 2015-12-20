@@ -1,3 +1,97 @@
+// Automatic Simplifiy (u)
+// To begin, since integers and symbols are in simplified form, the pro-
+// cedure simply returns the input expression simplified [page 91]
+function automatic_simplify(node)
+{
+	var ret = 0;
+
+	switch(node.type)
+	{
+		case NODE_CONST:
+		case NODE_VAR:
+			ret = node;
+			break;
+		case NODE_OP:
+			// var children = node.children.slice(0);
+			// for(var i = 0; i < children.length; i++)
+			// {
+			// 	children[i] = automatic_simplify(children[i]);
+			// }
+			switch(node.value)
+			{
+				case OP_DIV:
+					var left = automatic_simplify(node.children[0]);
+					var right = automatic_simplify(node.children[1]);
+					// identify fraction
+					if(left.type == NODE_CONST && right.type == NODE_CONST)
+					{
+						ret = simplify_rational_number(construct(OP_DIV, left, right));
+					// identify quotient
+					}else{
+						ret = simplify_quotient(node);
+					}
+					break;
+				case OP_POW:
+				case OP_MUL:
+				case OP_ADD:
+					ret = construct(OP_ADD, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
+					break;
+				case OP_SUB:
+					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
+					break;
+				case OP_NEG:
+					ret = simplify_difference(automatic_simplify(node.children[0]));
+					break;
+				case OP_POW:
+					// not implemented yet
+					ret = node;
+					break;
+			}
+			break;
+		case NODE_FUNC:
+			// not implemented yet
+			ret = node;
+			break;
+	}
+	return ret;
+}
+
+// Simplify Rational Number (u)
+// Let u be an integer or a fraction with non-zero denominator. The operator
+// Simplify rational number(u) transforms u to a rational number in standard form [page 37]
+function simplify_rational_number(node)
+{
+	var n = node.children[0].value;
+	var d = node.children[1].value;
+	if(n % d == 0) return createNode(NODE_CONST, (n / d) >> 0); // compare remainder and return integer quotient
+	else{
+		var g = gcd(n, d);
+		if(d > 0)
+			return createNode(NODE_OP, OP_DIV, createNode(NODE_CONST, (n / g) >> 0), createNode(NODE_CONST, (d / g) >> 0));
+		else
+			return createNode(NODE_OP, OP_DIV, createNode(NODE_CONST, (-n / g) >> 0), createNode(NODE_CONST, (-d / g) >> 0));
+	}
+}
+
+// Simplify Difference (u)
+// The operator Simplify difference(u) is based on the basic difference
+// transformations −u = (−1) · u and u − v = u + (−1) · v. [page 106]
+function simplify_difference(node)
+{
+	if(node.type == NODE_CONST)
+		return createNode(NODE_CONST, -node.value);
+	else
+		return construct(OP_MUL, createNode(NODE_CONST, -1), node);
+}
+
+// Simplify Quotient (u)
+// The operator Simplify quotient, which simplifies quotients, is based on the
+// basic quotient transformation u/v = u · v −1 [page 106]
+function simplify_quotient(node)
+{
+	return construct(OP_MUL, automatic_simplify(node.children[0]), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_CONST, -1)));
+}
+
 // Basic Algebraic Expressions
 // The BAEs are similar to conventional algebraic expressions, except now
 // products and sums can have one or more operands [page 80]
@@ -112,4 +206,20 @@ function construct(operator, expressions)
 	}
 
 	return n;
+}
+
+// Returns the GCD of the given integers. Each input will be transformer into non-negative.
+function gcd(a, b)
+{
+	a = Math.abs(a);
+	b = Math.abs(b);
+    if (!a) return b;
+    if (!b) return a;
+
+    while (1) {
+        a%= b;
+        if (!a) return b;
+        b%= a;
+        if (!b) return a;
+    }
 }
