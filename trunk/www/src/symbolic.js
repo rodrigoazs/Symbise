@@ -406,11 +406,13 @@ function toTex( node )
           ret = "{" + toTex( node.children[0] ) + "}/{" + toTex( node.children[1] ) +"}";
           break;
         case OP_MUL:
-          if(node.children[0].type == NODE_CONST || node.children[1].type == NODE_CONST)
-            ret = toTex( node.children[0] ) +"·"+ toTex( node.children[1] );
-          else if(node.children[1].type == NODE_VAR){
+          if(node.children[1].type == NODE_CONST)
+          {
+          	left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+            ret = left + "·" + toTex( node.children[1] );
+          }else if(node.children[1].type == NODE_VAR){
             left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
-            ret = left +"\\,"+ toTex( node.children[1] );
+            ret = left + "\\," + toTex( node.children[1] );
           }else{
             left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
             right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + toTex( node.children[1] ) + ")" : toTex( node.children[1] );
@@ -418,7 +420,8 @@ function toTex( node )
           }
           break;
         case OP_NEG:
-          ret = node.children[0].type == NODE_OP ? "(-" + toTex( node.children[0] ) + ")" : "-"+ toTex( node.children[0] );
+          //ret = node.children[0].type == NODE_OP ? "(-" + toTex( node.children[0] ) + ")" : "-"+ toTex( node.children[0] );
+          ret = "(-" + toTex( node.children[0] ) + ")";
           break;
         case OP_POW:
           left = node.children[0].type == NODE_OP ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
@@ -533,6 +536,13 @@ function initparser( node )
 {
   var func = stringEquation( node );
   var diff = symbolicDiff( node );
+  //var teste = automatic_simplify(node);
+  var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_CONST, 1), createNode(NODE_VAR, "x")), createNode(NODE_CONST, 3));
+  var a2 = construct(OP_ADD, createNode(NODE_CONST, 1), createNode(NODE_VAR, "x"));
+  var a3 = createNode(NODE_CONST, 2);
+  var array = new Array(a1, a2, a3);
+  array.sort(compare); 
+  //alert(compare(a3, a2));
   //alert(toMathML( diff ) );
   $("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
   M.parseMath(document.getElementById("console"));
