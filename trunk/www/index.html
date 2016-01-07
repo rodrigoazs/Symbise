@@ -6,6 +6,7 @@
 	<link rel="stylesheet" href="themes/Mathsym.min.css" />
 	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
 	<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" />
+	<link rel="stylesheet" href="css/material-design-iconic-font.min.css" />
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=UnifrakturMaguntia">
 	<link rel="stylesheet" href="src/mathscribe/jqmath-0.4.3.css">
 	<script src="src/mathscribe/jquery-1.4.3.min.js"></script>
@@ -15,8 +16,15 @@
 </head>
 <body>
 	<div data-role="page" data-theme="a">
+		<div data-role="panel" id="panel" style="background-color: #062235;">
+			<div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-flower-alt zmdi-hc-2x" style="color: white;"></i></div>
+		    <div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-layers zmdi-hc-2x" style="color: white;"></i></div>
+		    <div style="text-align: center;"><a href="#settings" data-transition="slide"><i class="zmdi zmdi-settings zmdi-hc-2x" style="color: white;"></i></a></div>
+		</div>
 		<div data-role="header" data-position="inline">
-			<h1>MathSym</h1>
+			<h1><i class="zmdi zmdi-fire"></i> MathSym</h1>
+			<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
+			<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
 		</div>
 		<div data-role="content" data-theme="a">
 			<form onSubmit="return false;"><table style="width:100%"><tr>
@@ -27,9 +35,58 @@
 			         <input id="equalbtn" value="=" type="submit">
 			    </td>
 			</tr></table>
-			<div id="console"  class="ui-body ui-body-a ui-corner-all" style="visibility: hidden; overflow-x:scroll;">
+			<div id="console" class="ui-body ui-body-a ui-corner-all" style="visibility: hidden; overflow-x:scroll;">
           		<p>ssss</p>
       		</div>
+		</div>
+	</div>
+	<div data-role="page" id="settings">
+		<div data-role="header" data-position="inline">
+			<h1>Configurações</h1>
+			<a data-rel="back" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-chevron-left"></i></a>
+		</div>
+		<div data-role="content" data-theme="a">
+			  <div class="ui-field-contain">
+			    <label for="name">Full Name:</label>
+			    <input name="text" id="name" value="" placeholder="What's Your Name?" type="text">
+			    </div>
+			    
+			    <div class="ui-field-contain">
+			    <label for="search">Looking for anything?</label>
+			    <input name="search" id="search" value="" placeholder="Search for content" data-type="search" type="text">
+			  </div>
+
+			  <div class="ui-field-contain">
+			    <label for="date">Today's date:</label>
+			   <input name="date" id="date" value="" type="date">
+			  </div>
+			  
+			  <div class="ui-field-contain">
+			    <label for="colors">Choose Favorite Color:</label>
+			   <select id="colors" name="colors">
+			      <option value="red">Red</option>
+			      <option value="green">Green</option>
+			      <option value="blue">Blue</option>
+			    </select>
+			  </div>
+			    
+			  <div class="ui-field-contain">
+			  <label for="switch">Flip Switch:</label>
+					<select name="slider2" id="slider2" data-role="slider">
+					    <option value="off">Off</option>
+					    <option value="on">On</option>
+					</select>
+			  </div>
+
+			   <div class="ui-field-contain">
+			   <legend>Choose Favorite Movies:</legend>
+			   
+			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov1">The Shawshank Redemption</label><input data-cacheval="false" name="mov1" id="mov1" type="checkbox"></div>
+			   
+			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off" for="mov2">The Godfather</label><input name="mov2" id="mov2" type="checkbox"></div>
+			   
+			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov3">Pulp Fiction</label><input data-cacheval="false" name="mov3" id="mov3" type="checkbox"></div>
+			   </div>
 		</div>
 	</div>
 <script src="src/order.js"></script>
