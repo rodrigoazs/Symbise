@@ -35,9 +35,16 @@
 			         <input id="equalbtn" value="=" type="submit">
 			    </td>
 			</tr></table>
-			<div id="console" class="ui-body ui-body-a ui-corner-all" style="visibility: hidden; overflow-x:scroll;">
-          		<p>ssss</p>
+			<div id="console" class="ui-body ui-body-a ui-corner-all" style="display: none; overflow-x:scroll;">
       		</div>
+      		<br>
+      		<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
+			  <div id="header-plot" class="ui-bar ui-bar-a">
+			    <h3>Plot</h3>
+			  </div>
+			  <div id="canvas-plot" class="ui-body ui-body-a" style="display: none;">
+			  </div>
+			</div>
 		</div>
 	</div>
 	<div data-role="page" id="settings">
@@ -89,6 +96,20 @@
 			   </div>
 		</div>
 	</div>
+<script src="src/function-plot/d3.js"></script>
+<script src="src/function-plot/function-plot.js"></script>
+<script>
+var instance = functionPlot({
+  target: '#canvas-plot',
+  disableZoom: true,
+  width: 300,
+  height: 200,
+  yAxis: {domain: [-1, 1]},
+  xAxis: {domain: [-6.28, 6.28]},
+  data: [{
+    fn: 'sin(x)'
+  }]
+})</script>
 <script src="src/order.js"></script>
 <script src="src/simplification.js"></script>
 <script src="src/symbolic.js"></script>

@@ -7,5 +7,18 @@ $( "#equalbtn" ).click(function() {
 	        $("#console").text(errstr);
 	        
 	    }
-	$("#console").css("visibility", "visible");
+	$("#console").css("display", "block");
+	$("#content-plot").css("display", "block");
+});
+
+$( "#header-plot" ).click(function() {
+	if($( "#canvas-plot" ).css("display") == "none"){
+	 	$( "#canvas-plot" ).slideDown( 1000, function() {
+    		$( this ).focus();
+    	});
+	}else{
+		$( "#canvas-plot" ).slideUp( 1000, function() {
+			$( this ).css("display", "none");
+    	});
+	}
 });
