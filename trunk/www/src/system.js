@@ -17,6 +17,8 @@ $( "#equalbtn" ).click(function() {
 
 $( "#header-plot" ).click(function() {
 	if($( "#canvas-plot" ).css("display") == "none"){
+		if($.isNumeric(plot_value))
+			plot_value = plot_value.toString();
 		var instance = functionPlot({
 			  target: '#canvas-plot',
 			  disableZoom: true,
