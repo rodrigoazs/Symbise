@@ -11,7 +11,7 @@ function compare(u, v)
 {
 	// O-1. Suppose that u and v are both constants (integers or fractions). Then,
 	// u✁v → u < v
-	if((kind(u) == NODE_CONST || is_fraction(u)) && (kind(v) == NODE_CONST || is_fraction(v)))
+	if((kind(u) == NODE_INT || is_fraction(u)) && (kind(v) == NODE_INT || is_fraction(v)))
 	{
 		var u_value = is_fraction(u) ? u.children[0].value / u.children[1].value : u.value;
 		var v_value = is_fraction(v) ? v.children[0].value / v.children[1].value : v.value;
@@ -25,7 +25,7 @@ function compare(u, v)
 	}
 	// O-2. Suppose that u and v are both symbols. Then, u✁v is defined by
 	// the lexicographical order of the symbols.
-	else if(kind(u) == NODE_VAR && kind(v) == NODE_VAR)
+	else if(kind(u) == NODE_SYM && kind(v) == NODE_SYM)
 	{
 		if(u.value == v.value)
 			return 0;
@@ -103,28 +103,28 @@ function compare(u, v)
 		}
 	}
 	// O-7. If u is an integer or fraction and v is any other type, then u✁v.
-	else if((kind(u) == NODE_CONST || is_fraction(u)) && kind(v) != NODE_CONST && !is_fraction(v))
+	else if((kind(u) == NODE_INT || is_fraction(u)) && kind(v) != NODE_INT && !is_fraction(v))
 	{
 		return -1;
 	}
 	// O-8. Suppose that u is a product. If v is a power, sum, factorial, function,
 	// or symbol, then 9
 	// u✁v → u✁ · v.
-	else if(kind(u) == OP_MUL && (kind(v) == OP_POW || kind(v) == OP_ADD || kind(v) == NODE_VAR || v.type == NODE_FUNC))
+	else if(kind(u) == OP_MUL && (kind(v) == OP_POW || kind(v) == OP_ADD || kind(v) == NODE_SYM || v.type == NODE_FUNC))
 	{
 		return compare(u, construct(OP_MUL, v));
 	}
 	// O-9. Suppose that u is a power. If v is a sum, factorial, function, or
 	// symbol, then
 	// u✁v → u✁v 1 .
-	else if(kind(u) == OP_POW && (kind(v) == OP_ADD || kind(v) == NODE_VAR || v.type == NODE_FUNC))
+	else if(kind(u) == OP_POW && (kind(v) == OP_ADD || kind(v) == NODE_SYM || v.type == NODE_FUNC))
 	{
-		return compare(u, construct(OP_POW, v, createNode(NODE_CONST, 1)));
+		return compare(u, construct(OP_POW, v, createNode(NODE_INT, 1)));
 	}
 	// O-10. Suppose that u is a sum. If v is a factorial, function, or symbol,
 	// then
 	// u✁v → u✁ + v.
-	else if(kind(u) == OP_ADD && (kind(v) == NODE_VAR || v.type == NODE_FUNC))
+	else if(kind(u) == OP_ADD && (kind(v) == NODE_SYM || v.type == NODE_FUNC))
 	{
 		return compare(u, construct(OP_ADD, v));
 	}
@@ -148,5 +148,5 @@ function compare(u, v)
 // Return if the node is a fraction or not
 function is_fraction(u)
 {
-	return u.type == NODE_OP && u.value == OP_DIV && u.children[0].type == NODE_CONST && u.children[1].type == NODE_CONST;
+	return u.type == NODE_OP && u.value == OP_DIV && u.children[0].type == NODE_INT && u.children[1].type == NODE_INT;
 }

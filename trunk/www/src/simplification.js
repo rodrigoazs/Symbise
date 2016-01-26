@@ -7,8 +7,8 @@ function automatic_simplify(node)
 
 	switch(node.type)
 	{
-		case NODE_CONST:
-		case NODE_VAR:
+		case NODE_INT:
+		case NODE_SYM:
 			ret = node;
 			break;
 		case NODE_OP:
@@ -23,7 +23,7 @@ function automatic_simplify(node)
 					var left = automatic_simplify(node.children[0]);
 					var right = automatic_simplify(node.children[1]);
 					// identify fraction
-					if(left.type == NODE_CONST && right.type == NODE_CONST)
+					if(left.type == NODE_INT && right.type == NODE_INT)
 					{
 						ret = simplify_rational_number(construct(OP_DIV, left, right));
 					// identify quotient
@@ -63,13 +63,13 @@ function simplify_rational_number(node)
 {
 	var n = node.children[0].value;
 	var d = node.children[1].value;
-	if(n % d == 0) return createNode(NODE_CONST, (n / d) >> 0); // compare remainder and return integer quotient
+	if(n % d == 0) return createNode(NODE_INT, (n / d) >> 0); // compare remainder and return integer quotient
 	else{
 		var g = gcd(n, d);
 		if(d > 0)
-			return createNode(NODE_OP, OP_DIV, createNode(NODE_CONST, (n / g) >> 0), createNode(NODE_CONST, (d / g) >> 0));
+			return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (n / g) >> 0), createNode(NODE_INT, (d / g) >> 0));
 		else
-			return createNode(NODE_OP, OP_DIV, createNode(NODE_CONST, (-n / g) >> 0), createNode(NODE_CONST, (-d / g) >> 0));
+			return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (-n / g) >> 0), createNode(NODE_INT, (-d / g) >> 0));
 	}
 }
 
@@ -78,10 +78,10 @@ function simplify_rational_number(node)
 // transformations −u = (−1) · u and u − v = u + (−1) · v. [page 106]
 function simplify_difference(node)
 {
-	if(node.type == NODE_CONST)
-		return createNode(NODE_CONST, -node.value);
+	if(node.type == NODE_INT)
+		return createNode(NODE_INT, -node.value);
 	else
-		return construct(OP_MUL, createNode(NODE_CONST, -1), node);
+		return construct(OP_MUL, createNode(NODE_INT, -1), node);
 }
 
 // Simplify Quotient (u)
@@ -89,7 +89,7 @@ function simplify_difference(node)
 // basic quotient transformation u/v = u · v −1 [page 106]
 function simplify_quotient(node)
 {
-	return construct(OP_MUL, automatic_simplify(node.children[0]), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_CONST, -1)));
+	return construct(OP_MUL, automatic_simplify(node.children[0]), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_INT, -1)));
 }
 
 // Basic Algebraic Expressions
@@ -136,7 +136,7 @@ function BAE_transform(node)
 // integer, fraction, +, ∗, ∧, and function names). For example, Kind (m ∗ x + b) → +. [page 8]
 function kind(node)
 {
-	if(node.type == NODE_CONST || node.type == NODE_VAR)
+	if(node.type == NODE_INT || node.type == NODE_SYM)
 		return node.type;
 	else
 		return node.value;
@@ -163,7 +163,7 @@ function operand(node, pos)
 // This operator returns all the operands of the main
 function operands(node)
 {
-	if(node.type == NODE_CONST || node.type == NODE_VAR)
+	if(node.type == NODE_INT || node.type == NODE_SYM)
 		return node;
 	else
 		return node.children;

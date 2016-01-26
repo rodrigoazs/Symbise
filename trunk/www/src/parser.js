@@ -8,17 +8,17 @@ var children;
 }
 
 //Defines
-var NODE_OP = 0;
-var NODE_VAR = 1;
-var NODE_CONST = 2;
-var NODE_FUNC = 3;
+var NODE_OP = 0;    // Operator
+var NODE_SYM = 1;   // Symbol
+var NODE_INT = 2;   // Integer
+var NODE_FUNC = 3;  // Function
 
-var OP_ADD = 10;
-var OP_SUB = 11;
-var OP_DIV = 12;
-var OP_MUL = 13;
-var OP_NEG = 14;
-var OP_POW = 15;
+var OP_ADD = 10;    // Addition
+var OP_SUB = 11;    // Subtraction
+var OP_DIV = 12;    // Division (used for interpreting "/" and for fractions after automatic simplification)
+var OP_MUL = 13;    // Multiplication
+var OP_NEG = 14;    // Negation
+var OP_POW = 15;    // Power
 
 var FUNC_SQRT = 20;
 var FUNC_EXP = 21;
@@ -188,11 +188,11 @@ break;
 }
 break;
 
-case NODE_VAR:
+case NODE_SYM:
 ret = "x";
 break;
 
-case NODE_CONST:
+case NODE_INT:
 ret = Number( node.value );
 break;
 }
@@ -1360,7 +1360,7 @@ switch( act )
     break;
     case 16:
     {
-         rval = createNode( NODE_VAR, vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_SYM, vstack[ vstack.length - 1 ] );
     }
     break;
     case 17:
@@ -1370,12 +1370,12 @@ switch( act )
     break;
     case 18:
     {
-         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_INT, vstack[ vstack.length - 1 ] );
     }
     break;
     case 19:
     {
-         rval = createNode( NODE_CONST, vstack[ vstack.length - 1 ] );
+         rval = createNode( NODE_INT, vstack[ vstack.length - 1 ] );
     }
     break;
     case 20:
@@ -1520,17 +1520,17 @@ switch( act )
     break;
     case 48:
     {
-         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_CONST, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_INT, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
     }
     break;
     case 49:
     {
-         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_CONST, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_INT, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
     }
     break;
     case 50:
     {
-         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_VAR, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_FUNC, FUNC_BLOG, createNode(NODE_SYM, vstack[ vstack.length - 4 ]), vstack[ vstack.length - 2 ] );
     }
     break;
 }

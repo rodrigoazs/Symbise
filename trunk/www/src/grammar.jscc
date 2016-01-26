@@ -10,8 +10,8 @@ function NODE()
 
 //Defines
 var NODE_OP = 0;
-var NODE_VAR  = 1;
-var NODE_CONST  = 2;
+var NODE_SYM  = 1;
+var NODE_INT  = 2;
 var NODE_FUNC = 3;
 
 var OP_ADD  = 10;
@@ -189,11 +189,11 @@ function execute( node )
       }
       break;
 
-    case NODE_VAR:
+    case NODE_SYM:
       ret = "x";
       break;
       
-    case NODE_CONST:
+    case NODE_INT:
       ret = Number( node.value );
       break;
   }
@@ -279,12 +279,12 @@ NegExp:     '-' Value           [* %% = createNode( NODE_OP, OP_NEG, %2 ); *]
             ;
 
 Value:      NumericValue
-            | IDENTIFIER        [* %% = createNode( NODE_VAR, %1 ); *]
+            | IDENTIFIER        [* %% = createNode( NODE_SYM, %1 ); *]
             | ParenExp
             ;
 
-NumericValue: INT               [* %% = createNode( NODE_CONST, %1 ); *]
-            | FLOAT             [* %% = createNode( NODE_CONST, %1 ); *]
+NumericValue: INT               [* %% = createNode( NODE_INT, %1 ); *]
+            | FLOAT             [* %% = createNode( NODE_INT, %1 ); *]
             ;
 
 ParenExp:   '(' e ')'           [* %% = %2; *]
