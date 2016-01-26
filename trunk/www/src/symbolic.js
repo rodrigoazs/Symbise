@@ -532,6 +532,9 @@ function toTex( node )
   return ret;  
 }
 
+// Global var for the function plot
+var plot_value;
+
 function initparser( node )
 {
   var func = stringEquation( node );
@@ -545,5 +548,7 @@ function initparser( node )
   //alert(compare(a3, a2));
   //alert(toMathML( diff ) );
   $("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
+  // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
+  plot_value = stringEquation(diff);
   M.parseMath(document.getElementById("console"));
 }

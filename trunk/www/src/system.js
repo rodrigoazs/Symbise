@@ -1,4 +1,7 @@
 $( "#equalbtn" ).click(function() {
+	// Close canvas-plot when request new calculation
+	$("#canvas-plot").css("display", "none");
+	// Start the parser
 	var str = $("#textinpt").val();
 	if( ( error_count = __parse( str, error_offsets, error_lookaheads ) ) > 0 )
 	    { var errstr = new String(); for( var i = 0; i < error_count; i++ )
@@ -7,12 +10,24 @@ $( "#equalbtn" ).click(function() {
 	        $("#console").text(errstr);
 	        
 	    }
+	// Show console and content-plot
 	$("#console").css("display", "block");
 	$("#content-plot").css("display", "block");
 });
 
 $( "#header-plot" ).click(function() {
 	if($( "#canvas-plot" ).css("display") == "none"){
+		var instance = functionPlot({
+			  target: '#canvas-plot',
+			  disableZoom: true,
+			  width: 300,
+			  height: 200,
+			  yAxis: {domain: [-1.5, 1.5]},
+			  xAxis: {domain: [-6.28, 6.28]},
+			  data: [{
+			    fn: plot_value
+			  }]
+			})
 	 	$( "#canvas-plot" ).slideDown( 1000, function() {
     		$( this ).focus();
     	});

@@ -99,6 +99,7 @@
 <script src="src/function-plot/d3.js"></script>
 <script src="src/function-plot/function-plot.js"></script>
 <script>
+var value_plot = 'sin(x)';
 var instance = functionPlot({
   target: '#canvas-plot',
   disableZoom: true,
@@ -107,7 +108,7 @@ var instance = functionPlot({
   yAxis: {domain: [-1, 1]},
   xAxis: {domain: [-6.28, 6.28]},
   data: [{
-    fn: 'sin(x)'
+    fn: value_plot
   }]
 })</script>
 <script src="src/order.js"></script>
