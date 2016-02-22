@@ -53,7 +53,11 @@ function automatic_simplify(node)
 			break;
 		case NODE_FUNC:
 			// not implemented yet
-			ret = node;
+			var new_children = new Array();
+			for(var i = 0; i < node.children.length; i++) {
+				new_children[i] = automatic_simplify(node.children[i]);
+			}
+			ret = createNodeWithArray(node.type, node.value, new_children);
 			break;
 	}
 	return ret;
