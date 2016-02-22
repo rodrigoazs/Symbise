@@ -34,9 +34,11 @@ function automatic_simplify(node)
 				case OP_MUL:
 					// not implemented yet
 					ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
+					ret.children.sort(compare);
 					break;
 				case OP_ADD:
 					ret = construct(OP_ADD, simplify_sum(automatic_simplify(node.children[0])), simplify_sum(automatic_simplify(node.children[1])));
+					ret.children.sort(compare);
 					break;
 				case OP_SUB:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
