@@ -32,7 +32,9 @@ function automatic_simplify(node)
 					}
 					break;
 				case OP_POW:
+					break;
 				case OP_MUL:
+					break;
 				case OP_ADD:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
 					break;
@@ -119,10 +121,21 @@ function BAE_transform(node)
         			ret = construct(OP_MUL, left_op, right_op);
         			break;
         		default:
-        			ret = node;
+							var new_childs = new Array();
+							for(var i = 0; i < node.children.length; i++) {
+								new_childs[i] = BAE_transform(node.children[i]);
+							}
+							ret = createNodeWithArray(node.type, node.value, new_childs);
         			break;
         	}
         	break;
+				case NODE_FUNC:
+					var new_childs = new Array();
+					for(var i = 0; i < node.children.length; i++) {
+						new_childs[i] = BAE_transform(node.children[i]);
+					}
+					ret = createNodeWithArray(node.type, node.value, new_childs);
+					break;
         default:
         	ret = node;
         	break;
@@ -206,6 +219,20 @@ function construct(operator, expressions)
 	}
 
 	return n;
+}
+
+// Same function as createNode instead of using array parameter
+function createNodeWithArray(type, value, childs)
+{
+  var n = new NODE();
+  n.type = type;
+  n.value = value;
+  n.children = new Array();
+
+  for( var i = 0; i < childs.length; i++ )
+  	n.children.push( childs[i] );
+
+  return n;
 }
 
 // Returns the GCD of the given integers. Each input will be transformer into non-negative.

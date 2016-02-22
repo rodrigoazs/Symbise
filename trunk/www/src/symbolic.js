@@ -106,10 +106,10 @@ function stringEquationParen( node )
 function symbolicDiff( node )
 {
   var ret = 0;
-  
+
   if( !node )
     return 0;
-    
+
   switch( node.type )
   {
     case NODE_OP:
@@ -144,7 +144,7 @@ function symbolicDiff( node )
           break;
         case FUNC_COS:
           ret = symbolicNegation(symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0]) ));
-          break; 
+          break;
         case FUNC_ASINH:
           ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicAdder(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
           break;
@@ -232,13 +232,13 @@ function symbolicDiff( node )
       else
         ret = createNode( NODE_INT, 0 );
       break;
-      
+
     case NODE_INT:
       ret = createNode( NODE_INT, 0 );
       break;
   }
-  
-  return ret;  
+
+  return ret;
 }
 
 function stringEquation( node )
@@ -246,17 +246,22 @@ function stringEquation( node )
   var ret = 0;
   var left = 0;
   var right = 0;
-  
+
   if( !node )
     return 0;
-    
+
   switch( node.type )
   {
     case NODE_OP:
       switch( node.value )
       {
         case OP_ADD:
-          ret = stringEquation( node.children[0] ) + "+" + stringEquation( node.children[1] );
+          //ret = stringEquation( node.children[0] ) + "+" + stringEquation( node.children[1] );
+          var ChildrenTex = new Array();
+          for(var i = 0; i < node.children.length; i++) {
+            ChildrenTex[i] = stringEquation(node.children[i]);
+          }
+          ret = ChildrenTex.join("+");
           break;
         case OP_SUB:
           ret = stringEquation( node.children[0] ) + "-" + stringEquation( node.children[1] );
@@ -373,13 +378,13 @@ function stringEquation( node )
     case NODE_SYM:
       ret = node.value;
       break;
-      
+
     case NODE_INT:
       ret = node.value;
       break;
   }
-  
-  return ret;  
+
+  return ret;
 }
 
 function toTex( node )
@@ -387,17 +392,22 @@ function toTex( node )
   var ret = 0;
   var left = 0;
   var right = 0;
-  
+
   if( !node )
     return 0;
-    
+
   switch( node.type )
   {
     case NODE_OP:
       switch( node.value )
       {
         case OP_ADD:
-          ret = toTex( node.children[0] ) + "+" + toTex( node.children[1] );
+          //ret = toTex( node.children[0] ) + "+" + toTex( node.children[1] );
+          var ChildrenTex = new Array();
+          for(var i = 0; i < node.children.length; i++) {
+            ChildrenTex[i] = toTex(node.children[i]);
+          }
+          ret = ChildrenTex.join("+");
           break;
         case OP_SUB:
           ret = toTex( node.children[0] ) + "-" + toTex( node.children[1] );
@@ -523,13 +533,13 @@ function toTex( node )
     case NODE_SYM:
       ret = node.value;
       break;
-      
+
     case NODE_INT:
       ret = node.value;
       break;
   }
-  
-  return ret;  
+
+  return ret;
 }
 
 // Global var for the function plot
@@ -539,15 +549,22 @@ function initparser( node )
 {
   var func = stringEquation( node );
   var diff = symbolicDiff( node );
-  //var teste = automatic_simplify(node);
-  var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
-  var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
-  var a3 = createNode(NODE_INT, 2);
+
+  var simplified = automatic_simplify(node);
+  var bae_simplified = BAE_transform(node);
+  //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
+  //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
+  //var a3 = createNode(NODE_INT, 2);
+  var a1 = createNode(NODE_INT, 1);
+  var a2 = createNode(NODE_INT, 2);
+  var a3 = createNode(NODE_INT, 3);
   var array = new Array(a1, a2, a3);
-  array.sort(compare); 
+  var a = construct(OP_ADD, array, array);
+  //array.sort(compare);
   //alert(compare(a3, a2));
   //alert(toMathML( diff ) );
-  $("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
+  //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
+  $("#console").html("<p>$$d/{dx}("+toTex(node)+") -> "+toTex( simplified )+"$$</p><br><br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
   plot_value = stringEquation(diff);
   M.parseMath(document.getElementById("console"));

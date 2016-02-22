@@ -52,15 +52,15 @@ var FUNC_ACOTH = 47;
 //Management functions
 function createNode( type, value, childs )
 {
-var n = new NODE();
-n.type = type;
-n.value = value;
-n.children = new Array();
+  var n = new NODE();
+  n.type = type;
+  n.value = value;
+  n.children = new Array();
 
-for( var i = 2; i < arguments.length; i++ )
-n.children.push( arguments[i] );
+  for( var i = 2; i < arguments.length; i++ )
+  n.children.push( arguments[i] );
 
-return n;
+  return n;
 }
 
 function execute( node )
@@ -204,17 +204,17 @@ return ret;
 /*
     Default template driver for JS/CC generated parsers running as
     browser-based JavaScript/ECMAScript applications.
-    
+
     WARNING:     This parser template will not run as console and has lesser
                 features for debugging than the console derivates for the
                 various JavaScript platforms.
-    
+
     Features:
     - Parser trace messages
     - Integrated panic-mode error recovery
-    
+
     Written 2007, 2008 by Jan Max Meyer, J.M.K S.F. Software Technologies
-    
+
     This is in the public domain.
 */
 
@@ -669,7 +669,7 @@ switch( state )
     {
         info.att = info.src.substr( start, match_pos - start );
         info.offset = match_pos;
-        
+
 switch( match )
 {
     case 37:
@@ -709,7 +709,7 @@ function __parse( src, err_off, err_la )
     var        rval;
     var     parseinfo        = new Function( "", "var offset; var src; var att;" );
     var        info            = new parseinfo();
-    
+
 /* Pop-Table */
 var pop_tab = new Array(
     new Array( 0/* p' */, 1 ),
@@ -1131,19 +1131,19 @@ var labels = new Array(
 );
 
 
-    
+
     info.offset = 0;
     info.src = src;
     info.att = new String();
-    
+
     if( !err_off )
         err_off    = new Array();
     if( !err_la )
     err_la = new Array();
-    
+
     sstack.push( 0 );
     vstack.push( 0 );
-    
+
     la = __lex( info );
 
     while( true )
@@ -1168,20 +1168,20 @@ var labels = new Array(
                             "\tStack: " + sstack.join() + "\n" +
                             "\tValue stack: " + vstack.join() + "\n" );
         }
-        
-            
+
+
         //Panic-mode: Try recovery when parse-error occurs!
         if( act == 152 )
         {
             if( _dbg_withtrace )
                 __dbg_print( "Error detected: There is no reduce or shift on the symbol " + labels[la] );
-            
+
             err_cnt++;
-            err_off.push( info.offset - info.att.length );            
+            err_off.push( info.offset - info.att.length );
             err_la.push( new Array() );
             for( var i = 0; i < act_tab[sstack[sstack.length-1]].length; i+=2 )
                 err_la[err_la.length-1].push( labels[act_tab[sstack[sstack.length-1]][i]] );
-            
+
             //Remember the original stack!
             var rsstack = new Array();
             var rvstack = new Array();
@@ -1190,7 +1190,7 @@ var labels = new Array(
                 rsstack[i] = sstack[i];
                 rvstack[i] = vstack[i];
             }
-            
+
             while( act == 152 && la != 48 )
             {
                 if( _dbg_withtrace )
@@ -1199,15 +1199,15 @@ var labels = new Array(
                                     "Action: " + act + "\n\n" );
                 if( la == -1 )
                     info.offset++;
-                    
+
                 while( act == 152 && sstack.length > 0 )
                 {
                     sstack.pop();
                     vstack.pop();
-                    
+
                     if( sstack.length == 0 )
                         break;
-                        
+
                     act = 152;
                     for( var i = 0; i < act_tab[sstack[sstack.length-1]].length; i+=2 )
                     {
@@ -1218,19 +1218,19 @@ var labels = new Array(
                         }
                     }
                 }
-                
+
                 if( act != 152 )
                     break;
-                
+
                 for( var i = 0; i < rsstack.length; i++ )
                 {
                     sstack.push( rsstack[i] );
                     vstack.push( rvstack[i] );
                 }
-                
+
                 la = __lex( info );
             }
-            
+
             if( act == 152 )
             {
                 if( _dbg_withtrace )
@@ -1242,40 +1242,40 @@ var labels = new Array(
             if( _dbg_withtrace )
                 __dbg_print( "\tError recovery succeeded, continuing" );
         }
-        
+
         /*
         if( act == 152 )
             break;
         */
-        
-        
+
+
         //Shift
         if( act > 0 )
-        {            
+        {
             if( _dbg_withtrace )
                 __dbg_print( "Shifting symbol: " + labels[la] + " (" + info.att + ")" );
-        
+
             sstack.push( act );
             vstack.push( info.att );
-            
+
             la = __lex( info );
-            
+
             if( _dbg_withtrace )
                 __dbg_print( "\tNew lookahead symbol: " + labels[la] + " (" + info.att + ")" );
         }
         //Reduce
         else
-        {        
+        {
             act *= -1;
-            
+
             if( _dbg_withtrace )
                 __dbg_print( "Reducing by producution: " + act );
-            
+
             rval = void(0);
-            
+
             if( _dbg_withtrace )
                 __dbg_print( "\tPerforming semantic action..." );
-            
+
 switch( act )
 {
     case 0:
@@ -1539,13 +1539,13 @@ switch( act )
 
             if( _dbg_withtrace )
                 __dbg_print( "\tPopping " + pop_tab[act][1] + " off the stack..." );
-                
+
             for( var i = 0; i < pop_tab[act][1]; i++ )
             {
                 sstack.pop();
                 vstack.pop();
             }
-                                    
+
             go = -1;
             for( var i = 0; i < goto_tab[sstack[sstack.length-1]].length; i+=2 )
             {
@@ -1555,19 +1555,19 @@ switch( act )
                     break;
                 }
             }
-            
+
             if( act == 0 )
                 break;
-                
+
             if( _dbg_withtrace )
                 __dbg_print( "\tPushing non-terminal " + labels[ pop_tab[act][0] ] );
-                
+
             sstack.push( go );
-            vstack.push( rval );            
+            vstack.push( rval );
         }
-        
+
         if( _dbg_withtrace )
-        {        
+        {
             alert( _dbg_string );
             _dbg_string = new String();
         }
@@ -1578,7 +1578,7 @@ switch( act )
         __dbg_print( "\nParse complete." );
         alert( _dbg_string );
     }
-    
+
     return err_cnt;
 }
 
