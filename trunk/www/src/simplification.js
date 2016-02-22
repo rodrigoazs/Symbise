@@ -31,12 +31,13 @@ function automatic_simplify(node)
 						ret = simplify_quotient(node);
 					}
 					break;
-				case OP_POW:
-					break;
 				case OP_MUL:
+					// not implemented yet
+					ret = construct(OP_MUL, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
 					break;
 				case OP_ADD:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
+					//ret = BAE_transform(ret);
 					break;
 				case OP_SUB:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
@@ -46,7 +47,7 @@ function automatic_simplify(node)
 					break;
 				case OP_POW:
 					// not implemented yet
-					ret = node;
+					ret = construct(OP_POW, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
 					break;
 			}
 			break;

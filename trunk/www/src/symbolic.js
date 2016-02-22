@@ -270,9 +270,14 @@ function stringEquation( node )
           ret = stringEquationParen( node.children[0] ) + "/" + stringEquationParen( node.children[1] );
           break;
         case OP_MUL:
-          left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + stringEquation( node.children[0] ) + ")" : stringEquation( node.children[0] );
-          right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + stringEquation( node.children[1] ) + ")" : stringEquation( node.children[1] );
-          ret = left + "*" + right;
+          var ChildrenTex = new Array();
+          for(var i = 0; i < node.children.length; i++) {
+            ChildrenTex[i] = node.children[i].type && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + stringEquation( node.children[i] ) + ")" : stringEquation( node.children[i] );
+          }
+          ret = ChildrenTex.join("*");
+          // left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + stringEquation( node.children[0] ) + ")" : stringEquation( node.children[0] );
+          // right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + stringEquation( node.children[1] ) + ")" : stringEquation( node.children[1] );
+          // ret = left + "*" + right;
           break;
         case OP_NEG:
           ret = node.children[0].type == NODE_OP ? "(-" + stringEquation( node.children[0] ) + ")" : "-"+ stringEquationParen( node.children[0] );
@@ -342,7 +347,7 @@ function stringEquation( node )
         case FUNC_CSCH:
           ret = "csch(" + stringEquation( node.children[0] ) + ")";
           break;
-		case FUNC_ACSC:
+		    case FUNC_ACSC:
           ret = "acsc(" + stringEquation( node.children[0] ) + ")";
           break;
         case FUNC_CSC:
@@ -416,18 +421,24 @@ function toTex( node )
           ret = "{" + toTex( node.children[0] ) + "}/{" + toTex( node.children[1] ) +"}";
           break;
         case OP_MUL:
-          if(node.children[1].type == NODE_INT)
-          {
-          	left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
-            ret = left + "·" + toTex( node.children[1] );
-          }else if(node.children[1].type == NODE_SYM){
-            left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
-            ret = left + "\\," + toTex( node.children[1] );
-          }else{
-            left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
-            right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + toTex( node.children[1] ) + ")" : toTex( node.children[1] );
-            ret = left + "\\," + right;
+          var ChildrenTex = new Array();
+          for(var i = 0; i < node.children.length; i++) {
+            ChildrenTex[i] = node.children[i].type && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + toTex( node.children[i] ) + ")" : toTex( node.children[i] );
           }
+          ret = ChildrenTex.join("·");
+          // Need to develop terms grouping before release this function
+          // if(node.children[1].type == NODE_INT)
+          // {
+          // 	left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+          //   ret = left + "·" + toTex( node.children[1] );
+          // }else if(node.children[1].type == NODE_SYM){
+          //   left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+          //   ret = left + "\\," + toTex( node.children[1] );
+          // }else{
+          //   left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+          //   right = node.children[1].type == NODE_OP && (node.children[1].value == OP_ADD || node.children[1].value == OP_SUB) ? "(" + toTex( node.children[1] ) + ")" : toTex( node.children[1] );
+          //   ret = left + "\\," + right;
+          // }
           break;
         case OP_NEG:
           //ret = node.children[0].type == NODE_OP ? "(-" + toTex( node.children[0] ) + ")" : "-"+ toTex( node.children[0] );
