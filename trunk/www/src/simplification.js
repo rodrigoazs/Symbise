@@ -33,11 +33,10 @@ function automatic_simplify(node)
 					break;
 				case OP_MUL:
 					// not implemented yet
-					ret = construct(OP_MUL, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
+					ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
 					break;
 				case OP_ADD:
-					ret = construct(OP_ADD, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
-					//ret = BAE_transform(ret);
+					ret = construct(OP_ADD, simplify_sum(automatic_simplify(node.children[0])), simplify_sum(automatic_simplify(node.children[1])));
 					break;
 				case OP_SUB:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
@@ -80,6 +79,34 @@ function simplify_rational_number(node)
 	}
 }
 
+// Simplify Sum (u)
+// The operator Simplify sum(u)
+// In development
+function simplify_sum(node)
+{
+	if(kind(node) == OP_ADD)
+	{
+		ret = node.children;
+	}else{
+		ret = node;
+	}
+	return ret;
+}
+
+// Simplify Product (u)
+// The operator Simplify product(u)
+// In development
+function simplify_product(node)
+{
+	if(kind(node) == OP_MUL)
+	{
+		ret = node.children;
+	}else{
+		ret = node;
+	}
+	return ret;
+}
+
 // Simplify Difference (u)
 // The operator Simplify difference(u) is based on the basic difference
 // transformations −u = (−1) · u and u − v = u + (−1) · v. [page 106]
@@ -96,12 +123,14 @@ function simplify_difference(node)
 // basic quotient transformation u/v = u · v −1 [page 106]
 function simplify_quotient(node)
 {
-	return construct(OP_MUL, automatic_simplify(node.children[0]), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_INT, -1)));
+	return construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_INT, -1)));
 }
 
 // Basic Algebraic Expressions
 // The BAEs are similar to conventional algebraic expressions, except now
 // products and sums can have one or more operands [page 80]
+// BAE was created to transform a whole expression into BAE. However, in the automatic_simplify this simplification
+// is already pro
 function BAE_transform(node)
 {
 	var ret = 0;

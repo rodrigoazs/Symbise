@@ -562,15 +562,10 @@ function initparser( node )
   var diff = symbolicDiff( node );
 
   var simplified = automatic_simplify(node);
-  var bae_simplified = BAE_transform(node);
   //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
   //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
   //var a3 = createNode(NODE_INT, 2);
-  var a1 = createNode(NODE_INT, 1);
-  var a2 = createNode(NODE_INT, 2);
-  var a3 = createNode(NODE_INT, 3);
-  var array = new Array(a1, a2, a3);
-  var a = construct(OP_ADD, array, array);
+
   //array.sort(compare);
   //alert(compare(a3, a2));
   //alert(toMathML( diff ) );
