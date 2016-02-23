@@ -95,6 +95,71 @@ function simplify_sum(node)
 	return ret;
 }
 
+// function group_sum_terms(left, right)
+// {
+// 	if(kind(left) == NODE_INT && kind(right) == NODE_INT)
+// 	{
+// 		return createNode(NODE_INT, left.value + right.value);
+// 	}
+// 	if(compare(base(left), base(right)) == 0)
+// 	{
+// 		return construct(OP_MUL, );
+// 	}
+// }
+
+function group_product_terms(left, right)
+{
+	if(kind(left) == NODE_INT && kind(right) == NODE_INT)
+	{
+		return createNode(NODE_INT, left.value * right.value);
+	}
+	else if(compare(base(left), base(right)) == 0)
+	{
+		return construct(OP_POW, base(left), automatic_simplify(construct(OP_ADD, exponent(left), exponent(right))));
+	}
+}
+
+function simplify_product_rec(arg)
+{
+	var children = arg.slice(0); // copy array
+	for(var i = 0; i < children.length; i++)
+	{
+		for(var j = i + 1; j < children.length; j++)
+		{
+			if(i != j)
+			{
+				var n = group_product_terms(children[i], children[j]);
+				if(n !== undefined)
+				{
+					console.log(i + children[i].value +" and "+children[j].value + j);
+					alert(toTex(construct(OP_MUL, children)));
+					//children.splice(j, 1, n);
+					children[i] = n;
+					children.splice(j, 1);
+					j--;
+				}
+			}
+		}
+	}
+	// {
+	// 	var j = 1;
+	// 	while(j < children.length && i != j)
+	// 	{
+	// 		var n = group_product_terms(children[i], children[j]);
+	// 		if(n !== undefined)
+	// 		{
+	// 			console.log(i + children[i].value +" and "+children[j].value + j);
+	// 			children.splice(j, 1, n);
+	// 			children.splice(i, 1);
+	// 		}
+	// 		j++;
+	// 	}
+	// 	i++;
+	// }
+	// return children;
+	return children;
+}
+
 // Simplify Product (u)
 // The operator Simplify product(u)
 // In development
@@ -216,6 +281,26 @@ function operands(node)
 		return node;
 	else
 		return node.children;
+}
+
+// Base (u)
+// This operator returns the base of an ASAE
+function base(node)
+{
+	if(kind(node) == OP_POW)
+		return operand(node, 0);
+	else
+		return node;
+}
+
+// Exponent (u)
+// This operator returns the exponent of an ASAE
+function exponent(node)
+{
+	if(kind(node) == OP_POW)
+		return operand(node, 1);
+	else
+		return createNode(NODE_INT, 1);
 }
 
 // Construct(f, L)

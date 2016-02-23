@@ -562,6 +562,8 @@ function initparser( node )
   var diff = symbolicDiff( node );
 
   var simplified = automatic_simplify(node);
+  //var teste = group_product_terms(simplified.children[0], simplified.children[1]);
+  var teste = simplify_product_rec(simplified.children);
   //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
   //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
   //var a3 = createNode(NODE_INT, 2);
@@ -571,7 +573,7 @@ function initparser( node )
   //alert(compare(a3, a2));
   //alert(toMathML( diff ) );
   //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
-  $("#console").html("<p>$$d/{dx}("+toTex(node)+") -> "+toTex( simplified )+"$$</p><br><br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
+  $("#console").html("<p>$$d/{dx}("+toTex(node)+") -> "+toTex( simplified )+" [ "+toTex(construct(OP_MUL, teste))+"] $$</p><br><br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
   plot_value = stringEquation(diff);
   M.parseMath(document.getElementById("console"));
