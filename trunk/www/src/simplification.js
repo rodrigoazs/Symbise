@@ -65,6 +65,7 @@ function automatic_simplify(node)
 					break;
 				case OP_SUB:
 					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
+					ret.children.sort(compare);	
 					break;
 				case OP_NEG:
 					ret = simplify_difference(automatic_simplify(node.children[0]));
