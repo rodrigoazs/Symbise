@@ -43,8 +43,8 @@ function automatic_simplify(node)
 							new_children.push(simplified);
 						}
 					}
-					ret = construct(OP_MUL, new_children);
-					//ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
+					ret = construct(OP_MUL, simplify_product_rec(new_children));
+					// ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
 					ret.children.sort(compare);
 					break;
 				case OP_ADD:
@@ -176,9 +176,10 @@ function simplify_product_rec(arg)
 // In development
 function simplify_product(node)
 {
+	var ret;
 	if(kind(node) == OP_MUL)
 	{
-		ret = node.children;
+		ret = node.children; //simplify_product_rec(node.children);
 	}else{
 		ret = node;
 	}
