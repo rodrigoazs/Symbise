@@ -555,12 +555,14 @@ function toTex( node )
       switch( node.value )
       {
         case OP_ADD:
-          //ret = toTex( node.children[0] ) + "+" + toTex( node.children[1] );
-          var ChildrenTex = new Array();
+          var group = "";
           for(var i = 0; i < node.children.length; i++) {
-            ChildrenTex[i] = toTex(node.children[i]);
+            if(signal(node.children[i]) && i > 0) {
+              group += "+";
+            }
+            group += toTex(node.children[i]);
           }
-          ret = ChildrenTex.join("+");
+          ret = group;
           break;
         case OP_SUB:
           ret = toTex( node.children[0] ) + "-" + toTex( node.children[1] );
@@ -571,9 +573,22 @@ function toTex( node )
         case OP_MUL:
           var ChildrenTex = new Array();
           for(var i = 0; i < node.children.length; i++) {
-            ChildrenTex[i] = node.children[i].type && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + toTex( node.children[i] ) + ")" : toTex( node.children[i] );
+            if(i == 0 && node.children[i].type == NODE_INT && node.children[i].value == -1)
+              ChildrenTex.push("-");
+            else
+            {
+              if(i != 0)
+              {
+                if(kind(node.children[i-1]) == NODE_INT && kind(node.children[i]) == NODE_INT)
+                  ChildrenTex.push("·");
+                else
+                  ChildrenTex.push("\\,");
+              }
+              var newpush = node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + stringEquation( node.children[i] ) + ")" : stringEquation( node.children[i] );
+              ChildrenTex.push(newpush);
+            }
           }
-          ret = ChildrenTex.join("·");
+          ret = ChildrenTex.join("");
           // Need to develop terms grouping before release this function
           // if(node.children[1].type == NODE_INT)
           // {
