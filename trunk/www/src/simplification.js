@@ -33,11 +33,34 @@ function automatic_simplify(node)
 					break;
 				case OP_MUL:
 					// not implemented yet
-					ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
+					var new_children = new Array();
+					for(var i = 0; i < node.children.length; i++) {
+						var simplified = simplify_product(automatic_simplify(node.children[i]));
+						if(Array.isArray(simplified))
+						{
+							new_children = new_children.concat(simplified);
+						} else {
+							new_children.push(simplified);
+						}
+					}
+					ret = construct(OP_MUL, new_children);
+					//ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
 					ret.children.sort(compare);
 					break;
 				case OP_ADD:
-					ret = construct(OP_ADD, simplify_sum(automatic_simplify(node.children[0])), simplify_sum(automatic_simplify(node.children[1])));
+					var new_children = new Array();
+					for(var i = 0; i < node.children.length; i++) {
+						var simplified = simplify_sum(automatic_simplify(node.children[i]));
+						if(Array.isArray(simplified))
+						{
+							new_children = new_children.concat(simplified);
+						} else {
+							new_children.push(simplified);
+						}
+						//new_children[i] = simplify_sum(automatic_simplify(node.children[i]));
+					}
+					ret = construct(OP_ADD, new_children);
+					// ret = construct(OP_ADD, simplify_sum(automatic_simplify(node.children[0])), simplify_sum(automatic_simplify(node.children[1])));
 					ret.children.sort(compare);
 					break;
 				case OP_SUB:
@@ -122,41 +145,29 @@ function group_product_terms(left, right)
 function simplify_product_rec(arg)
 {
 	var children = arg.slice(0); // copy array
-	for(var i = 0; i < children.length; i++)
+	var i = 0;
+	while(i < children.length - 1)
 	{
-		for(var j = i + 1; j < children.length; j++)
+		var new_children = new Array(children[i]);
+		for(var j=i+1; j < children.length; j++)
 		{
-			if(i != j)
+			var n = group_product_terms(new_children[0], children[j]);
+			if(n === undefined)
 			{
-				var n = group_product_terms(children[i], children[j]);
-				if(n !== undefined)
-				{
-					console.log(i + children[i].value +" and "+children[j].value + j);
-					alert(toTex(construct(OP_MUL, children)));
-					//children.splice(j, 1, n);
-					children[i] = n;
-					children.splice(j, 1);
-					j--;
-				}
+				new_children.push(children[j]);
+			}
+			else
+			{
+				new_children[0] = n;
 			}
 		}
+		var left = children.slice(0, i);
+		var right = new_children.slice(0);
+		var total = left.concat(right);
+		children = total.slice(0);
+		i++;
 	}
-	// {
-	// 	var j = 1;
-	// 	while(j < children.length && i != j)
-	// 	{
-	// 		var n = group_product_terms(children[i], children[j]);
-	// 		if(n !== undefined)
-	// 		{
-	// 			console.log(i + children[i].value +" and "+children[j].value + j);
-	// 			children.splice(j, 1, n);
-	// 			children.splice(i, 1);
-	// 		}
-	// 		j++;
-	// 	}
-	// 	i++;
-	// }
-	// return children;
+
 	return children;
 }
 
