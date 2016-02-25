@@ -256,12 +256,14 @@ function stringEquation( node )
       switch( node.value )
       {
         case OP_ADD:
-          //ret = stringEquation( node.children[0] ) + "+" + stringEquation( node.children[1] );
-          var ChildrenTex = new Array();
+          var group = "";
           for(var i = 0; i < node.children.length; i++) {
-            ChildrenTex[i] = stringEquation(node.children[i]);
+            if(signal(node.children[i]) && i > 0) {
+              group += "+";
+            }
+            group += stringEquation(node.children[i]);
           }
-          ret = ChildrenTex.join("+");
+          ret = group;
           break;
         case OP_SUB:
           ret = stringEquation( node.children[0] ) + "-" + stringEquation( node.children[1] );
@@ -272,7 +274,7 @@ function stringEquation( node )
         case OP_MUL:
           var ChildrenTex = new Array();
           for(var i = 0; i < node.children.length; i++) {
-            ChildrenTex[i] = node.children[i].type && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + stringEquation( node.children[i] ) + ")" : stringEquation( node.children[i] );
+            ChildrenTex[i] = node.children[i].value == OP_ADD || node.children[i].value == OP_SUB ? "(" + stringEquation( node.children[i] ) + ")" : stringEquation( node.children[i] );
           }
           ret = ChildrenTex.join("*");
           // left = node.children[0].type == NODE_OP && (node.children[0].value == OP_ADD || node.children[0].value == OP_SUB) ? "(" + stringEquation( node.children[0] ) + ")" : stringEquation( node.children[0] );

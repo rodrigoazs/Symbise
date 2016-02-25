@@ -64,8 +64,8 @@ function automatic_simplify(node)
 					ret.children.sort(compare);
 					break;
 				case OP_SUB:
-					ret = construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1])));
-					ret.children.sort(compare);	
+					ret = automatic_simplify(construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1]))));
+					ret.children.sort(compare);
 					break;
 				case OP_NEG:
 					ret = simplify_difference(automatic_simplify(node.children[0]));
@@ -384,4 +384,22 @@ function gcd(a, b)
         b%= a;
         if (!b) return a;
     }
+}
+
+// Returns the signal of a term. The node needs to be simplified.
+// false: < 0
+// true: >= 0
+function signal(term)
+{
+	if(kind(term) == NODE_INT)
+	{
+		return term.value >= 0;
+	}else if(kind(term) == OP_MUL)
+	{
+		if(kind(term.children[0]) == NODE_INT)
+		{
+			return term.children[0].value >= 0;
+		}
+		else return true;
+	}else return true;
 }
