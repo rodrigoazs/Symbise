@@ -135,7 +135,12 @@ function compare(u, v)
 
 	// O-12. Suppose that u is a function, and v is a symbol.
 	// -----------------------------------------------------------------
-	// Not implemented yet. It is not possible to use non predetermined functions.
+	// It is not possible to use non predetermined functions. Because of this, a symbol is always
+	// before a function.
+	else if(u.type == NODE_FUNC && kind(v) == NODE_SYM)
+	{
+		return 1;
+	}
 
 	// O-13. If u and v do not satisfy the conditions in any of the above rules,
 	else

@@ -575,7 +575,7 @@ function initparser( node )
   //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
-  
+
   $("#console").html("<p>$$d/{dx}("+toTex(node)+") -> "+toTex( simplified )+"  $$</p><br><br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
   plot_value = stringEquation(diff);

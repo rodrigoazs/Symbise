@@ -82,6 +82,7 @@ function automatic_simplify(node)
 				new_children[i] = automatic_simplify(node.children[i]);
 			}
 			ret = createNodeWithArray(node.type, node.value, new_children);
+			//ret = node;
 			break;
 	}
 	return ret;
