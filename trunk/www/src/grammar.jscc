@@ -55,22 +55,22 @@ function createNode( type, value, childs )
 {
   var n = new NODE();
   n.type = type;
-  n.value = value;  
+  n.value = value;
   n.children = new Array();
-  
+
   for( var i = 2; i < arguments.length; i++ )
     n.children.push( arguments[i] );
-    
+
   return n;
 }
 
 function execute( node )
 {
   var ret = 0;
-  
+
   if( !node )
     return 0;
-    
+
   switch( node.type )
   {
     case NODE_OP:
@@ -104,7 +104,7 @@ function execute( node )
           break;
         case FUNC_COS:
           ret = Math.cos( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_TAN:
           ret = Math.tan( execute( node.children[0] ) );
           break;
@@ -113,7 +113,7 @@ function execute( node )
           break;
         case FUNC_COSH:
           ret = Math.cosh( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_TANH:
           ret = Math.tanh( execute( node.children[0] ) );
           break;
@@ -122,7 +122,7 @@ function execute( node )
           break;
         case FUNC_ACOS:
           ret = Math.acos( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_ATAN:
           ret = Math.atan( execute( node.children[0] ) );
           break;
@@ -131,7 +131,7 @@ function execute( node )
           break;
         case FUNC_ACOSH:
           ret = Math.acosh( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_ATANH:
           ret = Math.atanh( execute( node.children[0] ) );
           break;
@@ -140,7 +140,7 @@ function execute( node )
           break;
         case FUNC_SEC:
           ret = 1 / Math.cos( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_COT:
           ret = 1 / Math.tan( execute( node.children[0] ) );
           break;
@@ -149,7 +149,7 @@ function execute( node )
           break;
         case FUNC_SECH:
           ret = 1 / Math.cos( execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_COTH:
           ret = 1 / Math.tan( execute( node.children[0] ) );
           break;
@@ -158,7 +158,7 @@ function execute( node )
           break;
         case FUNC_ASEC:
           ret = Math.acos(1 / execute( node.children[0] ) );
-          break; 
+          break;
         case FUNC_ACOT:
           ret = Math.atan(1 / execute( node.children[0] )) ;
           break;
@@ -169,7 +169,7 @@ function execute( node )
         case FUNC_ASECH:
           var func_executed = execute( node.children[0] );
           ret = Math.log(Math.sqrt(1/Math.pow(func_executed, 2) - 1) + 1/ func_executed);
-          break; 
+          break;
         case FUNC_ACOTH:
           var func_executed = execute( node.children[0] );
           ret = (Math.log((func_executed+ 1) / func_executed) + Math.log(func_executed/(func_executed-1))) / 2;
@@ -192,12 +192,12 @@ function execute( node )
     case NODE_SYM:
       ret = "x";
       break;
-      
+
     case NODE_INT:
       ret = Number( node.value );
       break;
   }
-  
+
   return ret;
 }
 
@@ -259,11 +259,15 @@ e:          e '-' MulDivExp   [* %% = createNode( NODE_OP, OP_SUB, %1, %3 ); *]
             | e '+' MulDivExp [* %% = createNode( NODE_OP, OP_ADD, %1, %3 ); *]
             | MulDivExp
             ;
-        
+
 MulDivExp:  MulDivExp '*' PowExp      [* %% = createNode( NODE_OP, OP_MUL, %1, %3 ); *]
-            | MulDivExp '/' PowExp    [* %% = createNode( NODE_OP, OP_DIV, %1, %3 ); *]
+            | DivExp
             | PowExp
             | NegExp MulNonExp        [* %% = createNode( NODE_OP, OP_MUL, %1, %2 ); *]
+            ;
+
+DivExp:     DivExp '/' PowExp         [* %% = createNode( NODE_OP, OP_DIV, %1, %3 ); *]
+            | PowExp
             ;
 
 MulNonExp:  MulNonExp Value           [* %% = createNode( NODE_OP, OP_MUL, %1, %2 ); *]
@@ -272,8 +276,9 @@ MulNonExp:  MulNonExp Value           [* %% = createNode( NODE_OP, OP_MUL, %1, %
 
 PowExp:     PowExp '^' NegExp   [* %% = createNode( NODE_OP, OP_POW, %1, %3 ); *]
             | NegExp
+            | DivExp
             ;
-        
+
 NegExp:     '-' Value           [* %% = createNode( NODE_OP, OP_NEG, %2 ); *]
             | Value
             ;

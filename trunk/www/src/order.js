@@ -15,9 +15,9 @@ function compare(u, v)
 	{
 		var u_value = is_fraction(u) ? u.children[0].value / u.children[1].value : u.value;
 		var v_value = is_fraction(v) ? v.children[0].value / v.children[1].value : v.value;
-		if(u.value == v.value)
+		if(u_value == v_value)
 			return 0;
-		else if(u.value < v.value)
+		else if(u_value < v_value)
 			return -1;
 		else
 			return 1;
