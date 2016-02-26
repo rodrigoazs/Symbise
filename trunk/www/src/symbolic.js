@@ -823,7 +823,7 @@ function toTexPowerFunc(node, power)
         ret = "{log}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
         break;
       case FUNC_BLOG:
-        ret = "log_{" + toTex( node.children[0] ) + "}(" + toTex( node.children[1] ) + ")";
+        ret = "{log}_{" + toTex( node.children[0] ) + "}^{" + toTex(power) + "}(" + toTex( node.children[1] ) + ")";
         break;
     }
     return ret;
