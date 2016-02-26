@@ -138,6 +138,16 @@ function group_product_terms(left, right)
 	{
 		return createNode(NODE_INT, left.value * right.value);
 	}
+	else if((is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
+	{
+		var left_num = is_fraction(left) ? left.children[0].value : left.value;
+		var left_den = is_fraction(left) ? left.children[1].value : 1;
+		var right_num = is_fraction(right) ? right.children[0].value : right.value;
+		var right_den = is_fraction(right) ? right.children[1].value : 1;
+		var num = left_num * right_num;
+		var den = left_den * right_den;
+		return simplify_rational_number(construct(OP_DIV, createNode(NODE_INT, num), createNode(NODE_INT, den)));
+	}
 	else if(compare(base(left), base(right)) == 0)
 	{
 		return construct(OP_POW, base(left), automatic_simplify(construct(OP_ADD, exponent(left), exponent(right))));
