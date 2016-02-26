@@ -102,6 +102,14 @@ function stringEquationParen( node )
     return stringEquation( node );
 }
 
+function toTexParenADDSUB( node )
+{
+  if(kind(node) == OP_ADD || kind(node) == OP_SUB)
+    return "(" + toTex( node ) + ")";
+  else
+    return toTex( node );
+}
+
 
 function symbolicDiff( node )
 {
@@ -565,7 +573,7 @@ function toTex( node )
           ret = group;
           break;
         case OP_SUB:
-          ret = toTex( node.children[0] ) + "-" + toTex( node.children[1] );
+          ret = toTex( node.children[0] ) + "-" + toTexParenADDSUB( node.children[1] );
           break;
         case OP_DIV:
           ret = "{" + toTex( node.children[0] ) + "}/{" + toTex( node.children[1] ) +"}";
@@ -584,7 +592,7 @@ function toTex( node )
                 else
                   ChildrenTex.push("\\,");
               }
-              var newpush = node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + stringEquation( node.children[i] ) + ")" : stringEquation( node.children[i] );
+              var newpush = node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + toTex( node.children[i] ) + ")" : toTex( node.children[i] );
               ChildrenTex.push(newpush);
             }
           }
@@ -605,7 +613,7 @@ function toTex( node )
           break;
         case OP_NEG:
           //ret = node.children[0].type == NODE_OP ? "(-" + toTex( node.children[0] ) + ")" : "-"+ toTex( node.children[0] );
-          ret = "(-" + toTex( node.children[0] ) + ")";
+          ret = "-" + toTexParenADDSUB( node.children[0] );
           break;
         case OP_POW:
           left = node.children[0].type == NODE_OP ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
