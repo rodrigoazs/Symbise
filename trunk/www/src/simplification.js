@@ -72,7 +72,7 @@ function automatic_simplify(node)
 					break;
 				case OP_POW:
 					// not implemented yet
-					ret = construct(OP_POW, automatic_simplify(node.children[0]), automatic_simplify(node.children[1]));
+					ret = simplify_power(construct(OP_POW, automatic_simplify(node.children[0]), automatic_simplify(node.children[1])));
 					break;
 			}
 			break;
@@ -104,6 +104,56 @@ function simplify_rational_number(node)
 		else
 			return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (-n / g) >> 0), createNode(NODE_INT, (-d / g) >> 0));
 	}
+}
+
+// Simplify Power (u)
+// Definition 3.33. Let u = vw where the base v = Operand(u, 1) and the
+// exponent w = Operand(u, 2) are either ASAEs or the symbol Undefined.
+// The operator Simplify power(u) is defined by the following transformation
+// rules. [page 94]
+function simplify_power(node)
+{
+	var v = operand(node, 0);
+	var w = operand(node, 1);
+
+	if(kind(v) == NODE_INT && v.value == 0)
+	{
+		return createNode(NODE_INT, 0);
+	}
+	else if(kind(v) == NODE_INT && v.value == 1)
+	{
+		return createNode(NODE_INT, 1);
+	}
+	else if(kind(w) == NODE_INT)
+	{
+		return simplify_integer_power(v, w);
+	}
+	else
+	{
+		return node;
+	}
+}
+
+// Simplify Integer Power (u)
+// Definition 3.34. Consider the expression vn where v = 0 is an ASAE and
+// n is an integer. The operator Simplify integer power(v, n) is defined by the
+// following transformation rules. [page 95]
+function simplify_integer_power(v, n)
+{
+	if(kind(v) == NODE_INT || is_fraction(v)) //not implemented yet
+	{
+		// simplify_RNE(construct(OP_POW, v, w))
+		return construct(OP_POW, v, w);
+	}
+	else if(kind(n) == NODE_INT && n.value == 0)
+	{
+		return createNode(NODE_INT, 1);
+	}
+	else if(kind(n) == NODE_INT && n.value == 1)
+	{
+		return v;
+	}
+	// Need to keep implementing
 }
 
 // Simplify Sum (u)
