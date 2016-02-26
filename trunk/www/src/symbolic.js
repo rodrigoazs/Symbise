@@ -587,10 +587,16 @@ function toTex( node )
             {
               if(i != 0)
               {
-                if(kind(node.children[i-1]) == NODE_INT && kind(node.children[i]) == NODE_INT)
+                if(kind(node.children[i-1]) == NODE_INT || is_fraction(node.children[i-1]) && kind(node.children[i]) == NODE_INT || is_fraction(node.children[i]))
+                {
+                  //alert(node.children[i-1].value + " - " + node.children[i].value);
                   ChildrenTex.push("·");
+                }
                 else
+                {
+                  //alert(node.children[i-1].value + " - " + node.children[i].value);
                   ChildrenTex.push("\\,");
+                }
               }
               var newpush = node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + toTex( node.children[i] ) + ")" : toTex( node.children[i] );
               ChildrenTex.push(newpush);
@@ -616,8 +622,14 @@ function toTex( node )
           ret = "-" + toTexParenADDSUB( node.children[0] );
           break;
         case OP_POW:
-          left = node.children[0].type == NODE_OP ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
-          ret = left +"^{"+ toTex(node.children[1]) +"}";
+          if(node.children[0].type == NODE_FUNC)
+          {
+            ret = toTexPowerFunc(node.children[0], node.children[1]);
+          }
+          else {
+            left = node.children[0].type == NODE_OP ? "(" + toTex( node.children[0] ) + ")" : toTex( node.children[0] );
+            ret = left +"^{"+ toTex(node.children[1]) +"}";
+          }
           break;
       }
       break;
@@ -679,7 +691,7 @@ function toTex( node )
         case FUNC_CSCH:
           ret = "csch(" + toTex( node.children[0] ) + ")";
           break;
-		case FUNC_ACSC:
+		    case FUNC_ACSC:
           ret = "acsc(" + toTex( node.children[0] ) + ")";
           break;
         case FUNC_CSC:
@@ -698,7 +710,7 @@ function toTex( node )
           ret = "cot(" + toTex( node.children[0] ) + ")";
           break;
         case FUNC_SQRT:
-          ret = "√{" + toTex( node.children[0] ) + "}";
+          ret = "{√{" + toTex( node.children[0] ) + "}}";
           break;
         case FUNC_EXP:
           ret = "exp(" + toTex( node.children[0] ) + ")";
@@ -724,6 +736,99 @@ function toTex( node )
   return ret;
 }
 
+function toTexPowerFunc(node, power)
+{
+    var ret = 0;
+    switch( node.value )
+    {
+      case FUNC_SIN:
+        ret = "{sin}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_COS:
+        ret = "{cos}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+       case FUNC_ASINH:
+        ret = "{asinh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_SINH:
+        ret = "{sinh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ASIN:
+        ret = "{asin}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACOSH:
+        ret = "{acosh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_COSH:
+        ret = "{cosh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACOS:
+        ret = "{acos}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ATANH:
+        ret = "{atanh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_TANH:
+        ret = "{tanh}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ATAN:
+        ret = "{atan}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_TAN:
+        ret = "{tan}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ASECH:
+        ret = "{asech}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_SECH:
+        ret = "{sech}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ASEC:
+        ret = "{asec}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_SEC:
+        ret = "{sec}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACSCH:
+        ret = "{acsch}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_CSCH:
+        ret = "{csch}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACSC:
+        ret = "{acsc}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_CSC:
+        ret = "{csc}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACOTH:
+        ret = "{acoth}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_COTH:
+        ret = "{coth}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_ACOT:
+        ret = "{acot}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_COT:
+        ret = "{cot}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_SQRT:
+        ret = "{√{" + toTex( node.children[0] ) + "}}";
+        break;
+      case FUNC_EXP:
+        ret = "{exp}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_NLOG:
+        ret = "{log}^{" + toTex(power) + "}(" + toTex( node.children[0] ) + ")";
+        break;
+      case FUNC_BLOG:
+        ret = "log_{" + toTex( node.children[0] ) + "}(" + toTex( node.children[1] ) + ")";
+        break;
+    }
+    return ret;
+}
+
 // Global var for the function plot
 var plot_value;
 
@@ -732,6 +837,7 @@ function initparser( node )
   var func = stringEquation( node );
   var diff = symbolicDiff( node );
 
+  var BAE_node = BAE_transform(node);
   var simplified = automatic_simplify(node);
   //var teste = group_product_terms(simplified.children[0], simplified.children[1]);
   //var teste = simplify_product_rec(simplified.children);
@@ -747,7 +853,7 @@ function initparser( node )
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
 
-  $("#console").html("<p>$$d/{dx}("+toTex(node)+") -> "+toTex( simplified )+"  $$</p><br><br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
+  $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+"  $$</p><br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
   plot_value = stringEquation(diff);
   M.parseMath(document.getElementById("console"));

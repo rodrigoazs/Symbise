@@ -320,7 +320,5 @@ ParenExp:   '(' e ')'           [* %% = %2; *]
             | 'sqrt' '(' e ')'  [* %% = createNode( NODE_FUNC, FUNC_SQRT, %3 ); *]
             | 'exp' '(' e ')'   [* %% = createNode( NODE_FUNC, FUNC_EXP, %3 ); *]
             | 'log' '(' e ')'   [* %% = createNode( NODE_FUNC, FUNC_NLOG, %3 ); *]
-            | 'log' INT '(' e ')'          [* %% = createNode( NODE_FUNC, FUNC_BLOG, %2, %4 ); *]
-            | 'log' FLOAT '(' e ')'        [* %% = createNode( NODE_FUNC, FUNC_BLOG, %2, %4 ); *]
-            | 'log' IDENTIFIER '(' e ')'   [* %% = createNode( NODE_FUNC, FUNC_BLOG, %2, %4 ); *]
+            | 'log' NumericValue '(' e ')'          [* %% = createNode( NODE_FUNC, FUNC_BLOG, %2, %4 ); *]
             ;
