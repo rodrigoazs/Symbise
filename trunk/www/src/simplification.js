@@ -143,7 +143,7 @@ function simplify_integer_power(v, n)
 	if(kind(v) == NODE_INT || is_fraction(v)) //not implemented yet
 	{
 		// simplify_RNE(construct(OP_POW, v, w))
-		return construct(OP_POW, v, w);
+		return construct(OP_POW, v, n);
 	}
 	else if(kind(n) == NODE_INT && n.value == 0)
 	{
@@ -153,7 +153,24 @@ function simplify_integer_power(v, n)
 	{
 		return v;
 	}
-	// Need to keep implementing
+	else if(kind(v) == OP_POW)
+	{
+		var r = operand(v, 0);
+		var s = operand(v, 1);
+		//var p = simplify_product(construct(OP_POW, s, n));
+		var p = automatic_simplify(construct(OP_MUL, s, n));
+
+		if(kind(p) == NODE_INT)
+		{
+			return simplify_integer_power(r, p);
+		}
+		else
+		{
+			return construct(OP_POW, r, p);
+		}
+	} else {
+		return construct(OP_POW, v, n);
+	}
 }
 
 // Simplify Sum (u)
