@@ -839,8 +839,7 @@ function initparser( node )
 
   var BAE_node = BAE_transform(node);
   var simplified = automatic_simplify(node);
-  //var teste = group_product_terms(simplified.children[0], simplified.children[1]);
-  //var teste = simplify_product_rec(simplified.children);
+  //var teste = group_product_terms(simplified.children[0], simplified.children[1])
   //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
   //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
   //var a3 = createNode(NODE_INT, 2);

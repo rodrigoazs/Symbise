@@ -12,40 +12,27 @@ function automatic_simplify(node)
 			ret = node;
 			break;
 		case NODE_OP:
-			// var children = node.children.slice(0);
-			// for(var i = 0; i < children.length; i++)
-			// {
-			// 	children[i] = automatic_simplify(children[i]);
-			// }
+			// v := Map(Automatic simplify, u);
+			var children = new Array();
+			for(var i = 0; i < node.children.length; i++)
+			{
+				children[i] = automatic_simplify(node.children[i]);
+			}
 			switch(node.value)
 			{
 				case OP_DIV:
-					var left = automatic_simplify(node.children[0]);
-					var right = automatic_simplify(node.children[1]);
 					// identify fraction
-					if(left.type == NODE_INT && right.type == NODE_INT)
+					if(children[0].type == NODE_INT && children[1].type == NODE_INT)
 					{
-						ret = simplify_rational_number(construct(OP_DIV, left, right));
+						ret = simplify_rational_number(construct(OP_DIV, children[0], children[1]));
 					// identify quotient
 					}else{
-						ret = simplify_quotient(node);
+						ret = simplify_quotient(construct(OP_DIV, children[0], children[1]));
 					}
 					break;
 				case OP_MUL:
 					// not implemented yet
-					var new_children = new Array();
-					for(var i = 0; i < node.children.length; i++) {
-						var simplified = simplify_product(automatic_simplify(node.children[i]));
-						if(Array.isArray(simplified))
-						{
-							new_children = new_children.concat(simplified);
-						} else {
-							new_children.push(simplified);
-						}
-					}
-					ret = construct(OP_MUL, simplify_product_rec(new_children));
-					// ret = construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), simplify_product(automatic_simplify(node.children[1])));
-					ret.children.sort(compare);
+					ret = simplify_product(construct(OP_MUL, children));
 					break;
 				case OP_ADD:
 					var new_children = new Array();
@@ -64,15 +51,15 @@ function automatic_simplify(node)
 					ret.children.sort(compare);
 					break;
 				case OP_SUB:
-					ret = automatic_simplify(construct(OP_ADD, automatic_simplify(node.children[0]), simplify_difference(automatic_simplify(node.children[1]))));
+					ret = simplify_sum(construct(OP_ADD, children[0], simplify_difference(node.children[1])));
 					ret.children.sort(compare);
 					break;
 				case OP_NEG:
-					ret = simplify_difference(automatic_simplify(node.children[0]));
+					ret = simplify_difference(children[0]);
 					break;
 				case OP_POW:
 					// not implemented yet
-					ret = simplify_power(construct(OP_POW, automatic_simplify(node.children[0]), automatic_simplify(node.children[1])));
+					ret = simplify_power(construct(OP_POW, children[0], children[1]));
 					break;
 			}
 			break;
@@ -124,7 +111,7 @@ function simplify_power(node)
 	{
 		return createNode(NODE_INT, 1);
 	}
-	else if(kind(w) == NODE_INT)
+	else if(kind(w) == NODE_INT || is_fraction(w))
 	{
 		return simplify_integer_power(v, w);
 	}
@@ -160,7 +147,7 @@ function simplify_integer_power(v, n)
 		//var p = simplify_product(construct(OP_POW, s, n));
 		var p = automatic_simplify(construct(OP_MUL, s, n));
 
-		if(kind(p) == NODE_INT)
+		if(kind(p) == NODE_INT || is_fraction(p))
 		{
 			return simplify_integer_power(r, p);
 		}
@@ -178,13 +165,13 @@ function simplify_integer_power(v, n)
 // In development
 function simplify_sum(node)
 {
-	if(kind(node) == OP_ADD)
-	{
-		ret = node.children;
-	}else{
-		ret = node;
-	}
-	return ret;
+	// if(kind(node) == OP_ADD)
+	// {
+	// 	ret = node.children;
+	// }else{
+	// 	ret = node;
+	// }
+	return node;
 }
 
 // function group_sum_terms(left, right)
@@ -199,11 +186,72 @@ function simplify_sum(node)
 // 	}
 // }
 
+// Simplify Product (u)
+// The operator Simplify product(u)
+// Let u be a product with one or more operands that
+// are ASAEs, and let L = [u 1 , . . . , u n ] be the list of the operands of u.
+// The Simplify product (u) operator is defined by the following transforma-
+// tion rules. [page 98]
+function simplify_product(node)
+{
+	if(kind(node) == OP_MUL){
+		for(var i = 0; i < node.children.length; i++)
+		{
+			if(kind(node.children[i]) == NODE_INT && node.children[i].value == 0)
+					return createNode(NODE_INT, 0);
+		}
+		if(node.children.length == 1)
+			return node.children[0];
+		else {
+			var v = simplify_product_rec(node.children);
+			if(v.length == 1)
+				return v[0];
+			else if(v.length >= 2)
+				return construct(OP_MUL, v);
+			else if(v.length == 0)
+				return createNode(NODE_INT, 1);
+		}
+	}
+	else {
+		return node;
+	}
+}
+// Simplify Product Recursive (u)
+// Function responsible to bring children up if the node is a product
+// Also calls the function group_all_product_terms that groups terms in the product
+function simplify_product_rec(children)
+{
+	var ret = 0;
+	var new_children = new Array();
+	for(var i = 0; i < children.length; i++) {
+		var simplified = kind(children[i]) == OP_MUL ? simplify_product_rec(children[i].children) : children[i];
+		if(Array.isArray(simplified))
+		{
+			new_children = new_children.concat(simplified);
+		} else {
+			new_children.push(simplified);
+		}
+	}
+	ret = group_all_product_terms(new_children);
+	ret.sort(compare);
+	return ret;
+}
+
+// Group Product Terms (l, r)
+// If possible, group the terms transforming them into a power, multiplying integers and so on
 function group_product_terms(left, right)
 {
 	if(kind(left) == NODE_INT && kind(right) == NODE_INT)
 	{
 		return createNode(NODE_INT, left.value * right.value);
+	}
+	else if(kind(left) == NODE_INT && left.value == 1)
+	{
+		return right;
+	}
+	else if(kind(right) == NODE_INT && right.value == 1)
+	{
+		return left;
 	}
 	else if((is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
 	{
@@ -221,7 +269,9 @@ function group_product_terms(left, right)
 	}
 }
 
-function simplify_product_rec(arg)
+// Group All Product Terms (u)
+// Responsible for grouping all the children of a product
+function group_all_product_terms(arg)
 {
 	var children = arg.slice(0); // copy array
 	var i = 0;
@@ -250,21 +300,6 @@ function simplify_product_rec(arg)
 	return children;
 }
 
-// Simplify Product (u)
-// The operator Simplify product(u)
-// In development
-function simplify_product(node)
-{
-	var ret;
-	if(kind(node) == OP_MUL)
-	{
-		ret = node.children; //simplify_product_rec(node.children);
-	}else{
-		ret = node;
-	}
-	return ret;
-}
-
 // Simplify Difference (u)
 // The operator Simplify difference(u) is based on the basic difference
 // transformations −u = (−1) · u and u − v = u + (−1) · v. [page 106]
@@ -273,7 +308,7 @@ function simplify_difference(node)
 	if(node.type == NODE_INT)
 		return createNode(NODE_INT, -node.value);
 	else
-		return construct(OP_MUL, createNode(NODE_INT, -1), node);
+		return simplify_product(construct(OP_MUL, createNode(NODE_INT, -1), node));
 }
 
 // Simplify Quotient (u)
@@ -281,7 +316,7 @@ function simplify_difference(node)
 // basic quotient transformation u/v = u · v −1 [page 106]
 function simplify_quotient(node)
 {
-	return construct(OP_MUL, simplify_product(automatic_simplify(node.children[0])), construct(OP_POW, automatic_simplify(node.children[1]), createNode(NODE_INT, -1)));
+	return simplify_product(construct(OP_MUL, node.children[0], construct(OP_POW, node.children[1], createNode(NODE_INT, -1))));
 }
 
 // Basic Algebraic Expressions
