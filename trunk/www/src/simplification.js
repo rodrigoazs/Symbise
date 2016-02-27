@@ -81,20 +81,23 @@ function automatic_simplify(node)
 // Simplify rational number(u) transforms u to a rational number in standard form [page 37]
 function simplify_rational_number(node)
 {
-	var n = node.children[0].value;
-	var d = node.children[1].value;
-	if(n % d == 0) return createNode(NODE_INT, (n / d) >> 0); // compare remainder and return integer quotient
-	else{
-		var g = gcd(n, d);
-		if(d > 0)
-			return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (n / g) >> 0), createNode(NODE_INT, (d / g) >> 0));
-		else
-			return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (-n / g) >> 0), createNode(NODE_INT, (-d / g) >> 0));
+	if(kind(node) == NODE_INT) return node;
+	else if(is_fraction(node)){
+		var n = operand(node, 0).value;
+		var d = operand(node, 1).value;
+		if(n % d == 0) return createNode(NODE_INT, (n / d) >> 0); // compare remainder and return integer quotient
+		else{
+			var g = gcd(n, d);
+			if(d > 0)
+				return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (n / g) >> 0), createNode(NODE_INT, (d / g) >> 0));
+			else
+				return createNode(NODE_OP, OP_DIV, createNode(NODE_INT, (-n / g) >> 0), createNode(NODE_INT, (-d / g) >> 0));
+		}
 	}
 }
 
 // Simplify Power (u)
-// Definition 3.33. Let u = vw where the base v = Operand(u, 1) and the
+// Definition 3.33. Let u = v^w where the base v = Operand(u, 1) and the
 // exponent w = Operand(u, 2) are either ASAEs or the symbol Undefined.
 // The operator Simplify power(u) is defined by the following transformation
 // rules. [page 94]
@@ -122,7 +125,7 @@ function simplify_power(node)
 }
 
 // Simplify Integer Power (u)
-// Definition 3.34. Consider the expression vn where v = 0 is an ASAE and
+// Definition 3.34. Consider the expression vn where v != 0 is an ASAE and
 // n is an integer. The operator Simplify integer power(v, n) is defined by the
 // following transformation rules. [page 95]
 function simplify_integer_power(v, n)
@@ -144,10 +147,12 @@ function simplify_integer_power(v, n)
 	{
 		var r = operand(v, 0);
 		var s = operand(v, 1);
-		//var p = simplify_product(construct(OP_POW, s, n));
-		var p = automatic_simplify(construct(OP_MUL, s, n));
 
-		if(kind(p) == NODE_INT || is_fraction(p))
+		// case of x^x^8 != x^(8*x)
+		if(kind(s) != NODE_INT) return construct(OP_POW, v, n);
+		var p = simplify_product(construct(OP_MUL, s, n));
+
+		if(kind(p) == NODE_INT)
 		{
 			return simplify_integer_power(r, p);
 		}
@@ -155,6 +160,17 @@ function simplify_integer_power(v, n)
 		{
 			return construct(OP_POW, r, p);
 		}
+	}
+	else if(kind(v) == OP_MUL)
+	{
+		var ret = new Array();
+		var r = v.children.slice(0);
+		for(var i = 0; i < r.length; i++)
+		{
+			r[i] = simplify_integer_power(r[i], n);
+			ret[i] = simplify_product(r[i]);
+		}
+		return construct(OP_MUL, ret);
 	} else {
 		return construct(OP_POW, v, n);
 	}
@@ -417,6 +433,40 @@ function base(node)
 		return operand(node, 0);
 	else
 		return node;
+}
+
+// Term (u)
+// [page 83]
+function term(node)
+{
+	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || kind(node) == NODE_FUNC)
+	{
+		return construct(OP_MUL, node);
+	}
+	else if(kind(node) == OP_MUL )
+	{
+		if(kind(operand(node, 0)) == NODE_INT || is_fraction(kind(operand(node, 0))))
+			return construct(OP_MUL, node.children.slice(1));
+		else
+			return node;
+	}
+}
+
+// Constt (u)
+// [page 83]
+function constt(node)
+{
+	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || kind(node) == NODE_FUNC)
+	{
+		return createNode(NODE_INT, 1);
+	}
+	else if(kind(node) == OP_MUL )
+	{
+		if(kind(operand(node, 0)) == NODE_INT || is_fraction(kind(operand(node, 0))))
+			return operand(node, 0);
+		else
+			return createNode(NODE_INT, 1);
+	}
 }
 
 // Exponent (u)
