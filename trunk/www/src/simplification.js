@@ -132,8 +132,8 @@ function simplify_integer_power(v, n)
 {
 	if(kind(v) == NODE_INT || is_fraction(v)) //not implemented yet
 	{
-		// simplify_RNE(construct(OP_POW, v, w))
-		return construct(OP_POW, v, n);
+		return simplify_RNE(construct(OP_POW, v, n));
+		//return construct(OP_POW, v, n);
 	}
 	else if(kind(n) == NODE_INT && n.value == 0)
 	{
@@ -333,6 +333,150 @@ function simplify_difference(node)
 function simplify_quotient(node)
 {
 	return simplify_product(construct(OP_MUL, node.children[0], construct(OP_POW, node.children[1], createNode(NODE_INT, -1))));
+}
+
+// Simplify RNE (u)
+// [page 40]
+function simplify_RNE(node)
+{
+	var v = simplify_RNE_rec(node);
+	if(v !== undefined)
+	{
+		return simplify_rational_number(v);
+	}
+}
+
+// Simplify RNE rec(u)
+// [page 41]
+function simplify_RNE_rec(node)
+{
+	if(kind(node) == NODE_INT) return node;
+	else if(is_fraction(node))
+	{
+		//if Denominator fun(u) = 0 then Return(Undefined)
+		return node;
+	}
+	else if(number_of_operands(node) == 1)
+	{
+		var v = simplify_RNE_rec(operand(node, 0));
+		return v;
+	}
+	else if(number_of_operands(node) == 2)
+	{
+		if(kind(node) == OP_POW)
+		{
+			var v = simplify_RNE_rec(operand(node, 0));
+			return evaluate_power(v, operand(node, 1));
+		}	else {
+			var v = simplify_RNE_rec(operand(node, 0));
+			var w = simplify_RNE_rec(operand(node, 1));
+			if(kind(node) == OP_ADD)
+				return evaluate_sum(v, w);
+			else if(kind(node) == OP_MUL)
+				return evaluate_product(v, w);
+			else if(kind(node) == OP_DIV)
+				return evaluate_quotient(v, w);
+		}
+	}
+}
+
+// Evaluate quotient (v,w)
+// an integer or a fraction in function notation
+function evaluate_quotient(v, w)
+{
+		return construct(OP_DIV, createNode(NODE_INT, numerator_fun(v) * denominator_fun(w)), createNode(NODE_INT, numerator_fun(w) * denominator_fun(v)));
+}
+
+// Evaluate product (v,w)
+// an integer or a fraction in function notation
+function evaluate_product(v, w)
+{
+		if(is_fraction(v) || is_fraction(w))
+		{
+			return construct(OP_DIV, createNode(NODE_INT, numerator_fun(v) * numerator_fun(w)), createNode(NODE_INT, denominator_fun(v) * denominator_fun(w)));
+		}	else {
+			return createNode(NODE_INT, numerator_fun(v) * numerator_fun(w));
+		}
+}
+
+// Evaluate sum (v,w)
+// an integer or a fraction in function notation
+function evaluate_sum(v, w)
+{
+		if(is_fraction(v) || is_fraction(w))
+		{
+			return construct(OP_DIV, createNode(NODE_INT, numerator_fun(v) * denominator_fun(w) + numerator_fun(w) * denominator_fun(v)), createNode(NODE_INT, denominator_fun(v) * denominator_fun(w)));
+		}	else {
+			return createNode(NODE_INT, numerator_fun(v) + numerator_fun(w));
+		}
+}
+
+// Evaluate power (v, n);
+// v : an integer or a fraction in function notation
+// n : an integer;
+function evaluate_power(v, n)
+{
+	if(numerator_fun(v) == 0)
+	{
+		if(n.value > 0)
+		{
+			return createNode(NODE_INT, 0);
+		}
+		else {
+			console.log('a');
+			return createNode(OP_POW, v, n);
+		}
+	}
+	else
+	{
+		if(n.value > 0)
+		{
+			var s = evaluate_power(v, createNode(NODE_INT, n.value-1));
+			return evaluate_product(s, v);
+		}
+		else if(n.value == 0)
+		{
+			return createNode(NODE_INT, 1);
+		}
+		else if(n.value == -1)
+		{
+			// check again in the book [page 42]
+			return construct(OP_DIV, createNode(NODE_INT, denominator_fun(v)), createNode(NODE_INT, numerator_fun(v)));
+		}
+		else if(n.value < -1)
+		{
+			var s = construct(OP_DIV, createNode(NODE_INT, denominator_fun(v)), createNode(NODE_INT, numerator_fun(v)));
+			return evaluate_power(s, createNode(NODE_INT, -n.value));
+		}
+	}
+}
+
+// Numerator Fun (v)
+// Returns the own integer
+function numerator_fun(v)
+{
+	if(kind(v) == NODE_INT)
+	{
+		return v.value;
+	}
+	else if(is_fraction(v))
+	{
+		return operand(v, 0).value;
+	}
+}
+
+// Denominator Fun (v)
+// Returns the own integer
+function denominator_fun(v)
+{
+	if(kind(v) == NODE_INT)
+	{
+		return 1;
+	}
+	else if(is_fraction(v))
+	{
+		return operand(v, 1).value;
+	}
 }
 
 // Basic Algebraic Expressions
