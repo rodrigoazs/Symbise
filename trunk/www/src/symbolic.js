@@ -587,7 +587,8 @@ function toTex( node )
             {
               if(i != 0)
               {
-                if(kind(node.children[i-1]) == NODE_INT || is_fraction(node.children[i-1]) && kind(node.children[i]) == NODE_INT || is_fraction(node.children[i]))
+                //if(kind(node.children[i-1]) == NODE_INT || is_fraction(node.children[i-1]) && kind(node.children[i]) == NODE_INT || is_fraction(node.children[i]))
+                if(kind(node.children[i]) == NODE_INT || is_fraction(node.children[i]))
                 {
                   //alert(node.children[i-1].value + " - " + node.children[i].value);
                   ChildrenTex.push("·");
