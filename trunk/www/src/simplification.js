@@ -85,6 +85,7 @@ function simplify_rational_number(node)
 	else if(is_fraction(node)){
 		var n = operand(node, 0).value;
 		var d = operand(node, 1).value;
+		if(d == 0) return node;
 		if(n % d == 0) return createNode(NODE_INT, (n / d) >> 0); // compare remainder and return integer quotient
 		else{
 			var g = gcd(n, d);
@@ -108,7 +109,10 @@ function simplify_power(node)
 
 	if(kind(v) == NODE_INT && v.value == 0)
 	{
-		return createNode(NODE_INT, 0);
+		if((kind(w) == NODE_INT && w.value > 0) || (is_fraction(w) && operand(w,0).value > 0))
+			return createNode(NODE_INT, 0);
+		else
+			return node;
 	}
 	else if(kind(v) == NODE_INT && v.value == 1)
 	{
