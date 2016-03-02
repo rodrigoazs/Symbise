@@ -35,20 +35,8 @@ function automatic_simplify(node)
 					ret = simplify_product(construct(OP_MUL, children));
 					break;
 				case OP_ADD:
-					var new_children = new Array();
-					for(var i = 0; i < node.children.length; i++) {
-						var simplified = simplify_sum(automatic_simplify(node.children[i]));
-						if(Array.isArray(simplified))
-						{
-							new_children = new_children.concat(simplified);
-						} else {
-							new_children.push(simplified);
-						}
-						//new_children[i] = simplify_sum(automatic_simplify(node.children[i]));
-					}
-					ret = construct(OP_ADD, new_children);
-					// ret = construct(OP_ADD, simplify_sum(automatic_simplify(node.children[0])), simplify_sum(automatic_simplify(node.children[1])));
-					ret.children.sort(compare);
+					// not implemented yet
+					ret = simplify_sum(construct(OP_ADD, children));
 					break;
 				case OP_SUB:
 					ret = simplify_sum(construct(OP_ADD, children[0], simplify_difference(node.children[1])));
@@ -185,26 +173,100 @@ function simplify_integer_power(v, n)
 // In development
 function simplify_sum(node)
 {
-	// if(kind(node) == OP_ADD)
-	// {
-	// 	ret = node.children;
-	// }else{
-	// 	ret = node;
-	// }
-	return node;
+	if(kind(node) == OP_ADD){
+		if(node.children.length == 1)
+			return node.children[0];
+		else {
+			var v = simplify_sum_rec(node.children);
+			if(v.length == 1)
+				return v[0];
+			else if(v.length >= 2)
+				return construct(OP_ADD, v);
+			else if(v.length == 0)
+				return createNode(NODE_INT, 0);
+		}
+	}
+	else {
+		return node;
+	}
 }
 
-// function group_sum_terms(left, right)
-// {
-// 	if(kind(left) == NODE_INT && kind(right) == NODE_INT)
-// 	{
-// 		return createNode(NODE_INT, left.value + right.value);
-// 	}
-// 	if(compare(base(left), base(right)) == 0)
-// 	{
-// 		return construct(OP_MUL, );
-// 	}
-// }
+// Simplify Sum Recursive (u)
+// Function responsible to bring children up if the node is a sum
+// Also calls the function group_all_sum_terms that groups terms in the sum
+function simplify_sum_rec(children)
+{
+	var ret = 0;
+	var new_children = new Array();
+	for(var i = 0; i < children.length; i++) {
+		var simplified = kind(children[i]) == OP_ADD ? simplify_sum_rec(children[i].children) : children[i];
+		if(Array.isArray(simplified))
+		{
+			new_children = new_children.concat(simplified);
+		} else {
+			new_children.push(simplified);
+		}
+	}
+	ret = group_all_sum_terms(new_children);
+	ret.sort(compare);
+	return ret;
+}
+
+// Group Sum Terms (l, r)
+// If possible, group the terms transforming them into multiples, adding integers and so on
+function group_sum_terms(left, right)
+{
+	if(kind(left) == NODE_INT && left.value == 0)
+	{
+		return right;
+	}
+	else if(kind(right) == NODE_INT && right.value == 0)
+	{
+		return left;
+	}
+	else if((kind(left) == NODE_INT && kind(right) == NODE_INT) || (is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
+	{
+		return simplify_rational_number(evaluate_sum(left, right));
+	}
+	else
+	{
+		var l = term(left);
+		var r = term(right);
+		if(l !== undefined && r !== undefined && compare(term(left), term(right)) == 0)
+			return simplify_product(construct(OP_MUL, simplify_sum(construct(OP_ADD, constant(left), constant(right))), term(left)));
+	}
+}
+
+// Group All Sum Terms (u)
+// Responsible for grouping all the children of a sum
+function group_all_sum_terms(arg)
+{
+	var children = arg.slice(0); // copy array
+	var i = 0;
+	while(i < children.length - 1)
+	{
+		var new_children = new Array(children[i]);
+		for(var j=i+1; j < children.length; j++)
+		{
+			var n = group_sum_terms(new_children[0], children[j]);
+			if(n === undefined)
+			{
+				new_children.push(children[j]);
+			}
+			else
+			{
+				new_children[0] = n;
+			}
+		}
+		var left = children.slice(0, i);
+		var right = new_children.slice(0);
+		var total = left.concat(right);
+		children = total.slice(0);
+		i++;
+	}
+
+	return children;
+}
 
 // Simplify Product (u)
 // The operator Simplify product(u)
@@ -236,6 +298,7 @@ function simplify_product(node)
 		return node;
 	}
 }
+
 // Simplify Product Recursive (u)
 // Function responsible to bring children up if the node is a product
 // Also calls the function group_all_product_terms that groups terms in the product
@@ -261,11 +324,12 @@ function simplify_product_rec(children)
 // If possible, group the terms transforming them into a power, multiplying integers and so on
 function group_product_terms(left, right)
 {
-	if(kind(left) == NODE_INT && kind(right) == NODE_INT)
-	{
-		return createNode(NODE_INT, left.value * right.value);
-	}
-	else if(kind(left) == NODE_INT && left.value == 1)
+	// if(kind(left) == NODE_INT && kind(right) == NODE_INT)
+	// {
+	// 	return createNode(NODE_INT, left.value * right.value);
+	// }
+	//else if(kind(left) == NODE_INT && left.value == 1)
+	if(kind(left) == NODE_INT && left.value == 1)
 	{
 		return right;
 	}
@@ -273,19 +337,21 @@ function group_product_terms(left, right)
 	{
 		return left;
 	}
-	else if((is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
+	//else if((is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
+	else if((kind(left) == NODE_INT && kind(right) == NODE_INT) || (is_fraction(left) && is_fraction(right)) || (kind(left) == NODE_INT && is_fraction(right)) ||  (is_fraction(left) && kind(right) == NODE_INT))
 	{
-		var left_num = is_fraction(left) ? left.children[0].value : left.value;
-		var left_den = is_fraction(left) ? left.children[1].value : 1;
-		var right_num = is_fraction(right) ? right.children[0].value : right.value;
-		var right_den = is_fraction(right) ? right.children[1].value : 1;
-		var num = left_num * right_num;
-		var den = left_den * right_den;
-		return simplify_rational_number(construct(OP_DIV, createNode(NODE_INT, num), createNode(NODE_INT, den)));
+		// var left_num = is_fraction(left) ? left.children[0].value : left.value;
+		// var left_den = is_fraction(left) ? left.children[1].value : 1;
+		// var right_num = is_fraction(right) ? right.children[0].value : right.value;
+		// var right_den = is_fraction(right) ? right.children[1].value : 1;
+		// var num = left_num * right_num;
+		// var den = left_den * right_den;
+		return simplify_rational_number(evaluate_product(left, right));
+		//return simplify_rational_number(construct(OP_DIV, createNode(NODE_INT, num), createNode(NODE_INT, den)));
 	}
 	else if(compare(base(left), base(right)) == 0)
 	{
-		return construct(OP_POW, base(left), automatic_simplify(construct(OP_ADD, exponent(left), exponent(right))));
+		return simplify_power(construct(OP_POW, base(left), simplify_sum(construct(OP_ADD, exponent(left), exponent(right)))));
 	}
 }
 
@@ -427,7 +493,6 @@ function evaluate_power(v, n)
 			return createNode(NODE_INT, 0);
 		}
 		else {
-			console.log('a');
 			return createNode(OP_POW, v, n);
 		}
 	}
@@ -600,9 +665,9 @@ function term(node)
 	}
 }
 
-// Constt (u)
+// Constant (u)
 // [page 83]
-function constt(node)
+function constant(node)
 {
 	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || kind(node) == NODE_FUNC)
 	{
