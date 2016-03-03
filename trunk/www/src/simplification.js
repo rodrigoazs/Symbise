@@ -73,6 +73,7 @@ function simplify_rational_number(node)
 	else if(is_fraction(node)){
 		var n = operand(node, 0).value;
 		var d = operand(node, 1).value;
+		if(!!(n % 1) || !!(d % 1)) return createNode(NODE_INT, n/d);
 		if(d == 0) return node;
 		if(n % d == 0) return createNode(NODE_INT, (n / d) >> 0); // compare remainder and return integer quotient
 		else{
