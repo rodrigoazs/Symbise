@@ -210,6 +210,7 @@ function simplify_sum_rec(children)
 	}
 	ret = group_all_sum_terms(new_children);
 	ret.sort(compare);
+	ret.reverse();
 	return ret;
 }
 
