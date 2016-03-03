@@ -653,7 +653,7 @@ function base(node)
 // [page 83]
 function term(node)
 {
-	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || kind(node) == NODE_FUNC)
+	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || node.type == NODE_FUNC)
 	{
 		return construct(OP_MUL, node);
 	}
@@ -670,7 +670,7 @@ function term(node)
 // [page 83]
 function constant(node)
 {
-	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || kind(node) == NODE_FUNC)
+	if(kind(node) == NODE_SYM || kind(node) == OP_ADD || kind(node) == OP_POW || node.type == NODE_FUNC)
 	{
 		return createNode(NODE_INT, 1);
 	}
