@@ -1385,3 +1385,33 @@ if( ( error_count = __parse( str, error_offsets, error_lookaheads ) ) > 0 )
         $("#console").text(errstr);
         $("#console").css("visibility", "visible");
     }*/
+
+
+    // Global var for the function plot
+    var plot_value;
+
+    function initparser( node )
+    {
+      var func = stringEquation( node );
+      var diff = symbolicDiff( node );
+
+      var BAE_node = BAE_transform(node);
+      var simplified = automatic_simplify(node);
+      //var teste = group_product_terms(simplified.children[0], simplified.children[1])
+      //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
+      //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
+      //var a3 = createNode(NODE_INT, 2);
+      //var aaa = construct(OP_ADD, new Array(createNode(NODE_INT, 1), createNode(NODE_INT, 4), createNode(NODE_INT, 2), createNode(NODE_INT, 3), createNode(NODE_INT, 2)));
+      var aaa = construct(OP_ADD, new Array(createNode(NODE_SYM, "y"), createNode(NODE_SYM, "x")));
+      aaa.children.sort(compare);
+      //alert(compare(a3, a2));
+      //alert(toMathML( diff ) );
+      //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
+
+      //[ "+toTex(construct(OP_MUL, simplified))+"]
+
+      $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+"  $$</p><br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
+      // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
+      plot_value = stringEquation(diff);
+      M.parseMath(document.getElementById("console"));
+    }
