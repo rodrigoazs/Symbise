@@ -148,10 +148,3 @@ function compare(u, v)
 		return -compare(v, u);
 	}
 }
-
-// Is Fraction (u)
-// Return if the node is a fraction or not
-function is_fraction(u)
-{
-	return u.type == NODE_OP && u.value == OP_DIV && u.children[0].type == NODE_INT && u.children[1].type == NODE_INT;
-}
