@@ -57,7 +57,7 @@
 			    <label for="name">Full Name:</label>
 			    <input name="text" id="name" value="" placeholder="What's Your Name?" type="text">
 			    </div>
-			    
+
 			    <div class="ui-field-contain">
 			    <label for="search">Looking for anything?</label>
 			    <input name="search" id="search" value="" placeholder="Search for content" data-type="search" type="text">
@@ -67,7 +67,7 @@
 			    <label for="date">Today's date:</label>
 			   <input name="date" id="date" value="" type="date">
 			  </div>
-			  
+
 			  <div class="ui-field-contain">
 			    <label for="colors">Choose Favorite Color:</label>
 			   <select id="colors" name="colors">
@@ -76,7 +76,7 @@
 			      <option value="blue">Blue</option>
 			    </select>
 			  </div>
-			    
+
 			  <div class="ui-field-contain">
 			  <label for="switch">Flip Switch:</label>
 					<select name="slider2" id="slider2" data-role="slider">
@@ -87,11 +87,11 @@
 
 			   <div class="ui-field-contain">
 			   <legend>Choose Favorite Movies:</legend>
-			   
+
 			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov1">The Shawshank Redemption</label><input data-cacheval="false" name="mov1" id="mov1" type="checkbox"></div>
-			   
+
 			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off" for="mov2">The Godfather</label><input name="mov2" id="mov2" type="checkbox"></div>
-			   
+
 			   <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov3">Pulp Fiction</label><input data-cacheval="false" name="mov3" id="mov3" type="checkbox"></div>
 			   </div>
 		</div>
@@ -99,9 +99,24 @@
 <script src="src/function-plot/d3.js"></script>
 <script src="src/function-plot/function-plot.js"></script>
 <script src="src/order.js"></script>
-<script src="src/simplification.js"></script>
+
+<!-- src/functions -->
+<script src="src/functions/functions.js"></script>
+
+<!-- src/simplify -->
+<!-- <script src="src/simplification.js"></script> -->
+<script src="src/simplify/bae.js"></script>
+<script src="src/simplify/evaluate.js"></script>
+<script src="src/simplify/simplify.js"></script>
+
 <script src="src/symbolic.js"></script>
-<script src="src/parser.js"></script>
+
+<!-- src/parsing -->
+<!-- <script src="src/parser.js"></script> -->
+<script src="src/parsing/execute.js"></script>
+<script src="src/parsing/parser.js"></script>
+<script src="src/parsing/structs.js"></script>
+
 <script src="src/system.js"></script>
 </body>
 </html>
