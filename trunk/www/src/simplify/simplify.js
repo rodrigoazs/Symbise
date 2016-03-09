@@ -179,7 +179,12 @@ function simplify_sum(node)
 			if(v.length == 1)
 				return v[0];
 			else if(v.length >= 2)
-				return construct(OP_ADD, v);
+			{
+				if(v[0].type == NODE_INT && v[0].value == 0)
+					return construct(OP_ADD, v.slice(1));
+				else
+					return construct(OP_ADD, v);
+			}
 			else if(v.length == 0)
 				return createNode(NODE_INT, 0);
 		}
@@ -207,7 +212,7 @@ function simplify_sum_rec(children)
 	}
 	ret = group_all_sum_terms(new_children);
 	ret.sort(compare);
-	ret.reverse();
+	//ret.reverse();
 	return ret;
 }
 
@@ -288,7 +293,12 @@ function simplify_product(node)
 			if(v.length == 1)
 				return v[0];
 			else if(v.length >= 2)
-				return construct(OP_MUL, v);
+			{
+				if(v[0].type == NODE_INT && v[0].value == 1)
+					return construct(OP_MUL, v.slice(1));
+				else
+					return construct(OP_MUL, v);
+			}
 			else if(v.length == 0)
 				return createNode(NODE_INT, 1);
 		}
@@ -372,7 +382,7 @@ function group_all_product_terms(arg)
 			}
 			else
 			{
-				new_children[0] = n;
+					new_children[0] = n;
 			}
 		}
 		var left = children.slice(0, i);
