@@ -1,6 +1,6 @@
 function toTex(node)
 {
-  var n = NPE_transform(node);
+  var n = PNE_transform(node);
   return toTex_rec(n);
 }
 

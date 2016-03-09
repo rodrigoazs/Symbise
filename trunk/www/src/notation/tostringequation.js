@@ -1,6 +1,6 @@
 function stringEquation(node)
 {
-  var n = NPE_transform(node);
+  var n = PNE_transform(node);
   return stringEquation_rec(n);
 }
 

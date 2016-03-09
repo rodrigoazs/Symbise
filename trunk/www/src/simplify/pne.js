@@ -1,7 +1,7 @@
-// Non Power Expressions
-// The NPEs are algebraic expressions that have divisions instead of negative powers
+// Power Notation Expressions
+// The PNEs are algebraic expressions that have divisions instead of negative powers
 // and square roots instead of powers of 1/2
-function NPE_transform(n)
+function PNE_transform(n)
 {
   var ret = 0;
   var childs = new Array();
