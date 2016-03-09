@@ -61,6 +61,10 @@ function NPE_transform(n)
           {
             ret = createNode(NODE_FUNC, FUNC_SQRT, operand(node, 0));
           }
+          else if(is_fraction(operand(node, 1)) && operand(operand(node, 1), 0).value == -1 && operand(operand(node, 1), 1).value == 2)
+          {
+            ret = construct(OP_DIV, createNode(NODE_INT, 1), createNode(NODE_FUNC, FUNC_SQRT, operand(node, 0)));
+          }
           else if(signal(operand(node, 1)) == false)
           {
             var base = operand(node, 0);
