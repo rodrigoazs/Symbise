@@ -7,7 +7,7 @@ function PNE_transform(n)
   var childs = new Array();
   for(var i = 0; i < n.children.length; i++) {
     if(kind(n) != OP_MUL)
-      childs[i] = NPE_transform(n.children[i]);
+      childs[i] = PNE_transform(n.children[i]);
     else
       childs[i] = n.children[i];
   }
