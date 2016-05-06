@@ -263,7 +263,7 @@ e:          e '-' MulDivExp   [* %% = createNode( NODE_OP, OP_SUB, %1, %3 ); *]
 MulDivExp:  MulDivExp '*' PowExp      [* %% = createNode( NODE_OP, OP_MUL, %1, %3 ); *]
             | DivExp
             | PowExp
-            | NegExp MulNonExp        [* %% = createNode( NODE_OP, OP_MUL, %1, %2 ); *]
+            | MulNonExp Value        [* %% = createNode( NODE_OP, OP_MUL, %1, %2 ); *]
             ;
 
 DivExp:     DivExp '/' PowExp         [* %% = createNode( NODE_OP, OP_DIV, %1, %3 ); *]
@@ -271,7 +271,7 @@ DivExp:     DivExp '/' PowExp         [* %% = createNode( NODE_OP, OP_DIV, %1, %
             ;
 
 MulNonExp:  MulNonExp Value           [* %% = createNode( NODE_OP, OP_MUL, %1, %2 ); *]
-            | Value
+            | NegExp
             ;
 
 PowExp:     PowExp '^' NegExp   [* %% = createNode( NODE_OP, OP_POW, %1, %3 ); *]
