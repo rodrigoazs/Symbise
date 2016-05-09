@@ -410,7 +410,7 @@ function simplify_difference(node)
 // basic quotient transformation u/v = u · v −1 [page 106]
 function simplify_quotient(node)
 {
-	return simplify_product(construct(OP_MUL, node.children[0], construct(OP_POW, node.children[1], createNode(NODE_INT, -1))));
+	return simplify_product(construct(OP_MUL, node.children[0], simplify_power(construct(OP_POW, node.children[1], createNode(NODE_INT, -1)))));
 }
 
 // Simplify RNE (u)
