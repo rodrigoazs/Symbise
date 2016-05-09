@@ -37,8 +37,7 @@ function automatic_simplify(node)
 					ret = simplify_sum(construct(OP_ADD, children));
 					break;
 				case OP_SUB:
-					ret = simplify_sum(construct(OP_ADD, children[0], simplify_difference(node.children[1])));
-					ret.children.sort(compare);
+					ret = simplify_sum(construct(OP_ADD, children[0], simplify_difference(children[1])));
 					break;
 				case OP_NEG:
 					ret = simplify_difference(children[0]);
