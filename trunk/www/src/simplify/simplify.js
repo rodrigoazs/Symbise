@@ -137,8 +137,6 @@ function simplify_integer_power(v, n)
 		var r = operand(v, 0);
 		var s = operand(v, 1);
 
-		// case of x^x^8 != x^(8*x)
-		if(kind(s) != NODE_INT) return construct(OP_POW, v, n);
 		var p = simplify_product(construct(OP_MUL, s, n));
 
 		if(kind(p) == NODE_INT)
