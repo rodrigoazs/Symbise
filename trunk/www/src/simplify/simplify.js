@@ -103,7 +103,7 @@ function simplify_power(node)
 	{
 		return createNode(NODE_INT, 1);
 	}
-	else if(kind(w) == NODE_INT || is_fraction(w))
+	else if(kind(w) == NODE_INT)
 	{
 		return simplify_integer_power(v, w);
 	}
