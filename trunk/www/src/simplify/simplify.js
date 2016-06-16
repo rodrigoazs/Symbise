@@ -355,6 +355,10 @@ function group_product_terms(left, right)
 		return simplify_rational_number(evaluate_product(left, right));
 		//return simplify_rational_number(construct(OP_DIV, createNode(NODE_INT, num), createNode(NODE_INT, den)));
 	}
+	else if(kind(left) == FUNC_EXP && kind(right) == FUNC_EXP) // groupind exp functions
+	{
+		return simplify_function(createNode(NODE_FUNC, FUNC_EXP, simplify_sum(construct(OP_ADD, operand(left, 0), operand(right, 0)))));
+	}
 	else if(compare(base(left), base(right)) == 0)
 	{
 		return simplify_power(construct(OP_POW, base(left), simplify_sum(construct(OP_ADD, exponent(left), exponent(right)))));
