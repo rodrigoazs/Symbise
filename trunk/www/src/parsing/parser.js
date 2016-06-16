@@ -1332,7 +1332,9 @@ switch( act )
     break;
     case 51:
     {
-         rval = createNode( NODE_FUNC, FUNC_EXP, vstack[ vstack.length - 2 ] );
+         //rval = createNode( NODE_FUNC, FUNC_EXP, vstack[ vstack.length - 2 ] );
+         // the function exp was transformed into e^n
+         rval = createNode( NODE_OP, OP_POW, createNode( NODE_SYM, "e" ), vstack[ vstack.length - 2 ] );
     }
     break;
     case 52:
@@ -1431,7 +1433,7 @@ if( ( error_count = __parse( str, error_offsets, error_lookaheads ) ) > 0 )
 
       //[ "+toTex(construct(OP_MUL, simplified))+"]
 
-      $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+"  $$</p><br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
+      $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolicDiff(simplified))+" -> "+toTex(automatic_simplify(symbolicDiff(simplified)))+" $$</p><br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
       // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
       plot_value = stringEquation(diff);
       M.parseMath(document.getElementById("console"));

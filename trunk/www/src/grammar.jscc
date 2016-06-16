@@ -324,7 +324,7 @@ ParenExp:   '(' e ')'           [* %% = %2; *]
             | 'acot' '(' e ')'  [* %% = createNode( NODE_FUNC, FUNC_ACOT, %3 ); *]
             | 'acoth' '(' e ')' [* %% = createNode( NODE_FUNC, FUNC_ACOTH, %3 ); *]
             | 'sqrt' '(' e ')'  [* %% = createNode( NODE_FUNC, FUNC_SQRT, %3 ); *]
-            | 'exp' '(' e ')'   [* %% = createNode( NODE_FUNC, FUNC_EXP, %3 ); *]
+            | 'exp' '(' e ')'   [* %% = createNode( NODE_OP, OP_POW, createNode( NODE_SYM, "e" ), %3 ); *] /~ --- createNode( NODE_FUNC, FUNC_EXP, %3 ); --- ~/
             | 'log' '(' e ')'   [* %% = createNode( NODE_FUNC, FUNC_NLOG, %3 ); *]
             | 'log' NumericValue '(' e ')'          [* %% = createNode( NODE_FUNC, FUNC_BLOG, %2, %4 ); *]
             ;

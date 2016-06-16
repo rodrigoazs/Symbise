@@ -114,7 +114,7 @@ function simplify_power(node)
 }
 
 // Simplify Integer Power (u)
-// Definition 3.34. Consider the expression vn where v != 0 is an ASAE and
+// Definition 3.34. Consider the expression v^n where v != 0 is an ASAE and
 // n is an integer. The operator Simplify integer power(v, n) is defined by the
 // following transformation rules. [page 95]
 function simplify_integer_power(v, n)
@@ -132,6 +132,11 @@ function simplify_integer_power(v, n)
 	{
 		return v;
 	}
+	// the function exp was transformed into e^n
+	// else if(kind(v) == FUNC_EXP) // exp function to the integer power
+	// {
+	// 	return simplify_function(createNode(NODE_FUNC, FUNC_EXP, simplify_product(construct(OP_MUL, n, operand(v, 0)))));
+	// }
 	else if(kind(v) == OP_POW)
 	{
 		var r = operand(v, 0);
@@ -355,10 +360,11 @@ function group_product_terms(left, right)
 		return simplify_rational_number(evaluate_product(left, right));
 		//return simplify_rational_number(construct(OP_DIV, createNode(NODE_INT, num), createNode(NODE_INT, den)));
 	}
-	else if(kind(left) == FUNC_EXP && kind(right) == FUNC_EXP) // groupind exp functions
-	{
-		return simplify_function(createNode(NODE_FUNC, FUNC_EXP, simplify_sum(construct(OP_ADD, operand(left, 0), operand(right, 0)))));
-	}
+	// the function exp was transformed into e^n
+	// else if(kind(left) == FUNC_EXP && kind(right) == FUNC_EXP) // groupind exp functions
+	// {
+	// 	return simplify_function(createNode(NODE_FUNC, FUNC_EXP, simplify_sum(construct(OP_ADD, operand(left, 0), operand(right, 0)))));
+	// }
 	else if(compare(base(left), base(right)) == 0)
 	{
 		return simplify_power(construct(OP_POW, base(left), simplify_sum(construct(OP_ADD, exponent(left), exponent(right)))));
@@ -480,6 +486,15 @@ function simplify_function(node)
 		return createNode(NODE_INT, 1);
 	}
 	else if(kind(node) == FUNC_SEC && kind(operand(node, 0)) == NODE_INT && operand(node, 0).value == 0)
+	{
+		return createNode(NODE_INT, 1);
+	}
+	// the function exp was transformed into e^n
+	// else if(kind(node) == FUNC_EXP && kind(operand(node, 0)) == NODE_INT && operand(node, 0).value == 0)
+	// {
+	// 	return createNode(NODE_INT, 1);
+	// }
+	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == NODE_SYM && operand(node, 0).value == "e")
 	{
 		return createNode(NODE_INT, 1);
 	}
