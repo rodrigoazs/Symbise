@@ -94,7 +94,7 @@ function symbolicPower( node, nodep )
     return createNode( NODE_OP, OP_POW, node, nodep );
 }
 
-function symbolicDiff( node )
+function symbolic_diff( node )
 {
   var ret = 0;
 
@@ -107,22 +107,37 @@ function symbolicDiff( node )
       switch( node.value )
       {
         case OP_ADD:
-          ret = symbolicAdder( symbolicDiff( node.children[0] ), symbolicDiff( node.children[1] ) );
+          var children = new Array();
+          for(var i = 0; i < node.children.length; i++)
+          {
+            children[i] = symbolic_diff(node.children[i]);
+          }
+          ret = construct(OP_ADD, children);
+          //ret = construct(OP_ADD, symbolic_diff( node.children[0] ), symbolic_diff( node.children[1] ) );
           break;
         case OP_SUB:
-          ret = symbolicSubtractor( symbolicDiff( node.children[0] ), symbolicDiff( node.children[1] ) );
+          ret = symbolicSubtractor( symbolic_diff( node.children[0] ), symbolic_diff( node.children[1] ) );
           break;
         case OP_DIV:
-          ret = symbolicDivisor(symbolicSubtractor(symbolicMultiplier(symbolicDiff(node.children[0]), node.children[1]), symbolicMultiplier(symbolicDiff(node.children[1]), node.children[0])), symbolicPower(node.children[1], createNode(NODE_INT, 2)));
+          ret = symbolicDivisor(symbolicSubtractor(symbolicMultiplier(symbolic_diff(node.children[0]), node.children[1]), symbolicMultiplier(symbolic_diff(node.children[1]), node.children[0])), symbolicPower(node.children[1], createNode(NODE_INT, 2)));
           break;
         case OP_MUL:
-          ret = symbolicAdder( symbolicMultiplier( symbolicDiff(node.children[0]), node.children[1] ), symbolicMultiplier( symbolicDiff(node.children[1]), node.children[0] ) );
+          if(node.children.length == 2)
+          {
+            ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, node.children[0], symbolic_diff(node.children[1])));
+          }
+          else
+          {
+            var children = node.children.slice(1);
+            ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), construct(OP_MUL, children)), construct(OP_MUL, node.children[0], symbolic_diff(construct(OP_MUL, children))));
+          }
+          //ret = construct(OP_ADD, symbolicMultiplier( symbolic_diff(node.children[0]), node.children[1] ), symbolicMultiplier( symbolic_diff(node.children[1]), node.children[0] ) );
           break;
         case OP_NEG:
-          ret = symbolicNegation(symbolicDiff(node.children[0]));
+          ret = symbolicNegation(symbolic_diff(node.children[0]));
           break;
         case OP_POW:
-          ret = symbolicAdder(symbolicMultiplier(symbolicMultiplier(node.children[1], symbolicPower(node.children[0], symbolicSubtractor(node.children[1], createNode(NODE_INT, 1)))), symbolicDiff(node.children[0])), symbolicMultiplier(symbolicMultiplier(symbolicPower(node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolicDiff(node.children[1])));
+          ret = construct(OP_ADD, symbolicMultiplier(symbolicMultiplier(node.children[1], symbolicPower(node.children[0], symbolicSubtractor(node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), symbolicMultiplier(symbolicMultiplier(symbolicPower(node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1])));
           break;
       }
       break;
@@ -131,88 +146,88 @@ function symbolicDiff( node )
       switch( node.value )
       {
         case FUNC_SIN:
-          ret = symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]) );
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]) );
           break;
         case FUNC_COS:
-          ret = symbolicNegation(symbolicMultiplier( symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0]) ));
+          ret = symbolicNegation(construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0]) ));
           break;
         case FUNC_ASINH:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicAdder(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
           break;
         case FUNC_SINH:
-          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_COSH, node.children[0]));
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_COSH, node.children[0]));
           break;
         case FUNC_ASIN:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
           break;
         case FUNC_ACOSH:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1))));
           break;
         case FUNC_COSH:
-          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_SINH, node.children[0]));
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SINH, node.children[0]));
           break;
         case FUNC_ACOS:
-          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
+          ret = symbolicDivisor(symbolicNegation(symbolic_diff(node.children[0])), createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(1, symbolicPower(node.children[0], createNode(NODE_INT, 2)))));
           break;
         case FUNC_ATANH:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
           break;
         case FUNC_TANH:
-          ret = symbolicMultiplier(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_INT, 2)));
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_INT, 2)));
           break;
         case FUNC_ATAN:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicAdder(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), construct(OP_ADD,createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
           break;
         case FUNC_TAN:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_INT, 2)));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), symbolicPower(createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_INT, 2)));
           break;
         case FUNC_ASECH:
-          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(symbolicMultiplier(node.children[0], creteNode(NODE_FUNC, FUNC_SQRT, symbolicDivisor(symbolicSubtractor(1, node.children[0]), symbolicAdder(1, node.children[0])))), symbolicAdder(1, node.children[0])));
+          ret = symbolicDivisor(symbolicNegation(symbolic_diff(node.children[0])), construct(OP_MUL,construct(OP_MUL,node.children[0], creteNode(NODE_FUNC, FUNC_SQRT, symbolicDivisor(symbolicSubtractor(1, node.children[0]), construct(OP_ADD,1, node.children[0])))), construct(OP_ADD,1, node.children[0])));
           break;
         case FUNC_SECH:
-          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_FUNC, FUNC_TANH, node.children[0])));
+          ret = construct(OP_MUL, symbolicNegation(symbolic_diff(node.children[0])), construct(OP_MUL,createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_FUNC, FUNC_TANH, node.children[0])));
           break;
         case FUNC_ASEC:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicMultiplier(node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1)))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), construct(OP_MUL,node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1)))));
           break;
         case FUNC_SEC:
-          ret = symbolicMultiplier(symbolicDiff(node.children[0]), symbolicMultiplier(createNode(NODE_FUNC, FUNC_TAN, node.children[0]), createNode(NODE_FUNC, FUNC_SEC, node.children[0])));
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), construct(OP_MUL,createNode(NODE_FUNC, FUNC_TAN, node.children[0]), createNode(NODE_FUNC, FUNC_SEC, node.children[0])));
           break;
         case FUNC_ACSCH:
-          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(createNode(NODE_FUNC, FUNC_SQRT, symbolicAdder(createNode(NODE_INT, 1), symbolicDivisor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))))), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
+          ret = symbolicDivisor(symbolicNegation(symbolic_diff(node.children[0])), construct(OP_MUL,createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), symbolicDivisor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))))), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
           break;
         case FUNC_CSCH:
-          ret = symbolicMultiplier(symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_COTH, node.children[0])), createNode(NODE_FUNC, FUNC_CSCH, node.children[0]));
+          ret = construct(OP_MUL,construct(OP_MUL, symbolicNegation(symbolic_diff(node.children[0])), createNode(NODE_FUNC, FUNC_COTH, node.children[0])), createNode(NODE_FUNC, FUNC_CSCH, node.children[0]));
           break;
 		    case FUNC_ACSC:
-          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicMultiplier(node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1)))));
+          ret = symbolicDivisor(symbolicNegation(symbolic_diff(node.children[0])), construct(OP_MUL,node.children[0], createNode(NODE_FUNC, FUNC_SQRT, symbolicSubtractor(symbolicPower(node.children[0], createNode(NODE_INT, 2)), createNode(NODE_INT, 1)))));
           break;
         case FUNC_CSC:
-          ret = symbolicMultiplier(symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), createNode(NODE_FUNC, FUNC_COT, node.children[0])), createNode(NODE_FUNC, FUNC_CSC, node.children[0]));
+          ret = construct(OP_MUL,construct(OP_MUL, symbolicNegation(symbolic_diff(node.children[0])), createNode(NODE_FUNC, FUNC_COT, node.children[0])), createNode(NODE_FUNC, FUNC_CSC, node.children[0]));
           break;
         case FUNC_ACOTH:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), symbolicSubtractor(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
           break;
         case FUNC_COTH:
-          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_INT, 2)));
+          ret = construct(OP_MUL, symbolicNegation(symbolic_diff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_INT, 2)));
           break;
         case FUNC_ACOT:
-          ret = symbolicDivisor(symbolicNegation(symbolicDiff(node.children[0])), symbolicAdder(createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
+          ret = symbolicDivisor(symbolicNegation(symbolic_diff(node.children[0])), construct(OP_ADD,createNode(NODE_INT, 1), symbolicPower(node.children[0], createNode(NODE_INT, 2))));
           break;
         case FUNC_COT:
-          ret = symbolicMultiplier(symbolicNegation(symbolicDiff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_INT, 2)));
+          ret = construct(OP_MUL, symbolicNegation(symbolic_diff(node.children[0])), symbolicPower(createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_INT, 2)));
           break;
         case FUNC_SQRT:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), symbolicMultiplier(createNode(NODE_INT, 2), createNode(NODE_FUNC, FUNC_SQRT, node.children[0])));
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), construct(OP_MUL,createNode(NODE_INT, 2), createNode(NODE_FUNC, FUNC_SQRT, node.children[0])));
           break;
         case FUNC_EXP:
-          ret = symbolicMultiplier(symbolicDiff(node.children[0]), createNode(NODE_FUNC, FUNC_EXP, node.children[0]));
+          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_EXP, node.children[0]));
           break;
         case FUNC_NLOG:
-          ret = symbolicDivisor(symbolicDiff(node.children[0]), node.children[0]);
+          ret = symbolicDivisor(symbolic_diff(node.children[0]), node.children[0]);
           break;
         case FUNC_BLOG:
-          ret = symbolicDivisor(symbolicDiff(node.children[1]), symbolicMultiplier(node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
+          ret = symbolicDivisor(symbolic_diff(node.children[1]), construct(OP_MUL,node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
           break;
       }
       break;
