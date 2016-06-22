@@ -198,3 +198,64 @@ function is_fraction(u)
 {
 	return u.type == NODE_OP && u.value == OP_DIV && u.children[0].type == NODE_INT && u.children[1].type == NODE_INT;
 }
+
+// Free of Symbol (u, s)
+// Return true if the node u does not contain a certain symbol s, otherwise returns false
+function free_of_symbol(node, symbol)
+{
+	if(kind(node) == NODE_SYM && node.value == symbol)
+	{
+		return false;
+	}
+	else if(kind(node) == NODE_SYM && node.value != symbol)
+	{
+		return true;
+	}
+	else
+	{
+		var ret = true;
+		for(var i = 0; i < node.children.length; i++)
+		{
+			ret = ret && free_of_symbol(node.children[i], symbol);
+			if(!ret) return ret;
+		}
+		return ret;
+	}
+}
+
+// Factor Out (u, s)
+// Factor out constants and variables from an ASAE u checking for
+// a symbol s and so returning two products
+// [constants, variables]
+// returns undefined if does not contain constants or variables
+function factor_out(node, symbol)
+{
+	if(kind(node) == OP_MUL)
+	{
+		var constants = new Array();
+		var variables = new Array();
+		for(var i = 0; i < node.children.length; i++)
+		{
+			if(free_of_symbol(node.children[i], symbol))
+			{
+				constants.push(node.children[i]);
+			}
+			else
+			{
+				variables.push(node.children[i]);
+			}
+		}
+		return [constants.length > 1 ? construct(OP_MUL, constants) : constants[0], variables.length > 1 ? construct(OP_MUL, variables) : variables[0]];
+	}
+	else
+	{
+		if(free_of_symbol(node, symbol))
+		{
+			return [node, undefined];
+		}
+		else
+		{
+			return [undefined, node];
+		}
+	}
+}
