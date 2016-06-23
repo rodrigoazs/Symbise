@@ -1,6 +1,7 @@
 // Power Notation Expressions
 // The PNEs are algebraic expressions that have divisions instead of negative powers
 // and square roots instead of powers of 1/2
+// It works only with ASAEs
 function PNE_transform(n)
 {
   var ret = 0;
