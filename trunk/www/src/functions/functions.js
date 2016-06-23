@@ -199,6 +199,20 @@ function is_fraction(u)
 	return u.type == NODE_OP && u.value == OP_DIV && u.children[0].type == NODE_INT && u.children[1].type == NODE_INT;
 }
 
+// Is Symbol (u ,s)
+// Return true if the node u is a symbol s
+function is_symbol(node, symbol)
+{
+	if(kind(node) == NODE_SYM && node.value == symbol)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Free of Symbol (u, s)
 // Return true if the node u does not contain a certain symbol s, otherwise returns false
 function free_of_symbol(node, symbol)
