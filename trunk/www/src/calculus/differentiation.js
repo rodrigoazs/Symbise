@@ -195,7 +195,8 @@ function step_diff(node)
         case OP_DIV:
           if(is_fraction(node))
           {
-            ret = createNode(NODE_INT, 0);
+            ret += "The derivative of a constant is zero:";
+            ret += "$$d/{dx}("+toTex(node)+")=0$$";
           }
           else
           {
@@ -203,15 +204,31 @@ function step_diff(node)
           }
           break;
         case OP_MUL:
-          if(node.children.length == 2)
+          var fac = factor_out(node, "x");
+          if(fac[0] !== undefined && fac[1] === undefined) //only constants
           {
-            ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, node.children[0], symbolic_diff(node.children[1])));
+            ret += "The derivative of a constant is zero:";
+            ret += "$$d/{dx}("+toTex(node)+")=0$$";
+          }
+          else if(fac[0] === undefined && fac[1] !== undefined) //only variables
+          {
+            ret += "not implemented yet";
           }
           else
           {
-            var children = node.children.slice(1);
-            ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), construct(OP_MUL, children)), construct(OP_MUL, node.children[0], symbolic_diff(construct(OP_MUL, children))));
+            ret += "Factor out constants:";
+            ret += "$$="+toTex(fac[0])+"(d/{dx}("+toTex(fac[1])+"))$$";
+            ret += step_diff(fac[1]);
           }
+          // if(node.children.length == 2)
+          // {
+          //   ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, node.children[0], symbolic_diff(node.children[1])));
+          // }
+          // else
+          // {
+          //   var children = node.children.slice(1);
+          //   ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), construct(OP_MUL, children)), construct(OP_MUL, node.children[0], symbolic_diff(construct(OP_MUL, children))));
+          // }
           //ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, symbolic_diff(node.children[1]), node.children[0]));
           break;
         case OP_NEG:
@@ -225,7 +242,7 @@ function step_diff(node)
             ret += "$$d/{dx}("+toTex(node)+")=0$$";
           }
           // power x^(constant)
-          else if(is_symbol(node.children[0]) && free_of_symbol(node.children[1], "x"))
+          else if(is_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
             ret += "Use the power rule, $d/{dx}(x^{n})=n x^{n-1}$, where $n="+toTex(node.children[1])+"$";
             ret += "$$d/{dx}("+toTex(node)+")="+toTex(automatic_simplify(symbolic_diff(node)))+"$$";
@@ -351,4 +368,10 @@ function step_diff(node)
   }
 
   return ret;
+}
+
+// Render a box in a jqMath code
+function render_mathbox(code)
+{
+  return "\\cl\"mathbox\"{"+code+"}";
 }
