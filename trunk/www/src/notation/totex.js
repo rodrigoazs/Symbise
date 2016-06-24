@@ -13,6 +13,11 @@ function toTex_rec( node )
   if( !node )
     return 0;
 
+  if(node.type == "COLOR")
+  {
+    return render_mathbox(toTex_rec(node.value));
+  }
+
   switch( node.type )
   {
     case NODE_OP:
@@ -177,6 +182,9 @@ function toTex_rec( node )
           break;
         case FUNC_BLOG:
           ret = "log_{" + toTex_rec( node.children[0] ) + "}(" + toTex_rec( node.children[1] ) + ")";
+          break;
+        case FUNC_DIFF:
+          ret = "d/{dx}(" + toTex_rec( node.children[0] ) + ")";
           break;
       }
       break;

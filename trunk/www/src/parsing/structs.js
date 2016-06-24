@@ -49,6 +49,8 @@ var FUNC_COTH = 45;
 var FUNC_ACOT = 46;
 var FUNC_ACOTH = 47;
 
+var FUNC_DIFF = 50;
+
 //Management functions
 function createNode( type, value, childs )
 {

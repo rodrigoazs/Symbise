@@ -164,79 +164,36 @@ function symbolic_diff(node)
 function step_diff(node)
 {
   var n = new step_diff_obj(node);
-  //n.expression = n.step_diff_wh(n.expression);
-  while(1)
-  {
-    n.expression = n.step_diff_rec(n.expression);
-    if(n.diff_found == false)
-    {
-      n.ret += "Result is:"
-    }
-    n.ret += "$$="+toTex(n.expression)+"$$";
-    n.expression = automatic_simplify(n.expression);
-    if(n.diff_found == false){
-      break;
-    } else {
-      n.diff_found = false;
-    }
-  }
+  n.step_diff_execute(n.expression);
   return n.ret;
 }
 
 function step_diff_obj(node)
 {
-  this.expression = createNode(NODE_FUNC, FUNC_DIFF, JSON.parse(JSON.stringify(node)));
+  this.expression = JSON.parse(JSON.stringify(node));
   this.ret = "Possible derivation:$$"+toTex(this.expression)+"$$";
-  this.diff_found = false;
 };
-
-step_diff_obj.prototype.step_diff_wh = function (node)
-{
-  var ret = node;
-  while(true)
-  {
-    ret = this.step_diff_rec(ret);
-    if(this.diff_found == false)
-    {
-      break;
-    }
-    else
-    {
-      this.diff_found = false;
-    }
-  }
-  return ret;
-}
 
 step_diff_obj.prototype.step_diff_rec = function (node)
 {
-  var ret = this.step_diff_check(node);
-  for(var i=0; i<ret.children.length; i++)
-  {
-    ret.children[i] = this.step_diff_check(ret.children[i]);
-  }
-  return ret;
-}
-
-step_diff_obj.prototype.step_diff_check = function (node)
-{
-  var ret = node;
-  if(this.diff_found == true)
-  {
-    return ret;
-  }
   if(kind(node) == FUNC_DIFF)
   {
-    this.diff_found = true;
-    ret = this.step_diff_execute(node.children[0]);
+    node = node.children[0];
+    this.step_diff_execute(node);
   }
-  return ret;
+  else
+  {
+    for(var i=0; i<node.children.length; i++)
+    {
+      this.step_diff_rec(node.children[i]);
+    }
+  }
 }
 
 // Step-by-step Diff (u)
-step_diff_obj.prototype.step_diff_execute = function(node)
+step_diff_obj.prototype.step_diff_execute = function(node, data)
 {
-  var ret = 0;
+  var nodeto = 0;
   switch(node.type)
   {
     case NODE_OP:
@@ -244,12 +201,16 @@ step_diff_obj.prototype.step_diff_execute = function(node)
       {
         case OP_ADD:
           this.ret += "Differentiate the sum term by term:";
-          var children = new Array();
           for(var i = 0; i < node.children.length; i++)
           {
-            children[i] = createNode(NODE_FUNC, FUNC_DIFF, node.children[i]);
+            node.children[i] = createNode(NODE_FUNC, FUNC_DIFF, node.children[i]);
           }
-          ret = construct(OP_ADD, children);
+          this.ret += "$$="+toTex(this.expression)+"$$";
+          for(var i = 0; i < node.children.length; i++)
+          {
+            node.children[i] = node.children[i].children[0];
+            this.step_diff_execute(node.children[i], {parent: node, i: i});
+          }
           break;
         case OP_SUB:
           ret = construct(OP_SUB, symbolic_diff(node.children[0]), symbolic_diff(node.children[1]));
@@ -414,21 +375,29 @@ step_diff_obj.prototype.step_diff_execute = function(node)
       if(node.value == "x")
       {
         this.ret += "The derivative of a $x$ is $1$:";
-        ret = createNode(NODE_INT, 1);
+        nodeto = createNode(NODE_INT, 1);
+        data.parent.children[data.i] = createNode("COLOR", nodeto);
+        this.ret += "$$="+toTex(this.expression)+"$$";
+        data.parent.children[data.i] = nodeto;
       }
       else
       {
         this.ret += "The derivative of a constant is zero:";
-        ret = createNode(NODE_INT, 0);
+        nodeto = createNode(NODE_INT, 0);
+        data.parent.children[data.i] = createNode("COLOR", nodeto);
+        this.ret += "$$="+toTex(this.expression)+"$$";
+        data.parent.children[data.i] = nodeto;
       }
       break;
 
     case NODE_INT:
       this.ret += "The derivative of a constant is zero:";
-      ret = createNode(NODE_INT, 0);
+      nodeto = createNode(NODE_INT, 0);
+      data.parent.children[data.i] = createNode("COLOR", nodeto);
+      this.ret += "$$="+toTex(this.expression)+"$$";
+      data.parent.children[data.i] = nodeto;
       break;
   }
-  return ret;
 }
 
 // // Step-by-step Diff (u)
