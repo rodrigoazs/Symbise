@@ -173,7 +173,7 @@ function step_diff(node)
       n.ret += "Result is:"
     }
     n.ret += "$$="+toTex(n.expression)+"$$";
-    n.remove_color();
+    n.remove_box();
     n.expression = automatic_simplify(n.expression);
 
     if(n.diff_found == false){
@@ -207,16 +207,16 @@ step_diff_obj.prototype.step_diff_rec = function (node)
   return ret;
 }
 
-step_diff_obj.prototype.remove_color = function()
+step_diff_obj.prototype.remove_box = function()
 {
-  if(this.box.type == "COLOR" && this.box.children.length == 1)
+  if(this.box.type == "STEP_DIFF_BOX" && this.box.children.length == 1)
   {
     this.box.type = this.box.children[0].type;
     this.box.value = this.box.children[0].value;
     this.box.children = this.box.children[0].children;
   }
   // var ret = node;
-  // if(node.type == "COLOR")
+  // if(node.type == "STEP_DIFF_BOX")
   // {
   //   ret = ret.children[0];
   // }
@@ -241,7 +241,7 @@ step_diff_obj.prototype.step_diff_check = function (node)
   {
     this.diff_found = true;
     //ret = this.step_diff_execute(node.children[0]);
-    ret = createNode("COLOR", 0, this.step_diff_execute(node.children[0]));
+    ret = createNode("STEP_DIFF_BOX", 0, this.step_diff_execute(node.children[0]));
     this.box = ret;
   }
   return ret;
@@ -653,9 +653,3 @@ step_diff_obj.prototype.step_diff_execute = function(node)
 //
 //   return ret;
 // }
-
-// Render a box in a jqMath code
-function render_mathbox(code)
-{
-  return "\\cl\"mathbox\"{"+code+"}";
-}

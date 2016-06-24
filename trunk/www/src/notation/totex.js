@@ -13,9 +13,9 @@ function toTex_rec( node )
   if( !node )
     return 0;
 
-  if(node.type == "COLOR")
+  if(node.type == "STEP_DIFF_BOX")
   {
-    return render_mathbox(toTex_rec(node.children[0]));
+    return "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";;
   }
 
   switch( node.type )
