@@ -173,7 +173,7 @@ function step_diff(node)
       n.ret += "Result is:"
     }
     n.ret += "$$="+toTex(n.expression)+"$$";
-    n.expression = n.remove_color_rec(n.expression);
+    n.remove_color();
     n.expression = automatic_simplify(n.expression);
 
     if(n.diff_found == false){
@@ -190,6 +190,7 @@ function step_diff_obj(node)
   this.expression = createNode(NODE_FUNC, FUNC_DIFF, JSON.parse(JSON.stringify(node)));
   this.ret = "Possible derivation:$$"+toTex(this.expression)+"$$";
   this.diff_found = false;
+  this.box = 0;
 };
 
 step_diff_obj.prototype.step_diff_rec = function (node)
@@ -206,21 +207,27 @@ step_diff_obj.prototype.step_diff_rec = function (node)
   return ret;
 }
 
-step_diff_obj.prototype.remove_color_rec = function(node)
+step_diff_obj.prototype.remove_color = function()
 {
-  var ret = node;
-  if(node.type == "COLOR")
+  if(this.box.type == "COLOR" && this.box.children.length == 1)
   {
-    ret = ret.children[0];
+    this.box.type = this.box.children[0].type;
+    this.box.value = this.box.children[0].value;
+    this.box.children = this.box.children[0].children;
   }
-  else
-  {
-    for(var i=0; i<node.children.length; i++)
-    {
-      ret.children[i] = this.remove_color_rec(ret.children[i]);
-    }
-  }
-  return ret;
+  // var ret = node;
+  // if(node.type == "COLOR")
+  // {
+  //   ret = ret.children[0];
+  // }
+  // else
+  // {
+  //   for(var i=0; i<node.children.length; i++)
+  //   {
+  //     ret.children[i] = this.remove_color_rec(ret.children[i]);
+  //   }
+  // }
+  // return ret;
 }
 
 step_diff_obj.prototype.step_diff_check = function (node)
@@ -235,6 +242,7 @@ step_diff_obj.prototype.step_diff_check = function (node)
     this.diff_found = true;
     //ret = this.step_diff_execute(node.children[0]);
     ret = createNode("COLOR", 0, this.step_diff_execute(node.children[0]));
+    this.box = ret;
   }
   return ret;
 }
