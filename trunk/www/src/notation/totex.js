@@ -15,7 +15,7 @@ function toTex_rec( node )
 
   if(node.type == "COLOR")
   {
-    return render_mathbox(toTex_rec(node.value));
+    return render_mathbox(toTex_rec(node.children[0]));
   }
 
   switch( node.type )
@@ -197,7 +197,6 @@ function toTex_rec( node )
       ret = node.value;
       break;
   }
-
   return ret;
 }
 

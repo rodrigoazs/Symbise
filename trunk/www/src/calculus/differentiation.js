@@ -173,7 +173,9 @@ function step_diff(node)
       n.ret += "Result is:"
     }
     n.ret += "$$="+toTex(n.expression)+"$$";
+    n.expression = n.remove_color_rec(n.expression);
     n.expression = automatic_simplify(n.expression);
+
     if(n.diff_found == false){
       break;
     } else {
@@ -190,30 +192,33 @@ function step_diff_obj(node)
   this.diff_found = false;
 };
 
-step_diff_obj.prototype.step_diff_wh = function (node)
+step_diff_obj.prototype.step_diff_rec = function (node)
 {
-  var ret = node;
-  while(true)
+  var ret = this.step_diff_check(node);
+  if(this.diff_found)
   {
-    ret = this.step_diff_rec(ret);
-    if(this.diff_found == false)
-    {
-      break;
-    }
-    else
-    {
-      this.diff_found = false;
-    }
+    return ret;
+  }
+  for(var i=0; i<ret.children.length; i++)
+  {
+    ret.children[i] = this.step_diff_check(ret.children[i]);
   }
   return ret;
 }
 
-step_diff_obj.prototype.step_diff_rec = function (node)
+step_diff_obj.prototype.remove_color_rec = function(node)
 {
-  var ret = this.step_diff_check(node);
-  for(var i=0; i<ret.children.length; i++)
+  var ret = node;
+  if(node.type == "COLOR")
   {
-    ret.children[i] = this.step_diff_check(ret.children[i]);
+    ret = ret.children[0];
+  }
+  else
+  {
+    for(var i=0; i<node.children.length; i++)
+    {
+      ret.children[i] = this.remove_color_rec(ret.children[i]);
+    }
   }
   return ret;
 }
@@ -228,7 +233,8 @@ step_diff_obj.prototype.step_diff_check = function (node)
   if(kind(node) == FUNC_DIFF)
   {
     this.diff_found = true;
-    ret = this.step_diff_execute(node.children[0]);
+    //ret = this.step_diff_execute(node.children[0]);
+    ret = createNode("COLOR", 0, this.step_diff_execute(node.children[0]));
   }
   return ret;
 }
