@@ -286,11 +286,17 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // only constants is already checked in the beggining of the algorithm
           if(fac[0] === undefined && fac[1] !== undefined) //only variables
           {
+            var u = fac[1].children[0];
             if(fac[1].children.length == 2)
             {
-              this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(fac[1].children[0])+"$ and $v="+toTex(fac[1].children[1])+"$";
-              ret = construct(OP_ADD, construct(OP_MUL, fac[1].children[1], createNode(NODE_FUNC, FUNC_DIFF, fac[1].children[0])), construct(OP_MUL, fac[1].children[0], createNode(NODE_FUNC, FUNC_DIFF, fac[1].children[1])));
+              var v = fac[1].children[1];
             }
+            else
+            {
+              var v = construct(OP_MUL, fac[1].children.slice(1));
+            }
+            this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
+            ret = construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)));
           }
           else
           {

@@ -15,7 +15,7 @@ function toTex_rec( node )
 
   if(node.type == "STEP_DIFF_BOX")
   {
-    return "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";;
+    return "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";
   }
 
   switch( node.type )
@@ -60,7 +60,7 @@ function toTex_rec( node )
                   ChildrenTex.push("\\,");
                 }
               }
-              var newpush = node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB) ? "(" + toTex_rec( node.children[i] ) + ")" : toTex_rec( node.children[i] );
+              var newpush = (node.children[i].type == NODE_OP && (node.children[i].value == OP_ADD || node.children[i].value == OP_SUB)) || (node.children[i].type == "STEP_DIFF_BOX") ? "(" + toTex_rec( node.children[i] ) + ")" : toTex_rec( node.children[i] );
               ChildrenTex.push(newpush);
             }
           }
