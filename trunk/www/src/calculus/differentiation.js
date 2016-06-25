@@ -164,18 +164,16 @@ function symbolic_diff(node)
 function step_diff(node)
 {
   var n = new step_diff_obj(node);
-  //n.expression = n.step_diff_wh(n.expression);
   while(1)
   {
     n.expression = n.step_diff_rec(n.expression);
     if(n.diff_found == false)
     {
-      n.ret += "Result is:"
+      n.ret += "The result is:"
     }
     n.ret += "$$="+toTex(n.expression)+"$$";
     n.remove_box();
     n.expression = automatic_simplify(n.expression);
-
     if(n.diff_found == false){
       break;
     } else {
@@ -185,9 +183,12 @@ function step_diff(node)
   return n.ret;
 }
 
+// Changed JSON object clone to copy with automatic_simplify
 function step_diff_obj(node)
 {
-  this.expression = createNode(NODE_FUNC, FUNC_DIFF, JSON.parse(JSON.stringify(node)));
+  //this.expression = createNode(NODE_FUNC, FUNC_DIFF, JSON.parse(JSON.stringify(node)));
+  //this.expression = createNode(NODE_FUNC, FUNC_DIFF, node);
+  this.expression = createNode(NODE_FUNC, FUNC_DIFF, automatic_simplify(node));
   this.ret = "Possible derivation:$$"+toTex(this.expression)+"$$";
   this.diff_found = false;
   this.box = 0;
@@ -202,7 +203,7 @@ step_diff_obj.prototype.step_diff_rec = function (node)
   }
   for(var i=0; i<ret.children.length; i++)
   {
-    ret.children[i] = this.step_diff_check(ret.children[i]);
+    ret.children[i] = this.step_diff_rec(ret.children[i]);
   }
   return ret;
 }
@@ -248,9 +249,18 @@ step_diff_obj.prototype.step_diff_check = function (node)
 }
 
 // Step-by-step Diff (u)
+// Only an ASAE as input node is acceptable
 step_diff_obj.prototype.step_diff_execute = function(node)
 {
   var ret = 0;
+  // if constant
+  if(free_of_symbol(node, "x"))
+  {
+    this.ret += "The derivative of a constant is zero:";
+    ret = createNode(NODE_INT, 0);
+    return ret;
+  }
+
   switch(node.type)
   {
     case NODE_OP:
@@ -265,60 +275,36 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           }
           ret = construct(OP_ADD, children);
           break;
-        case OP_SUB:
-          ret = construct(OP_SUB, symbolic_diff(node.children[0]), symbolic_diff(node.children[1]));
-          break;
-        case OP_DIV:
-          if(is_fraction(node))
-          {
-            ret += "The derivative of a constant is zero:";
-            ret += "$$d/{dx}("+toTex(node)+")=0$$";
-          }
-          else
-          {
-            ret = construct(OP_DIV, construct(OP_SUB, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, symbolic_diff(node.children[1]), node.children[0])), construct(OP_POW, node.children[1], createNode(NODE_INT, 2)));
-          }
-          break;
+        // Difference does not exist in an ASAE
+        // case OP_SUB:
+        //   break;
+        // Quotient does not exist in an ASAE
+        // case OP_DIV:
+        //   break;
         case OP_MUL:
           var fac = factor_out(node, "x");
-          if(fac[0] !== undefined && fac[1] === undefined) //only constants
+          // only constants is already checked in the beggining of the algorithm
+          if(fac[0] === undefined && fac[1] !== undefined) //only variables
           {
-            ret += "The derivative of a constant is zero:";
-            ret += "$$d/{dx}("+toTex(node)+")=0$$";
-          }
-          else if(fac[0] === undefined && fac[1] !== undefined) //only variables
-          {
-            ret += "not implemented yet";
+            if(fac[1].children.length == 2)
+            {
+              this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(fac[1].children[0])+"$ and $v="+toTex(fac[1].children[1])+"$";
+              ret = construct(OP_ADD, construct(OP_MUL, fac[1].children[1], createNode(NODE_FUNC, FUNC_DIFF, fac[1].children[0])), construct(OP_MUL, fac[1].children[0], createNode(NODE_FUNC, FUNC_DIFF, fac[1].children[1])));
+            }
           }
           else
           {
-            ret += "Factor out constants:";
-            ret += "$$="+toTex(fac[0])+"(d/{dx}("+toTex(fac[1])+"))$$";
-            ret += step_diff(fac[1]);
+            this.ret += "Factor out constants:";
+            ret = construct(OP_MUL, fac[0], createNode(NODE_FUNC, FUNC_DIFF, fac[1]));
           }
-          // if(node.children.length == 2)
-          // {
-          //   ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, node.children[0], symbolic_diff(node.children[1])));
-          // }
-          // else
-          // {
-          //   var children = node.children.slice(1);
-          //   ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), construct(OP_MUL, children)), construct(OP_MUL, node.children[0], symbolic_diff(construct(OP_MUL, children))));
-          // }
-          //ret = construct(OP_ADD, construct(OP_MUL, symbolic_diff(node.children[0]), node.children[1]), construct(OP_MUL, symbolic_diff(node.children[1]), node.children[0]));
           break;
-        case OP_NEG:
-          ret = construct(OP_NEG, symbolic_diff(node.children[0]));
-          break;
+        // Negation does not exist in an ASAE
+        // case OP_NEG:
+        //   break;
         case OP_POW:
-          // constant
-          if(free_of_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
-          {
-            ret += "The derivative of a constant is zero:";
-            ret += "$$d/{dx}("+toTex(node)+")=0$$";
-          }
+          // only constants is already checked in the beggining of the algorithm
           // power x^(constant)
-          else if(is_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
+          if(is_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
             ret += "Use the power rule, $d/{dx}(x^{n})=n x^{n-1}$, where $n="+toTex(node.children[1])+"$";
             ret += "$$d/{dx}("+toTex(node)+")="+toTex(automatic_simplify(symbolic_diff(node)))+"$$";
@@ -430,17 +416,17 @@ step_diff_obj.prototype.step_diff_execute = function(node)
         this.ret += "The derivative of a $x$ is $1$:";
         ret = createNode(NODE_INT, 1);
       }
-      else
-      {
-        this.ret += "The derivative of a constant is zero:";
-        ret = createNode(NODE_INT, 0);
-      }
+      // else
+      // {
+      //   this.ret += "The derivative of a constant is zero:";
+      //   ret = createNode(NODE_INT, 0);
+      // }
       break;
 
-    case NODE_INT:
-      this.ret += "The derivative of a constant is zero:";
-      ret = createNode(NODE_INT, 0);
-      break;
+    // case NODE_INT:
+    //   this.ret += "The derivative of a constant is zero:";
+    //   ret = createNode(NODE_INT, 0);
+    //   break;
   }
   return ret;
 }
