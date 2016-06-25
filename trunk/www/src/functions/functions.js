@@ -273,3 +273,70 @@ function factor_out(node, symbol)
 		}
 	}
 }
+
+// Form quotient (u)
+// Form quotient from a expression separing
+// positive powers from negativa powers
+// [positives, negatives] = [numerator, denominator]
+// returns 1 if does not contain positives or negatives
+function form_quotient(node)
+{
+	//var node = automatic_simplify(u);
+	var positives = new Array();
+	var negatives = new Array();
+	for(var i = 0; i < node.children.length; i++) {
+		if(kind(node.children[i]) != OP_POW)
+		{
+				positives.push(node.children[i]);
+		}
+		else // OP_POW
+		{
+			if(signal(operand(node.children[i], 1)))
+			{
+				positives.push(node.children[i]);
+			}
+			else
+			{
+				var base = operand(node.children[i], 0);
+				var exponent = operand(node.children[i], 1);
+				if(kind(exponent) == NODE_INT)
+				{
+					negatives.push(simplify_power(construct(OP_POW, base, createNode(NODE_INT, -1*exponent.value))));
+				} else {
+					exponent.children[0].value = -1*exponent.children[0].value;
+					negatives.push(simplify_power(construct(OP_POW, base, simplify_product(construct(OP_MUL, exponent.children)))));
+				}
+			}
+		}
+	}
+	var numerator;
+	var denominator;
+
+	if(positives.length == 0)
+	{
+		numerator = createNode(NODE_INT, 1);
+	}
+	else if(positives.length == 1)
+	{
+		numerator = positives[0];
+	}
+	else
+	{
+		numerator = construct(OP_MUL, positives);
+	}
+
+	if(negatives.length == 0)
+	{
+		denominator = createNode(NODE_INT, 1);
+	}
+	else if(negatives.length == 1)
+	{
+		denominator = negatives[0];
+	}
+	else
+	{
+		denominator = construct(OP_MUL, negatives);
+	}
+
+	return [numerator, denominator];
+}

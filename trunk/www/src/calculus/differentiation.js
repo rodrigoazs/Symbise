@@ -286,17 +286,29 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // only constants is already checked in the beggining of the algorithm
           if(fac[0] === undefined && fac[1] !== undefined) //only variables
           {
-            var u = fac[1].children[0];
-            if(fac[1].children.length == 2)
+            // check if its actually a quotient
+            var quo = form_quotient(node);
+            if(kind(quo[1]) == NODE_INT && quo[1].value == 1) // if denominator is 1 there is no negative power
             {
-              var v = fac[1].children[1];
+              var u = fac[1].children[0];
+              if(fac[1].children.length == 2)
+              {
+                var v = fac[1].children[1];
+              }
+              else
+              {
+                var v = construct(OP_MUL, fac[1].children.slice(1));
+              }
+              this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
+              ret = construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)));
             }
             else
             {
-              var v = construct(OP_MUL, fac[1].children.slice(1));
+              var u = quo[0];
+              var v = quo[1];
+              this.ret += "Use the quotient rule, $d/{dx}(u/v)={v {du}/{dx}-u {dv}/{dx}}/{v^{2}}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
+              ret = construct(OP_MUL, construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)))), construct(OP_POW, v, createNode(NODE_INT, -2)));
             }
-            this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
-            ret = construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)));
           }
           else
           {
