@@ -324,16 +324,38 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // power x^(constant)
           if(is_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
-            ret += "Use the power rule, $d/{dx}(x^{n})=n x^{n-1}$, where $n="+toTex(node.children[1])+"$";
-            ret += "$$d/{dx}("+toTex(node)+")="+toTex(automatic_simplify(symbolic_diff(node)))+"$$";
+            this.ret += "Use the power rule, $d/{dx}(x^{n})=n x^{n-1}$, where $n="+toTex(node.children[1])+"$";
+            ret = construct(OP_MUL, node.children[1], automatic_simplify(construct(OP_POW, node.children[0], construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))));
           }
           // power (variable)^(constant)
           else if(!free_of_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
-            ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(u^{"+toTex(node.children[1])+"}) d/{dx}("+toTex(node.children[0])+")$, where $u="+toTex(node.children[0])+"$";
-            ret += "$$d/{dx}("+toTex(node)+")="+toTex(automatic_simplify(symbolic_diff(node)))+"$$";
+            var dev = automatic_simplify(construct(OP_MUL, node.children[1], construct(OP_POW, createNode(NODE_SYM, "u"), construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))));
+            this.ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(u^{"+toTex(node.children[1])+"}) d/{dx}("+toTex(node.children[0])+")$, where $u="+toTex(node.children[0])+"$ and $d/{du}(u^{"+toTex(node.children[1])+"})="+toTex(dev)+"$:";
+            ret = construct(OP_MUL, [node.children[1], automatic_simplify(construct(OP_POW, node.children[0], construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))), createNode(NODE_FUNC, FUNC_DIFF, node.children[0])]);
           }
-          //ret = construct(OP_ADD, construct(OP_MUL, construct(OP_MUL, node.children[1], construct(OP_POW, node.children[0], construct(OP_SUB, node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), construct(OP_MUL, construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1])));
+          // power (e)^(x)
+          else if(is_symbol(node.children[0], "e") && is_symbol(node.children[1], "x"))
+          {
+            this.ret = "The derivative of $e^x$ is $e^x$:";
+            ret = node;
+          }
+          // power (constant)^(x)
+          // else if(free_of_symbol(node.children[0], "x") && is_symbol(node.children[1], "x"))
+          // {
+          //   var exp = construct(OP_MUL, createNode(NODE_SYM, "x"), createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
+          //   var rew = construct(OP_POW, createNode(NODE_SYM, "e"), exp);
+          //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
+          //   ret = automatic_simplify(construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
+          // }
+          // power (variable)^(variable)
+          else
+          {
+            var exp = construct(OP_MUL, node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
+            var rew = construct(OP_POW, createNode(NODE_SYM, "e"), exp);
+            this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
+            ret = automatic_simplify(construct(OP_ADD, construct(OP_MUL, construct(OP_MUL, node.children[1], construct(OP_POW, node.children[0], construct(OP_SUB, node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), construct(OP_MUL, construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1]))));
+          }
           break;
       }
       break;
@@ -342,13 +364,40 @@ step_diff_obj.prototype.step_diff_execute = function(node)
       switch(node.value)
       {
         case FUNC_SIN:
-          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]));
+          if(is_symbol(node.children[0], "x"))
+          {
+            this.ret += "Use the derivative of sin, $d/{dx}(sin(x))=cos(x)$";
+            ret = createNode(NODE_FUNC, FUNC_COS, node.children[0]);
+          }
+          else
+          {
+            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sin(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(sin(u))=cos(u)$:";
+            ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]));
+          }
           break;
         case FUNC_COS:
-          ret = construct(OP_NEG, construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0])));
+          if(is_symbol(node.children[0], "x"))
+          {
+            this.ret += "Use the derivative of cos, $d/{dx}(cos(x))=-sin(x)$";
+            ret = construct(OP_MUL, createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_SIN, node.children[0]));
+          }
+          else
+          {
+            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cos(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(cos(u))=-sin(u)$:";
+            ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0])]);
+          }
           break;
         case FUNC_ASINH:
-          ret = construct(OP_DIV, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))));
+          if(is_symbol(node.children[0], "x"))
+          {
+            this.ret += "Use the derivative of asinh, $d/{dx}(asinh(x))=1/{√{1+x^2}}$";
+            ret = construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1));
+          }
+          else
+          {
+            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asinh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asinh(u))=1/{√{1+x^2}}$:";
+            ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
+          }
           break;
         case FUNC_SINH:
           ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_COSH, node.children[0]));
