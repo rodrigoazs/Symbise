@@ -182,7 +182,12 @@ function signal(term)
 	if(kind(term) == NODE_INT)
 	{
 		return term.value >= 0;
-	}else if(kind(term) == OP_MUL)
+	}
+	else if(is_fraction(term))
+	{
+		return term.children[0].value >= 0;
+	}
+	else if(kind(term) == OP_MUL)
 	{
 		if(kind(term.children[0]) == NODE_INT)
 		{
@@ -276,12 +281,21 @@ function factor_out(node, symbol)
 
 // Form quotient (u)
 // Form quotient from a expression separing
-// positive powers from negativa powers
+// positive powers from negative powers
 // [positives, negatives] = [numerator, denominator]
 // returns 1 if does not contain positives or negatives
-function form_quotient(node)
+function form_quotient(u)
 {
 	//var node = automatic_simplify(u);
+	var node;
+	if(kind(u) == OP_MUL)
+	{
+		node = u;
+	}
+	else
+	{
+		node = construct(OP_MUL, u);
+	}
 	var positives = new Array();
 	var negatives = new Array();
 	for(var i = 0; i < node.children.length; i++) {
@@ -302,9 +316,13 @@ function form_quotient(node)
 				if(kind(exponent) == NODE_INT)
 				{
 					negatives.push(simplify_power(construct(OP_POW, base, createNode(NODE_INT, -1*exponent.value))));
+				}
+				else if(is_fraction(exponent))
+				{
+					negatives.push(simplify_power(construct(OP_POW, base, construct(OP_DIV, createNode(NODE_INT, -1*exponent.children[0].value), exponent.children[1]))));
 				} else {
-					exponent.children[0].value = -1*exponent.children[0].value;
-					negatives.push(simplify_power(construct(OP_POW, base, simplify_product(construct(OP_MUL, exponent.children)))));
+					var to_array = [createNode(NODE_INT, -1*exponent.children[0].value)].concat(exponent.children.slice(1));
+					negatives.push(simplify_power(construct(OP_POW, base, simplify_product(construct(OP_MUL, to_array)))));
 				}
 			}
 		}
