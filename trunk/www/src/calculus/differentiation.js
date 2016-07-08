@@ -339,7 +339,7 @@ function automatic_diff(node, sub)
       ret = 0;
       break;
   }
-  if(isNaN(ret)) console.log('isNan', stringEquation(node));
+
   return ret;
 }
 
