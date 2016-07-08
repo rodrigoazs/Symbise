@@ -210,14 +210,22 @@ function automatic_diff(node, sub)
           else
           {
             var children = node.children.slice(1);
-            ret = automatic_diff(node.children[0], sub) * execute(construct(OP_MUL, children), sub) + node.children[0] * automatic_diff(construct(OP_MUL, children), sub);
+            ret = automatic_diff(node.children[0], sub) * execute(construct(OP_MUL, children), sub) + execute(node.children[0], sub) * automatic_diff(construct(OP_MUL, children), sub);
           }
           break;
         case OP_NEG:
           ret = - automatic_diff(node.children[0], sub);
           break;
         case OP_POW:
-          ret = (execute(node.children[1], sub)*Math.pow(execute(node.children[0], sub),(execute(node.children[1], sub)-1))*automatic_diff(node.children[0], sub))+(Math.pow(execute(node.children[0], sub),execute(node.children[1], sub))*Math.log(execute(node.children[0], sub))*automatic_diff(node.children[1], sub));
+          // prevents NaN in log(). It happens because 0*NaN = NaN instead of 0.
+          var term1 = Math.pow(execute(node.children[0], sub),execute(node.children[1], sub));
+          var term2 = Math.log(execute(node.children[0], sub));
+          var term3 = automatic_diff(node.children[1], sub);
+          if(term1 == 0 || term2 == 0 || term3 == 0)
+          {
+            term1 = term2 = term3 = 0;
+          }
+          ret = (execute(node.children[1], sub)*Math.pow(execute(node.children[0], sub),(execute(node.children[1], sub)-1))*automatic_diff(node.children[0], sub))+(term1 * term2 * term3);
           break;
       }
       break;
@@ -331,7 +339,7 @@ function automatic_diff(node, sub)
       ret = 0;
       break;
   }
-
+  if(isNaN(ret)) console.log('isNan', stringEquation(node));
   return ret;
 }
 

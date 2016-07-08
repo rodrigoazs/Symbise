@@ -39,7 +39,7 @@ function execute(node, sub)
           ret = -execute(node.children[0], sub);
           break;
         case OP_POW:
-          if(kind(node.children[0], sub) == NODE_SYM && node.children[0].value == "e")
+          if(kind(node.children[0]) == NODE_SYM && node.children[0].value == "e")
           {
             ret = Math.exp(execute(node.children[1], sub));
           }
