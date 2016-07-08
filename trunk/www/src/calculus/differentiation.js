@@ -137,9 +137,9 @@ function symbolic_diff(node)
         case FUNC_SQRT:
           ret = construct(OP_DIV, symbolic_diff(node.children[0]), construct(OP_MUL,createNode(NODE_INT, 2), createNode(NODE_FUNC, FUNC_SQRT, node.children[0])));
           break;
-        case FUNC_EXP:
-          ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_EXP, node.children[0]));
-          break;
+        // case FUNC_EXP:
+        //   ret = construct(OP_MUL, symbolic_diff(node.children[0]), createNode(NODE_FUNC, FUNC_EXP, node.children[0]));
+        //   break;
         case FUNC_NLOG:
           ret = construct(OP_DIV, symbolic_diff(node.children[0]), node.children[0]);
           break;
@@ -158,6 +158,177 @@ function symbolic_diff(node)
 
     case NODE_INT:
       ret = createNode(NODE_INT, 0);
+      break;
+  }
+
+  return ret;
+}
+
+// Automatic Diff (u)
+// Given an expression BAE or ASAE and a dictionary of variables with their
+// respect values, including the value of the derivative point,
+// derivate and evaluate the expression
+// The output is a numeric value
+function automatic_diff(node, sub)
+{
+  var ret = 0;
+
+  if(!node)
+    return 0;
+
+  switch(node.type)
+  {
+    case NODE_OP:
+      switch(node.value)
+      {
+        case OP_ADD:
+          var sum = 0;
+          for(var i = 0; i < node.children.length; i++)
+          {
+            sum += automatic_diff(node.children[i], sub);
+          }
+          ret = sum;
+          break;
+        case OP_SUB:
+          ret = automatic_diff(node.children[0], sub) - automatic_diff(node.children[1], sub);
+          break;
+        case OP_DIV:
+          if(is_fraction(node))
+          {
+            ret = 0;
+          }
+          else
+          {
+            ret = (automatic_diff(node.children[0], sub) * execute(node.children[1], sub) - automatic_diff(node.children[1], sub) * execute(node.children[0], sub)) / Math.pow(execute(node.children[1], sub), 2);
+          }
+          break
+        case OP_MUL:
+          if(node.children.length == 2)
+          {
+            ret = automatic_diff(node.children[0], sub) * execute(node.children[1], sub) + execute(node.children[0], sub) * automatic_diff(node.children[1], sub);
+          }
+          else
+          {
+            var children = node.children.slice(1);
+            ret = automatic_diff(node.children[0], sub) * execute(construct(OP_MUL, children), sub) + node.children[0] * automatic_diff(construct(OP_MUL, children), sub);
+          }
+          break;
+        case OP_NEG:
+          ret = - automatic_diff(node.children[0], sub);
+          break;
+        case OP_POW:
+          ret = (execute(node.children[1], sub)*Math.pow(execute(node.children[0], sub),(execute(node.children[1], sub)-1))*automatic_diff(node.children[0], sub))+(Math.pow(execute(node.children[0], sub),execute(node.children[1], sub))*Math.log(execute(node.children[0], sub))*automatic_diff(node.children[1], sub));
+          break;
+      }
+      break;
+
+    case NODE_FUNC:
+      switch(node.value)
+      {
+        case FUNC_SIN:
+          ret = automatic_diff(node.children[0], sub) * Math.cos(execute(node.children[0], sub));
+          break;
+        case FUNC_COS:
+          ret = - automatic_diff(node.children[0], sub) * Math.sin(execute(node.children[0], sub));
+          break;
+        case FUNC_ASINH:
+          ret = automatic_diff(node.children[0], sub) / (Math.sqrt(Math.pow(execute(node.children[0], sub), 2) + 1));
+          break;
+        case FUNC_SINH:
+          ret = automatic_diff(node.children[0], sub) * Math.cosh(execute(node.children[0], sub));
+          break;
+        case FUNC_ASIN:
+          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_ACOSH:
+          var ex = execute(node.children[0], sub);
+          ret = automatic_diff(node.children[0], sub) / (Math.sqrt(ex - 1) * Math.sqrt(ex + 1));
+          break;
+        case FUNC_COSH:
+          ret = automatic_diff(node.children[0], sub) * Math.sinh(execute(node.children[0], sub));
+          break;
+        case FUNC_ACOS:
+          ret = - automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_ATANH:
+          ret = automatic_diff(node.children[0], sub) / (1 - Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_TANH:
+          ret = automatic_diff(node.children[0], sub) * (1 / Math.pow(Math.cosh(execute(node.children[0], sub)), 2));
+          break;
+        case FUNC_ATAN:
+          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 + Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_TAN:
+          ret = automatic_diff(node.children[0], sub) / (1 / Math.pow(Math.cos(execute(node.children[0], sub)), 2));
+          break;
+        case FUNC_ASECH:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) / (ex * Math.sqrt((1-ex)/(1+ex)) * (1+x));
+          break;
+        case FUNC_SECH:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) * Math.tanh(ex) * (1/Math.cosh(ex));
+          break;
+        case FUNC_ASEC:
+          var ex = execute(node.children[0], sub);
+          ret = automatic_diff(node.children[0], sub) * (1/(Math.sqrt(1-1/Math.pow(ex, 2)) * Math.pow(ex, 2)));
+          break;
+        case FUNC_SEC:
+          var ex = execute(node.children[0], sub);
+          ret = automatic_diff(node.children[0], sub) * Math.tan(ex) * (1/Math.cos(ex));
+          break;
+        case FUNC_ACSCH:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) / (Math.sqrt(1+1/Math.pow(ex, 2)) * Math.pow(ex, 2));
+          break;
+        case FUNC_CSCH:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) * (1/Math.sinh(ex)) * (1/Math.tanh(ex));
+          break;
+		    case FUNC_ACSC:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) / (Math.sqrt(1-1/Math.pow(ex, 2)) * Math.pow(ex, 2));
+          break;
+        case FUNC_CSC:
+          var ex = execute(node.children[0], sub);
+          ret = - automatic_diff(node.children[0], sub) * (1/Math.sin(ex)) * (1/Math.tan(ex));
+          break;
+        case FUNC_ACOTH:
+          ret = automatic_diff(node.children[0], sub) / (1- Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_COTH:
+          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sinh(execute(node.children[0], sub)), 2);
+          break;
+        case FUNC_ACOT:
+          ret = - automatic_diff(node.children[0], sub) / (1 + Math.pow(execute(node.children[0], sub), 2));
+          break;
+        case FUNC_COT:
+          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sin(execute(node.children[0], sub)), 2);
+          break;
+        case FUNC_SQRT:
+          ret = automatic_diff(node.children[0], sub) / (2 * Math.sqrt(execute(node.children[0], sub)));
+          break;
+        // case FUNC_EXP:
+        //   break;
+        case FUNC_NLOG:
+          ret = automatic_diff(node.children[0], sub) / execute(node.children[0], sub);
+          break;
+        case FUNC_BLOG:
+          ret = automatic_diff(node.children[1], sub) / (execute(node.children[1], sub) * Math.log(execute(node.children[0], sub)));
+          break;
+      }
+      break;
+
+    case NODE_SYM:
+      if(node.value == "x")
+        ret = 1;
+      else
+        ret = 0;
+      break;
+
+    case NODE_INT:
+      ret = 0;
       break;
   }
 
@@ -520,7 +691,6 @@ step_diff_obj.prototype.step_diff_execute = function(node)
             this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asech(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asech(u))=-1/{u √{{1-u}/{1+u}} (1+u)}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, node.children[0], createNode(NODE_INT, -1)), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_MUL, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), node.children[0])), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)))), createNode(NODE_INT, -1))]);
           }
-          ret = node;
           break;
         case FUNC_SECH:
           if(is_symbol(node.children[0], "x"))
