@@ -17,6 +17,7 @@
 
 var _dbg_withtrace        = false;
 var _dbg_string            = new String();
+var _dbg_expression;
 
 function __dbg_print( text )
 {
@@ -1082,7 +1083,7 @@ switch( act )
     break;
     case 1:
     {
-         initparser(vstack[ vstack.length - 1 ]);
+         _dbg_expression = (vstack[ vstack.length - 1 ]); //initparser
     }
     break;
     case 2:
@@ -1396,46 +1397,16 @@ switch( act )
     return err_cnt;
 }
 
-var error_offsets = new Array();
-var error_lookaheads = new Array();
-var error_count = 0;
-/*var str = prompt( "Please enter a string to be parsed:", "" );
-if( ( error_count = __parse( str, error_offsets, error_lookaheads ) ) > 0 )
-    { var errstr = new String(); for( var i = 0; i < error_count; i++ )
-        errstr += "Parse error in line " + ( str.substr( 0, error_offsets[i] ).match( /\n/g ) ? str.substr( 0, error_offsets[i] ).match( /\n/g ).length : 1 ) + " near \"" + str.substr( error_offsets[i] ) + "\", expecting \"" + error_lookaheads[i].join() + "\"\n" ;
-        //alert( errstr );
-        $("#console").text(errstr);
-        $("#console").css("visibility", "visible");
-    }*/
-
-
-    // Global var for the function plot
-    var plot_value;
-
-    function initparser( node )
-    {
-      console.log(node);
-      var func = stringEquation( node );
-      var diff = symbolic_diff( node );
-
-      var BAE_node = BAE_transform(node);
-      var simplified = automatic_simplify(node);
-      //var teste = group_product_terms(simplified.children[0], simplified.children[1])
-      //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
-      //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
-      //var a3 = createNode(NODE_INT, 2);
-      //var aaa = construct(OP_ADD, new Array(createNode(NODE_INT, 1), createNode(NODE_INT, 4), createNode(NODE_INT, 2), createNode(NODE_INT, 3), createNode(NODE_INT, 2)));
-      var aaa = construct(OP_ADD, new Array(createNode(NODE_SYM, "y"), createNode(NODE_SYM, "x")));
-      aaa.children.sort(compare);
-      //alert(compare(a3, a2));
-      //alert(toMathML( diff ) );
-      //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
-
-      //[ "+toTex(construct(OP_MUL, simplified))+"]
-
-      $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolic_diff(simplified))+" -> "+toTex(automatic_simplify(symbolic_diff(simplified)))+" $$</p><br><br>"+step_diff(simplified)+"<br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
-      // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
-      plot_value = stringEquation(diff);
-      M.trustHtml = true;
-      M.parseMath(document.getElementById("console"));
-    }
+// Function responsible for parsing
+function parse(str)
+{
+  var error_offsets = new Array();
+  var error_lookaheads = new Array();
+  var error_count = 0;
+  if( ( error_count = __parse( str, error_offsets, error_lookaheads ) ) > 0 )
+  { var errstr = new String(); for( var i = 0; i < error_count; i++ )
+      errstr += "Parse error in line " + ( str.substr( 0, error_offsets[i] ).match( /\n/g ) ? str.substr( 0, error_offsets[i] ).match( /\n/g ).length : 1 ) + " near \"" + str.substr( error_offsets[i] ) + "\", expecting \"" + error_lookaheads[i].join() + "\"\n" ;
+      throw errstr;
+  }
+  return _dbg_expression;
+}
