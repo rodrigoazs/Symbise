@@ -146,6 +146,9 @@ function stringEquation_rec( node )
         case FUNC_BLOG:
           ret = "log" + stringEquation_rec( node.children[0] ) + "(" + stringEquation_rec( node.children[1] ) + ")";
           break;
+        case FUNC_DIFF:
+          ret = "diff(" + toTex_rec( node.children[0] ) + ")";
+          break;
       }
       break;
 

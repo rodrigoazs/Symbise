@@ -13,6 +13,7 @@ function PNE_transform(n)
       {
         case OP_MUL:
           var quot = form_quotient(node);
+          console.log('quot', quot);
           if(kind(quot[1]) == NODE_INT && quot[1].value == 1)
           {
             ret = node;
@@ -25,8 +26,10 @@ function PNE_transform(n)
             }
             else if(kind(quot[0]) == OP_MUL && is_fraction(quot[0].children[0]))
             {
+              console.log('here');
+              console.log([createNode(NODE_INT, quot[0].children[0].children[1].value)].concat(quot[1].children));
               var num = simplify_product(construct(OP_MUL, [createNode(NODE_INT, quot[0].children[0].children[0].value)].concat(quot[0].children.slice(1))));
-              var dem = simplify_product(construct(OP_MUL, [createNode(NODE_INT, quot[0].children[0].children[1].value)].concat(quot[1].children)));
+              var dem = simplify_product(construct(OP_MUL, [createNode(NODE_INT, quot[0].children[0].children[1].value)].concat(quot[1])));
               ret = construct(OP_DIV, num, dem);
             }
             else
