@@ -209,6 +209,9 @@ step_diff_obj.prototype.step_diff_execute = function(node)
             this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
             //ret = automatic_simplify(construct(OP_ADD, construct(OP_MUL, construct(OP_MUL, node.children[1], construct(OP_POW, node.children[0], construct(OP_SUB, node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), construct(OP_MUL, construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1]))));
             ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, exp));
+            // only rewriting
+            //this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$:";
+            //ret = createNode(NODE_FUNC, FUNC_DIFF, rew);
           }
           break;
       }
