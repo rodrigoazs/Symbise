@@ -188,6 +188,11 @@ step_diff_obj.prototype.step_diff_execute = function(node)
             this.ret = "The derivative of $e^x$ is $e^x$:";
             ret = node;
           }
+          else if(is_symbol(node.children[0], "e") && !free_of_symbol(node.children[1], "x"))
+          {
+            this.ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(e^{u}) d/{dx}("+toTex(node.children[1])+")$, where $u="+toTex(node.children[1])+"$ and $d/{du}(e^{u})=e^{u}$:";
+            ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, node.children[1]));
+          }
           // power (constant)^(x)
           // else if(free_of_symbol(node.children[0], "x") && is_symbol(node.children[1], "x"))
           // {
