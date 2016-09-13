@@ -153,7 +153,7 @@ function simplify_integer_power(v, n)
 			return construct(OP_POW, r, p);
 		}
 	}
-	else if(kind(v) == OP_MUL)
+	else if(kind(v) == OP_MUL && kind(n) == NODE_INT && !(n.value % 1)) // only exact integers
 	{
 		var ret = new Array();
 		var r = v.children.slice(0);
