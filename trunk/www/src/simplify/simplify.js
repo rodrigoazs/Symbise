@@ -494,9 +494,29 @@ function simplify_function(node)
 	// {
 	// 	return createNode(NODE_INT, 1);
 	// }
+	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == NODE_INT && operand(node, 0).value == 1)
+	{
+		return createNode(NODE_INT, 0);
+	}
+	else if(kind(node) == FUNC_BLOG && kind(operand(node, 1)) == NODE_INT && operand(node, 1).value == 1)
+	{
+		return createNode(NODE_INT, 0);
+	}
 	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == NODE_SYM && operand(node, 0).value == "e")
 	{
 		return createNode(NODE_INT, 1);
+	}
+	else if(kind(node) == FUNC_BLOG && kind(operand(node, 1)) == NODE_INT && operand(node, 1).value == operand(node, 0).value)
+	{
+		return createNode(NODE_INT, 1);
+	}
+	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == OP_POW && kind(operand(operand(node, 0), 0)) == NODE_SYM && operand(operand(node, 0), 0).value == "e")
+	{
+		return operand(operand(node, 0), 1);
+	}
+	else if(kind(node) == FUNC_BLOG && kind(operand(node, 1)) == OP_POW && kind(operand(operand(node, 1), 0)) == NODE_INT && operand(operand(node, 1), 0).value == operand(node, 0).value)
+	{
+		return operand(operand(node, 1), 1);
 	}
 	else {
 		return node;
