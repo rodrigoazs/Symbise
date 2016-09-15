@@ -22,6 +22,18 @@ module.exports = function (grunt) {
                         ' * ' + '<%= grunt.template.today("yyyy-mm-dd") %>\n' + // 9
                         ' **/\n'
             },
+            lib: {
+              src: [
+              'sources/lib_header.js',
+              'sources/functions/*.js',
+              'sources/simplify/*.js',
+              'sources/calculus/*.js',
+              'sources/notation/*.js',
+              'sources/parsing/*.js',
+              'sources/lib_footer.js'
+              ],
+              dest: 'jsym.lib.js'
+            },
             test: {
               src: [
               'sources/functions/*.js',
@@ -64,6 +76,7 @@ module.exports = function (grunt) {
     });
     // Default task.
     grunt.registerTask('default', ['uglify']); //'cssmin'
+    grunt.registerTask('lib', ['concat:lib']);
     grunt.registerTask('test', ['concat:test']);
     grunt.registerTask('app', ['uglify:app']);
 };

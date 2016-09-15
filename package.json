@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Computer Algebra System in JavaScript",
   "scripts": {
+    "lib": "grunt lib",
     "app": "grunt app",
     "test": "grunt test"
   },
