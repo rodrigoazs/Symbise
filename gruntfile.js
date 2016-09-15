@@ -14,6 +14,27 @@ module.exports = function (grunt) {
         //         }
         //     }
         // },
+        concat: {
+            options: {
+                banner: '/*\n' + // 6
+                        ' * ' + '<%= pkg.name %>\n' + // 7
+                        ' * ' + 'v<%= pkg.version %>\n' + // 8
+                        ' * ' + '<%= grunt.template.today("yyyy-mm-dd") %>\n' + // 9
+                        ' **/\n'
+            },
+            test: {
+              src: [
+              'sources/function-plot/*.js',
+              'sources/functions/*.js',
+              'sources/simplify/*.js',
+              'sources/calculus/*.js',
+              'sources/notation/*.js',
+              'sources/parsing/*.js',
+              'sources/*.js'
+              ],
+              dest: 'app/www/js/jsym.app.js'
+            }
+        },
         uglify: {
             options: {
                 compress: true,
@@ -45,5 +66,6 @@ module.exports = function (grunt) {
     });
     // Default task.
     grunt.registerTask('default', ['uglify']); //'cssmin'
+    grunt.registerTask('test', ['concat:test']);
     grunt.registerTask('app', ['uglify:app']);
 };

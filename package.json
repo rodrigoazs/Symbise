@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "Computer Algebra System in JavaScript",
   "scripts": {
-    "app": "grunt app"
+    "app": "grunt app",
+    "test": "grunt test"
   },
   "devDependencies": {
           "grunt" :                       "~0.4.*",
@@ -11,6 +12,7 @@
           "grunt-contrib-qunit":         "*",
           "grunt-contrib-jshint":         "*",
           "grunt-contrib-uglify":         "*",
+          "grunt-contrib-concat":         "*",
           "matchdep":                     "*"
   },
   "author": "Rodrigo Azevedo",
