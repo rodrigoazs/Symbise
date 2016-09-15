@@ -24,7 +24,6 @@ module.exports = function (grunt) {
             },
             test: {
               src: [
-              'sources/function-plot/*.js',
               'sources/functions/*.js',
               'sources/simplify/*.js',
               'sources/calculus/*.js',
@@ -52,7 +51,6 @@ module.exports = function (grunt) {
             },
             app: {
                 src: [
-                'sources/function-plot/*.js',
                 'sources/functions/*.js',
                 'sources/simplify/*.js',
                 'sources/calculus/*.js',
