@@ -51,6 +51,8 @@ var FUNC_ACOTH = 47;
 
 var FUNC_DIFF = 50;
 
+var FUNC_BOX = 100;
+
 //Management functions
 function createNode( type, value, childs )
 {

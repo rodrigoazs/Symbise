@@ -56,7 +56,7 @@ step_diff_obj.prototype.step_diff_rec = function (node)
 // Remove the box from the sub-expression
 step_diff_obj.prototype.remove_box = function()
 {
-  if(this.box.type == "STEP_DIFF_BOX" && this.box.children.length == 1)
+  if(this.box.type == NODE_FUNC && this.box.value == FUNC_BOX && this.box.children.length == 1)
   {
     this.box.type = this.box.children[0].type;
     this.box.value = this.box.children[0].value;
@@ -90,7 +90,7 @@ step_diff_obj.prototype.step_diff_check = function (node)
   {
     this.diff_found = true;
     //ret = this.step_diff_execute(node.children[0]);
-    ret = createNode("STEP_DIFF_BOX", 0, this.step_diff_execute(node.children[0]));
+    ret = createNode(NODE_FUNC, FUNC_BOX, this.step_diff_execute(node.children[0]));
     this.box = ret;
   }
   return ret;

@@ -13,10 +13,10 @@ function toTex_rec( node )
   if( !node )
     return 0;
 
-  if(node.type == "STEP_DIFF_BOX")
-  {
-    return "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";
-  }
+  // if(node.type == "STEP_DIFF_BOX")
+  // {
+  //   return "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";
+  // }
 
   switch( node.type )
   {
@@ -185,6 +185,9 @@ function toTex_rec( node )
           break;
         case FUNC_DIFF:
           ret = "d/{dx}(" + toTex_rec( node.children[0] ) + ")";
+          break;
+        case FUNC_BOX:
+          ret = "\\cl\"mathbox\"{"+toTex_rec(node.children[0])+"}";
           break;
       }
       break;
