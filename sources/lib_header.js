@@ -2,7 +2,13 @@ var jsym = (function (undefined) {
     "use strict";
 
     function Expression(value) {
-      this.value = automatic_simplify(parse(value));
+      if(typeof value === "string")
+      {
+        this.value = automatic_simplify(parse(value));
+      }else{
+        this.value = value;
+      }
+
     }
 
     Expression.prototype.copy = function() {
@@ -18,7 +24,7 @@ var jsym = (function (undefined) {
     };
 
     Expression.prototype.add = function(v) {
-      this.value = automatic_simplify(construct(OP_ADD, this.value, parse(v)));
+      return new Expression(automatic_simplify(construct(OP_ADD, this.value, parse(v))));
     };
 
     function Value(v) {
