@@ -41,7 +41,7 @@ module.exports = function (grunt) {
               'sources/calculus/*.js',
               'sources/notation/*.js',
               'sources/parsing/*.js',
-              'sources/*.js'
+              'sources/system.js'
               ],
               dest: 'app/www/js/jsym.app.js'
             }
