@@ -18,7 +18,7 @@ $( "#equalbtn" ).click(function() {
 	}
 	catch(err)
 	{
-		$("#console-error").text(err);
+		$("#value-error").text(err);
 		$("#console-error").css("display", "block");
 	}
 	// Show console and content-plot

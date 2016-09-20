@@ -15,8 +15,17 @@
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/jquery.mobile-1.4.5.min.js"></script>
 	<style>
+	.ui-content {
+		padding: 0;
+	}
+	.ui-body-a {
+		border-width:0 ;border-style:none;
+	}
+	.ui-bar, .ui-body {
+		padding: 0;
+	}
 	.teste {
-				background: rgba(0, 0, 0, 0.1);
+				background: rgba(125,180,181, 1);
 		    border: none;
 		    outline: none;
 				display: inline-block;
@@ -55,6 +64,15 @@
 		border: none;
 		outline: none;
 	}
+	.console-title {
+		background: rgba(0,0,0, 0.1);
+		height: 30px;
+		line-height: 30px;
+		padding-left: 10px;
+	}
+	.console-scrollable {
+		overflow-x:scroll;
+	}
 	</style>
 </head>
 <body>
@@ -70,26 +88,29 @@
 			<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
 		</div>
 		<div data-role="content" data-theme="a">
-			<form onSubmit="return false;" style="background-color: #34495e;">
+			<form onSubmit="return false;">
 				<input class="teste" autocapitalize="none" type="text" id="textinpt" data-role="none" />
 				<input class="eqa" id="equalbtn" value="=" type="submit" data-role="none">
 			</form>
-			<div id="console" class="ui-body ui-body-a ui-corner-all" style="background-color:#fff; display: none; overflow-x:scroll;">
+			<div id="console" class="ui-body ui-body-a ui-corner-all" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
 				<div id="console-error" style="display: none">
+					<div class="console-title">Error</div>
+					<div id="value-error" class="console-scrollable">
+					</div>
 				</div>
 				<div id="console-input" style="display: none">
-					Input:
-					<div id="value-input">
+					<div class="console-title">Input</div>
+					<div id="value-input" class="console-scrollable">
 					</div>
 				</div>
 				<div id="console-result" style="display: none">
-					Result:
-					<div id="value-result">
+					<div class="console-title">Result</div>
+					<div id="value-result" class="console-scrollable">
 					</div>
 				</div>
 				<div id="console-derivative" style="display: none">
-					Derivative:
-					<div id="value-derivative">
+					<div class="console-title">Derivative</div>
+					<div id="value-derivative" class="console-scrollable">
 					</div>
 					<a href="#" id="derivative-step-btn">Step-by-step solution</a>
 					<div id="value-derivative-step" style="display: none">
