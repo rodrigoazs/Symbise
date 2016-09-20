@@ -1,19 +1,33 @@
 $( "#equalbtn" ).click(function() {
 	// Close canvas-plot when request new calculation
+	$("#console-error").css("display", "none");
+	$("#console-input").css("display", "none");
+	$("#console-result").css("display", "none");
+	$("#console-derivative").css("display", "none");
+	$("#value-derivative-step").css("display", "none");
 	$("#canvas-plot").css("display", "none");
 	// Start the parser
 	var str = $("#textinpt").val();
 	try
 	{
 		initparser(parse(str));
+		$("#content-plot").css("display", "block");
+		$("#console-input").css("display", "block");
+		$("#console-result").css("display", "block");
+		$("#console-derivative").css("display", "block");
 	}
 	catch(err)
 	{
-		$("#console").text(err);
+		$("#console-error").text(err);
+		$("#console-error").css("display", "block");
 	}
 	// Show console and content-plot
 	$("#console").css("display", "block");
-	$("#content-plot").css("display", "block");
+
+});
+
+$( "#derivative-step-btn" ).click(function() {
+	$("#value-derivative-step").css("display", "block");
 });
 
 $( "#header-plot" ).click(function() {
@@ -66,8 +80,11 @@ function initparser( node )
   //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
-
-  $("#console").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolic_diff(simplified))+" -> "+toTex(automatic_simplify(symbolic_diff(simplified)))+" $$</p><br><br>"+step_diff(simplified)+"<br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
+	$("#value-input").html("<p>$$"+toTex(BAE_node)+"$$</p>");
+	$("#value-result").html("<p>$$"+toTex(simplified)+"$$</p>");
+	$("#value-derivative").html("<p>$$d/{dx}("+toTex(simplified)+")="+toTex(automatic_simplify(symbolic_diff(simplified)))+"$$</p>");
+	$("#value-derivative-step").html("<p>"+step_diff(simplified)+"</p>");
+  //$("#value-derivative").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolic_diff(simplified))+" -> "+toTex(automatic_simplify(symbolic_diff(simplified)))+" $$</p><br><br>"+step_diff(simplified)+"<br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
   plot_value = stringEquation(diff);
   M.trustHtml = true;

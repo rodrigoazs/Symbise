@@ -14,6 +14,48 @@
 	<script src="js/mathscribe/jqmath-etc-0.4.3.min.js" charset="utf-8"></script>
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/jquery.mobile-1.4.5.min.js"></script>
+	<style>
+	.teste {
+				background: rgba(0, 0, 0, 0.1);
+		    border: none;
+		    outline: none;
+				display: inline-block;
+				margin: 1em;
+				width: calc(100% - 2em);
+				vertical-align: top;
+				display: block;
+				padding: 0.8em;
+				border: none;
+				border-radius: 0;
+				color: #fff;
+				font-weight: bold;
+				padding-right: 45px;
+				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+				-webkit-appearance: none; /* for box shadows to show on iOS */
+	}
+	.eqa {
+		background: rgba(0, 0, 0, 0);
+		width: 1em;
+		border: none;
+		font-weight: bold;
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		position: relative;
+    float: right;
+		overflow: visible;
+		font-size: 250%;
+		color: #fff;
+		top: -66px;
+		left: -20px;
+	}
+	.eqa:hover {
+		border: none;
+		opacity: 0.8;
+	}
+	.eqa:focus {
+		border: none;
+		outline: none;
+	}
+	</style>
 </head>
 <body>
 	<div data-role="page" data-theme="a">
@@ -28,18 +70,33 @@
 			<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
 		</div>
 		<div data-role="content" data-theme="a">
-			<form onSubmit="return false;"><table style="width:100%"><tr>
-			    <td>
-			        <input name="text-basic" id="textinpt" value="" autocapitalize="none" type="text">
-			    </td>
-			    <td style="font-size:50%; width:7em;">
-			         <input id="equalbtn" value="=" type="submit">
-			    </td>
-			</tr></table>
-			<div id="console" class="ui-body ui-body-a ui-corner-all" style="display: none; overflow-x:scroll;">
-      		</div>
-      		<br>
-      		<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
+			<form onSubmit="return false;" style="background-color: #34495e;">
+				<input class="teste" autocapitalize="none" type="text" id="textinpt" data-role="none" />
+				<input class="eqa" id="equalbtn" value="=" type="submit" data-role="none">
+			</form>
+			<div id="console" class="ui-body ui-body-a ui-corner-all" style="background-color:#fff; display: none; overflow-x:scroll;">
+				<div id="console-error" style="display: none">
+				</div>
+				<div id="console-input" style="display: none">
+					Input:
+					<div id="value-input">
+					</div>
+				</div>
+				<div id="console-result" style="display: none">
+					Result:
+					<div id="value-result">
+					</div>
+				</div>
+				<div id="console-derivative" style="display: none">
+					Derivative:
+					<div id="value-derivative">
+					</div>
+					<a href="#" id="derivative-step-btn">Step-by-step solution</a>
+					<div id="value-derivative-step" style="display: none">
+					</div>
+				</div>
+      </div>
+  		<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
 			  <div id="header-plot" class="ui-bar ui-bar-a">
 			    <h3>Plot</h3>
 			  </div>
