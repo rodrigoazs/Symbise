@@ -183,12 +183,12 @@ step_diff_obj.prototype.step_diff_execute = function(node)
             ret = construct(OP_MUL, [node.children[1], automatic_simplify(construct(OP_POW, node.children[0], construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))), createNode(NODE_FUNC, FUNC_DIFF, node.children[0])]);
           }
           // power (e)^(x)
-          else if(is_symbol(node.children[0], "e") && is_symbol(node.children[1], "x"))
+          else if(is_symbol(node.children[0], SYM_EULER) && is_symbol(node.children[1], "x"))
           {
             this.ret = "The derivative of $e^x$ is $e^x$:";
             ret = node;
           }
-          else if(is_symbol(node.children[0], "e") && !free_of_symbol(node.children[1], "x"))
+          else if(is_symbol(node.children[0], SYM_EULER) && !free_of_symbol(node.children[1], "x"))
           {
             this.ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(e^{u}) d/{dx}("+toTex(node.children[1])+")$, where $u="+toTex(node.children[1])+"$ and $d/{du}(e^{u})=e^{u}$:";
             ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, node.children[1]));
@@ -197,7 +197,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // else if(free_of_symbol(node.children[0], "x") && is_symbol(node.children[1], "x"))
           // {
           //   var exp = construct(OP_MUL, createNode(NODE_SYM, "x"), createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
-          //   var rew = construct(OP_POW, createNode(NODE_SYM, "e"), exp);
+          //   var rew = construct(OP_POW, createNode(NODE_SYM, SYM_EULER), exp);
           //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
           //   ret = automatic_simplify(construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
           // }
@@ -205,7 +205,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           else
           {
             var exp = construct(OP_MUL, node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
-            var rew = construct(OP_POW, createNode(NODE_SYM, "e"), exp);
+            var rew = construct(OP_POW, createNode(NODE_SYM, SYM_EULER), exp);
             this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
             //ret = automatic_simplify(construct(OP_ADD, construct(OP_MUL, construct(OP_MUL, node.children[1], construct(OP_POW, node.children[0], construct(OP_SUB, node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), construct(OP_MUL, construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1]))));
             ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, exp));

@@ -502,7 +502,7 @@ function simplify_function(node)
 	{
 		return createNode(NODE_INT, 0);
 	}
-	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == NODE_SYM && operand(node, 0).value == "e")
+	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == NODE_SYM && operand(node, 0).value == SYM_EULER)
 	{
 		return createNode(NODE_INT, 1);
 	}
@@ -510,7 +510,7 @@ function simplify_function(node)
 	{
 		return createNode(NODE_INT, 1);
 	}
-	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == OP_POW && kind(operand(operand(node, 0), 0)) == NODE_SYM && operand(operand(node, 0), 0).value == "e")
+	else if(kind(node) == FUNC_NLOG && kind(operand(node, 0)) == OP_POW && kind(operand(operand(node, 0), 0)) == NODE_SYM && operand(operand(node, 0), 0).value == SYM_EULER)
 	{
 		return operand(operand(node, 0), 1);
 	}

@@ -39,7 +39,7 @@ function execute(node, sub)
           ret = -execute(node.children[0], sub);
           break;
         case OP_POW:
-          if(kind(node.children[0]) == NODE_SYM && node.children[0].value == "e")
+          if(kind(node.children[0]) == NODE_SYM && node.children[0].value == SYM_EULER)
           {
             ret = Math.exp(execute(node.children[1], sub));
           }
@@ -145,7 +145,7 @@ function execute(node, sub)
       break;
 
     case NODE_SYM:
-      if(node.value == "e")
+      if(node.value == SYM_EULER)
       {
         ret = Math.exp(1);
       }

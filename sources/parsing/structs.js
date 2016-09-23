@@ -49,6 +49,10 @@ var FUNC_COTH = 45;
 var FUNC_ACOT = 46;
 var FUNC_ACOTH = 47;
 
+var SYM_EULER = "e";
+var SYM_PI = "pi";
+var SYM_INFINITY = "infinity";
+
 var FUNC_DIFF = 50;
 
 var FUNC_BOX = 100;

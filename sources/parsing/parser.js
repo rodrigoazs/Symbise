@@ -1335,7 +1335,7 @@ switch( act )
     {
          //rval = createNode( NODE_FUNC, FUNC_EXP, vstack[ vstack.length - 2 ] );
          // the function exp was transformed into e^n
-         rval = createNode( NODE_OP, OP_POW, createNode( NODE_SYM, "e" ), vstack[ vstack.length - 2 ] );
+         rval = createNode( NODE_OP, OP_POW, createNode( NODE_SYM, SYM_EULER ), vstack[ vstack.length - 2 ] );
     }
     break;
     case 52:
