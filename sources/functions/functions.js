@@ -358,3 +358,67 @@ function form_quotient(u)
 
 	return [numerator, denominator];
 }
+
+// Substitute(u, t, r)
+// Let u, t, and r be mathematical expressions.
+// This operator forms a new expression with each occurrence of the
+// target expression t in u replaced by the replacement expression r. The
+// substitution occurs whenever t is structurally identical to a complete
+// sub-expression of u. For example,
+// Substitute((a + b) c, a + b , x) → x c. [page 10]
+function substitute(node, o, n)
+{
+	if(compare(node, o) == 0)
+	{
+		return n;
+	}
+	else
+	{
+		var new_childs = new Array();
+		for(var i = 0; i < node.children.length; i++) {
+			new_childs[i] = substitute(node.children[i], o, n);
+		}
+		return createNodeWithArray(node.type, node.value, new_childs);
+	}
+}
+
+// List of symbols (u)
+// Let u be a mathematical expression. This function
+// returns all the symbols presented in the expression u.
+// The symbols are not repeated.
+function list_of_symbols(node)
+{
+	var arr = list_of_symbols_rec(node);
+	var seen = {};
+	var arr2 = [];
+	for (var i = 0; i < arr.length; i++)
+	{
+		if (!(arr[i].value in seen))
+		{
+			arr2.push(arr[i]);
+			seen[arr[i].value] = true;
+		}
+  }
+ 	return arr2;
+}
+
+// List of symbols rec (u)
+// Let u be a mathematical expression. This function
+// returns all the symbols presented in the expression u.
+// The symbols are repeated by the number of their appearence.
+function list_of_symbols_rec(node)
+{
+	if(kind(node) == NODE_SYM)
+	{
+		return node;
+	}
+	else
+	{
+		var list = []
+		for(var i = 0; i < node.children.length; i++) {
+			var ret = list_of_symbols_rec(node.children[i]);
+			list = list.concat(ret);
+		}
+		return list;
+	}
+}
