@@ -422,3 +422,57 @@ function list_of_symbols_rec(node)
 		return list;
 	}
 }
+
+// Free of Variables (u)
+// Return true if the node u does not contain any variable, otherwise returns false
+function free_of_variables(node)
+{
+	var symbols = list_of_symbols_rec(node);
+	for(var i=0; i<symbols.length; i++)
+	{
+		if(symbols[i].value != SYM_EULER &&
+			 symbols[i].value != SYM_INFINITY &&
+			 symbols[i].value != SYM_PI &&
+			 symbols[i].value != SYM_IMAGINARY)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+// Term of (node, u)
+// Given ASAE node and u, factor out the term not u from node.
+// Example: node = ax^2 and u = x^2, returns a.
+// Returns 0 otherwise.
+function term_of(node, u)
+{
+	if(kind(node) == OP_MUL)
+	{
+		var ret = [];
+		var flag = false;
+		for(var i=0; i<node.children.length; i++)
+		{
+			if(compare(node.children[i], u) == 0)
+			{
+				flag = true;
+			}
+			else
+			{
+				ret.push(node.children[i]);
+			}
+		}
+		if(flag)
+		{
+			return simplify_product(construct(OP_MUL, ret));
+		}
+	}
+	else
+	{
+		if(compare(node, u) == 0)
+		{
+			return createNode(NODE_INT, 1);
+		}
+	}
+	return createNode(NODE_INT, 0);
+}

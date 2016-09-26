@@ -28,6 +28,7 @@ module.exports = function (grunt) {
               'sources/functions/*.js',
               'sources/simplify/*.js',
               'sources/calculus/*.js',
+              'sources/algebra/*.js',
               'sources/notation/*.js',
               'sources/parsing/*.js',
               'sources/lib_footer.js'
@@ -39,6 +40,7 @@ module.exports = function (grunt) {
               'sources/functions/*.js',
               'sources/simplify/*.js',
               'sources/calculus/*.js',
+              'sources/algebra/*.js',
               'sources/notation/*.js',
               'sources/parsing/*.js',
               'sources/system.js'
@@ -66,6 +68,7 @@ module.exports = function (grunt) {
                 'sources/functions/*.js',
                 'sources/simplify/*.js',
                 'sources/calculus/*.js',
+                'sources/algebra/*.js',
                 'sources/notation/*.js',
                 'sources/parsing/*.js',
                 'sources/*.js'
