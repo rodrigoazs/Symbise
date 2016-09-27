@@ -107,13 +107,33 @@ function simplify_power(node)
 	{
 		return simplify_integer_power(v, w);
 	}
+	// added - verify if it is a square root of integer
+	else if(kind(v) == NODE_INT && is_fraction(w))
+	{
+		return simplify_square_root_power(v, w);
+	}
 	else
 	{
 		return node;
 	}
 }
 
-// Simplify Integer Power (u)
+// Simplify Square Root Power (v, w)
+// Not found on book. (Should it be implemented here?)
+function simplify_square_root_power(v, w)
+{
+	if(operand(w, 0).value == 1 && operand(w, 1).value == 2)
+	{
+		var s = Math.sqrt(v.value);
+		if(!(s % 1))
+		{
+			return createInteger(s);
+		}
+	}
+	return construct(OP_POW, v, w);
+}
+
+// Simplify Integer Power (v, n)
 // Definition 3.34. Consider the expression v^n where v != 0 is an ASAE and
 // n is an integer. The operator Simplify integer power(v, n) is defined by the
 // following transformation rules. [page 95]
