@@ -505,6 +505,7 @@ function term_of(node, u)
 // Given an integer u, returns its primes used in factorization
 function primes_of(u)
 {
+	if(!!(u % 1)) return [];
 	if(u == 1) return [1];
 	var primes = [];
 	var a = u;
@@ -528,6 +529,7 @@ function primes_of(u)
 // Given an integer u, returns its dividers
 function dividers_of(u)
 {
+	if(!!(u % 1)) return [];
 	var primes = primes_of(u);
 	var dividers = [];
 
