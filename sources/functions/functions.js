@@ -158,6 +158,30 @@ function construct(operator, expressions)
 	return n;
 }
 
+// Short function to construct sub as ASAE
+function construct_sub(a, b)
+{
+	return construct(OP_ADD, a, construct(OP_MUL, createNode(NODE_INT, 1), b));
+}
+
+// Short function to construct div as ASAE
+function construct_div(a, b)
+{
+	return construct(OP_MUL, a, construct(OP_POW, b, createNode(NODE_INT, -1)));
+}
+
+// Short function to create Node Int
+function createInteger(u)
+{
+	return createNode(NODE_INT, u);
+}
+
+// Short function to create Node Sym
+function createSymbol(u)
+{
+	return createNode(NODE_SYM, u);
+}
+
 // Returns the GCD of the given integers. Each input will be transformer into non-negative.
 function gcd(a, b)
 {
