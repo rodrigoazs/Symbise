@@ -500,3 +500,49 @@ function term_of(node, u)
 	}
 	return createNode(NODE_INT, 0);
 }
+
+// Primes of (u)
+// Given an integer u, returns its primes used in factorization
+function primes_of(u)
+{
+	if(u == 1) return [1];
+	var primes = [];
+	var a = u;
+	while(a != 1)
+	{
+		for(var i=2; i <= u; i++)
+		{
+			var b = a/i;
+			if(!(b % 1))
+			{
+				primes.push(i);
+				a = b;
+				i--;
+			}
+		}
+	}
+	return primes;
+}
+
+// Dividers of (u)
+// Given an integer u, returns its dividers
+function dividers_of(u)
+{
+	var primes = primes_of(u);
+	var dividers = [];
+
+	var len = Math.pow(2, primes.length);
+	for(var i=0; i<len; i++)
+	{
+		var n = primes.length;
+		var bits = i.toString(2);
+    var m = bits.length;
+		var real = [];
+		for(var k=0; k<n; k++){ real[k] = 0; }
+		for(var k=0; k<m; k++){ real[n-k-1] = parseInt(bits[m-k-1]); }
+		var sum = 1;
+		for(var j=0; j<n; j++){ sum *= Math.pow(primes[j], real[j]); }
+		dividers.push(sum);
+	}
+  return dividers;
+}
