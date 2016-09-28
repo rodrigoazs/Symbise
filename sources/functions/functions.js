@@ -507,6 +507,7 @@ function factorization_of(u)
 {
 	if(!!(u % 1)) return [];
 	if(u == 1) return [1];
+	if(u == 0) return [0];
 	var primes = [];
 	var a = u;
 	while(a != 1)
@@ -530,6 +531,7 @@ function factorization_of(u)
 function divisors_of(u)
 {
 	if(!!(u % 1)) return [];
+	if(u == 0) return [0];
 	var primes = factorization_of(u);
 	var divisors = [];
 

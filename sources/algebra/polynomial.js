@@ -22,21 +22,22 @@ function possible_roots_of_polynomial(node)
     if(kind(last) == NODE_INT)
     {
       var d = [];
+      var hash = {};
       var divisors = divisors_of(Math.abs(last.value));
       for(var i=0; i<divisors.length; i++)
       {
+        var a1 = createInteger(-divisors[i]);
+        var a2 = createInteger(divisors[i]);
+        hash[stringEquation(a1)] = 1;
+        hash[stringEquation(a2)] = 1;
         d.push(createInteger(-divisors[i]));
         d.push(createInteger(divisors[i]));
-        var a1 = automatic_simplify(construct(OP_DIV, createInteger(-divisors[i]), createInteger(first.value)));
-        var a2 = automatic_simplify(construct(OP_DIV, createInteger(divisors[i]), createInteger(first.value)));
-        if(d.find(function (a) { return compare(a, a1)==0 }) === undefined)
-        {
-          d.push(a1);
-        }
-        if(d.find(function (a) { return compare(a, a2)==0 }) === undefined)
-        {
-          d.push(a2);
-        }
+        var a3 = automatic_simplify(construct(OP_DIV, createInteger(-divisors[i]), createInteger(first.value)));
+        var a4 = automatic_simplify(construct(OP_DIV, createInteger(divisors[i]), createInteger(first.value)));
+        var s3 = stringEquation(a3);
+        var s4 = stringEquation(a4);
+        if(!(s3 in hash)) d.push(a3);
+        if(!(s4 in hash)) d.push(a4);
       }
     }
     return d;
