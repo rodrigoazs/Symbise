@@ -546,5 +546,5 @@ function divisors_of(u)
 		for(var j=0; j<n; j++){ sum *= Math.pow(primes[j], real[j]); }
 		divisors.push(sum);
 	}
-  return divisors.sort(function (a, b) { return a - b; });;
+  return divisors.sort(function (a, b) { return a - b; });
 }
