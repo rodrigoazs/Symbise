@@ -1,20 +1,70 @@
+// Solve Polynomial (node)
+// Given any kind of polynomial, returns
+// the roots found
 function solve_polynomial(node)
 {
-  var roots = possible_roots_of_polynomial(node);
-  if(roots != null)
+  var roots = [];
+  var coefficients = coefficients_of_polynomial(node);
+  while(coefficients != null && coefficients.length > 0)
   {
-    for(var i=0; i<roots.length; i++)
+    var root = get_polynomial_root(coefficients);
+    if(root == null) return roots;
+    roots = roots.concat(root);
+    if(coefficients.length == 2) return roots;
+    coefficients = briot_ruffini(coefficients, root);
+  }
+  return roots;
+}
+
+// Form polynomial from coefficients (cf)
+// Given an array of coefficients, create back a polynomial
+// as ASAE
+function form_polynomial_from_coefficients(coefficients)
+{
+  var operands = [];
+  for(var i=0; i<coefficients.length; i++)
+  {
+    operands.push(construct(OP_MUL, coefficients[i], construct(OP_POW, createSymbol("x"), createInteger(i))));
+  }
+  return automatic_simplify(construct(OP_ADD, operands));
+}
+
+// Get Polynomial Root (cf)
+// Given the array of coefficients,
+// uses bhaskara if its is quadratic or
+// look for a possible root, evaluate and return it
+function get_polynomial_root(coefficients)
+{
+  if(coefficients.length == 3)
+  {
+    var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
+    return roots;
+  }
+  else
+  {
+    var possible_roots = possible_roots_of_polynomial(coefficients);
+    if(possible_roots != null)
     {
-      var a = automatic_simplify(substitute(node, createSymbol("x"), roots[i]));
-      console.log(stringEquation(roots[i]) + " result: "+ stringEquation(a));
+      for(var i=0; i<possible_roots.length; i++)
+      {
+        var node = form_polynomial_from_coefficients(coefficients);
+        var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i]));
+        if(compare(a, createInteger(0)) == 0)
+        {
+          return possible_roots[i];
+        }
+      }
     }
   }
   return null;
 }
 
-function possible_roots_of_polynomial(node)
+// Possible roots of polynomial (cf)
+// Given the array of coefficients of a polynomial, find its
+// possible roots by guessing divisors of coefficient
+// of x^0 and x^N
+function possible_roots_of_polynomial(cf)
 {
-  var cf = coeficients_of_polynomial(node);
   if(cf != null)
   {
     var first = cf[cf.length-1];
@@ -46,33 +96,33 @@ function possible_roots_of_polynomial(node)
 
 }
 
-// Coeficients of Polynomial (n)
-// If it is a valid polynomial returns its array of coeficients
+// Coefficients of Polynomial (n)
+// If it is a valid polynomial returns its array of coefficients
 // as ASAE
-function coeficients_of_polynomial(node)
+function coefficients_of_polynomial(node)
 {
   var degree = identify_polynomial_degree(node);
   if(degree != null)
   {
-    var coeficients = [];
-    for(var i=0; i<=degree; i++){ coeficients[i] = []; }
+    var coefficients = [];
+    for(var i=0; i<=degree; i++){ coefficients[i] = []; }
     for(var i=0; i<node.children.length; i++)
     {
       if(free_of_symbol(node.children[i], "x"))
       {
-        coeficients[0].push(node.children[i]);
+        coefficients[0].push(node.children[i]);
       }
       else
       {
-        coeficients[1].push(term_of(node.children[i], createNode(NODE_SYM, "x")));
+        coefficients[1].push(term_of(node.children[i], createNode(NODE_SYM, "x")));
         for(var j=2; j<=degree; j++)
         {
-          coeficients[j].push(term_of(node.children[i], construct(OP_POW, createNode(NODE_SYM, "x"), createNode(NODE_INT, j))));
+          coefficients[j].push(term_of(node.children[i], construct(OP_POW, createNode(NODE_SYM, "x"), createNode(NODE_INT, j))));
         }
       }
     }
-    for(var i=0; i<=degree; i++){ coeficients[i] = automatic_simplify(construct(OP_ADD, coeficients[i])); }
-    return coeficients;
+    for(var i=0; i<=degree; i++){ coefficients[i] = automatic_simplify(construct(OP_ADD, coefficients[i])); }
+    return coefficients;
   }
   return null;
 }
@@ -155,6 +205,7 @@ function identify_polynomial_power(n)
   }
 }
 
+// ------------ DEPRECATED FUNCTION ----------------------------
 // Univariate Quadratic (u)
 // Given an expression ASAE in form o univariate
 // quadratic function, returns its roots.
@@ -210,4 +261,29 @@ function bhaskara(a, b, c)
   var x1 = construct(OP_MUL, construct(OP_ADD, l, r), construct(OP_POW, d, createNode(NODE_INT, -1)));
   var x2 = construct(OP_MUL, construct(OP_ADD, l, construct(OP_MUL, r, createNode(NODE_INT, -1))), construct(OP_POW, d, createNode(NODE_INT, -1)));
   return [automatic_simplify(x1), automatic_simplify(x2)];
+}
+
+// Briot-Ruffini (c, r)
+// c: array of coefficients (integer nodes)
+// r: root found (integer node)
+function briot_ruffini(c, r)
+{
+  var new_c = [];
+  var temp = [];
+  var new_pol = [];
+
+  for(var i=c.length-1; i>=0; i--) { new_c.push(c[i]); }
+  new_pol.push(new_c[0]);
+  temp = temp.concat([null, createInteger(new_c[0].value*r.value)]);
+  for(var i=1; i<new_c.length; i++)
+  {
+    var n = createInteger(new_c[i].value + temp[i].value);
+    new_pol.push(n);
+    temp.push(createInteger(n.value*r.value));
+  }
+
+  if(new_pol[new_pol.length-1].value != 0) return null;
+  var ret_pol = [];
+  for(var i=new_pol.length-2; i>=0; i--) { ret_pol.push(new_pol[i]); }
+  return ret_pol;
 }
