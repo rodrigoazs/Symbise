@@ -4,6 +4,7 @@ $( "#equalbtn" ).click(function() {
 	$("#console-input").css("display", "none");
 	$("#console-result").css("display", "none");
 	$("#console-derivative").css("display", "none");
+	$("#content-plot").css("display", "none");
 	$("#value-derivative-step").css("display", "none");
 	$("#canvas-plot").css("display", "none");
 	// Start the parser

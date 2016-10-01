@@ -15,115 +15,81 @@
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/jquery.mobile-1.4.5.min.js"></script>
 	<style>
-	.ui-content {
-		padding: 0;
-	}
-	.ui-body-a {
-		border-width:0 ;border-style:none;
-	}
-	.ui-bar, .ui-body {
-		padding: 0;
-	}
-	.teste {
-				background: rgba(125,180,181, 1);
-		    border: none;
-		    outline: none;
-				display: inline-block;
-				margin: 1em;
-				width: calc(100% - 2em);
-				vertical-align: top;
-				display: block;
-				padding: 0.8em;
-				border: none;
-				border-radius: 0;
-				color: #fff;
-				font-weight: bold;
-				padding-right: 45px;
-				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-				-webkit-appearance: none; /* for box shadows to show on iOS */
-	}
-	.eqa {
-		background: rgba(0, 0, 0, 0);
-		width: 1em;
-		border: none;
-		font-weight: bold;
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-		position: relative;
-    float: right;
-		overflow: visible;
-		font-size: 250%;
-		color: #fff;
-		top: -66px;
-		left: -20px;
-	}
-	.eqa:hover {
-		border: none;
-		opacity: 0.8;
-	}
-	.eqa:focus {
-		border: none;
-		outline: none;
-	}
-	.console-title {
-		background: rgba(0,0,0, 0.1);
-		height: 30px;
-		line-height: 30px;
-		padding-left: 10px;
-	}
-	.console-scrollable {
-		overflow-x:scroll;
-	}
+		.console-scrollable {
+			overflow-x:scroll;
+		}
+		.eqa {
+			background-color: rgba(0, 0, 0, 0);
+			border: none;
+			font-weight: bold;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			position: relative;
+	    float: right;
+			font-size: 150%;
+			top: -48px;
+			left: -5px;
+		}
+		.eqa:hover {
+			border: none;
+			opacity: 0.8;
+		}
+		.eqa:focus {
+			border: none;
+			outline: none;
+		}
 	</style>
 </head>
 <body>
 	<div data-role="page" data-theme="a">
 		<div data-role="panel" id="panel" style="background-color: #062235;">
-			<div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-flower-alt zmdi-hc-2x" style="color: white;"></i></div>
+				<div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-flower-alt zmdi-hc-2x" style="color: white;"></i></div>
 		    <div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-layers zmdi-hc-2x" style="color: white;"></i></div>
 		    <div style="text-align: center;"><a href="#settings" data-transition="slide"><i class="zmdi zmdi-settings zmdi-hc-2x" style="color: white;"></i></a></div>
 		</div>
 		<div data-role="header" data-position="inline">
-			<h1><i class="zmdi zmdi-fire"></i> MathSym</h1>
-			<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
-			<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
+				<h1><i class="zmdi zmdi-fire"></i> MathSym</h1>
+				<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
+				<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
 		</div>
 		<div data-role="content" data-theme="a">
-			<form onSubmit="return false;">
-				<input class="teste" autocapitalize="none" type="text" id="textinpt" data-role="none" />
-				<input class="eqa" id="equalbtn" value="=" type="submit" data-role="none">
-			</form>
-			<div id="console" class="ui-body ui-body-a ui-corner-all" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
-				<div id="console-error" style="display: none">
-					<div class="console-title">Error</div>
-					<div id="value-error" class="console-scrollable">
+				<form onSubmit="return false;">
+					<input name="text-basic" style="padding-right: 35px;" id="textinpt" value="" autocapitalize="none" type="text">
+					<input id="equalbtn" class="eqa" value="=" type="submit" data-role="none">
+				<div id="console" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
+					<div id="console-error" class="ui-corner-all custom-corners" style="display: none">
+						<div class="ui-bar ui-bar-a">Error</div>
+						<div id="value-error" class="ui-body ui-body-a console-scrollable">
+						</div>
+					</div>
+					<br>
+					<div id="console-input" class="ui-corner-all custom-corners" style="display: none">
+						<div class="ui-bar ui-bar-a">Input</div>
+						<div id="value-input" class="ui-body ui-body-a console-scrollable">
+						</div>
+					</div>
+					<br>
+					<div id="console-result" class="ui-corner-all custom-corners" style="display: none">
+						<div class="ui-bar ui-bar-a">Result</div>
+						<div id="value-result" class="ui-body ui-body-a console-scrollable">
+						</div>
+					</div>
+					<br>
+					<div id="console-derivative" class="ui-corner-all custom-corners" style="display: none">
+						<div class="ui-bar ui-bar-a">Derivative</div>
+						<div id="value-derivative" class="ui-body ui-body-a console-scrollable">
+						</div>
+						<a href="#" id="derivative-step-btn">Step-by-step solution</a>
+						<div id="value-derivative-step" class="ui-body ui-body-a console-scrollable" style="display: none">
+						</div>
+					</div>
+					<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
+						<div id="header-plot" class="ui-bar ui-bar-a">
+							<h3>Plot</h3>
+						</div>
+						<div id="canvas-plot" class="ui-body ui-body-a" style="display: none;">
+						</div>
 					</div>
 				</div>
-				<div id="console-input" style="display: none">
-					<div class="console-title">Input</div>
-					<div id="value-input" class="console-scrollable">
-					</div>
-				</div>
-				<div id="console-result" style="display: none">
-					<div class="console-title">Result</div>
-					<div id="value-result" class="console-scrollable">
-					</div>
-				</div>
-				<div id="console-derivative" style="display: none">
-					<div class="console-title">Derivative</div>
-					<div id="value-derivative" class="console-scrollable">
-					</div>
-					<a href="#" id="derivative-step-btn">Step-by-step solution</a>
-					<div id="value-derivative-step" class="console-scrollable" style="display: none">
-					</div>
-				</div>
-      </div>
-  		<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
-			  <div id="header-plot" class="ui-bar ui-bar-a">
-			    <h3>Plot</h3>
-			  </div>
-			  <div id="canvas-plot" class="ui-body ui-body-a" style="display: none;">
-			  </div>
-			</div>
 		</div>
 	</div>
 	<div data-role="page" id="settings">
