@@ -12,7 +12,7 @@ For node use:
 
 # The MIT License (MIT)
 
-Copyright © `2016` `all jSym contributors`
+Copyright © `2016` `all Symbise contributors`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
