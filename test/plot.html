@@ -1,0 +1,88 @@
+<style>
+canvas {
+    border: 1px solid black;
+    width: 500px;
+    height: 300px;
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<canvas id="myCanvas" width="1000px" height="600px"></canvas>
+
+
+<script>
+var canvas = $('#myCanvas')[0],
+    ctx = canvas.getContext('2d'),
+    width = canvas.width,
+    height = canvas.height,
+
+    plot = function plot(fn, range) {
+        var widthScale = (width / (range[1] - range[0])),
+            heightScale = (height / (range[3] - range[2])),
+            first = true;
+            x_axis = 0;
+            y_axis = 0;
+
+        ctx.beginPath();
+
+        for (var x = 0; x < width; x++) {
+
+            var xFnVal = (x / widthScale) + range[0],
+                f = fn(xFnVal),
+                yGVal = (f - range[2]) * heightScale;
+
+
+						if(!isFinite(f))
+            {
+              ctx.strokeStyle = "blue";
+        			ctx.lineWidth = 3;
+        			ctx.stroke();
+              ctx.beginPath();
+              first = true;
+              x_axis = x;
+              y_axis = yGVal;
+            }else if(f == 0)
+            {
+              x_axis = x;
+              y_axis = yGVal;
+            }
+
+
+            yGVal = height - yGVal; // 0,0 is top-left
+
+            if (first) {
+                ctx.moveTo(x, yGVal);
+                first = false;
+            }
+            else {
+                ctx.lineTo(x, yGVal);
+            }
+        }
+
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // x-axis
+        ctx.beginPath();
+        ctx.moveTo(0, y_axis);
+        ctx.lineTo(width, y_axis);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // y-axis
+        ctx.beginPath();
+        ctx.moveTo(x_axis, 0);
+        ctx.lineTo(x_axis, height);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    };
+
+plot(function (x) {
+    return Math.tan(x);
+}, [-4,4, -3, 3]);
+
+</script>
