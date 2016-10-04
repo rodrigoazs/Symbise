@@ -1,4 +1,4 @@
-# jSym
+# Symbise
 Computer algebra system written in JavaScript - In Development
 
 # How to build
