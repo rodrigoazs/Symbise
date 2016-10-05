@@ -2,7 +2,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>jSym</title>
+	<title>Symbise</title>
 	<link rel="stylesheet" href="themes/Symbise.css" />
 	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
 	<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" />
@@ -43,11 +43,11 @@
 	<div data-role="page" data-theme="a">
 		<div data-role="panel" id="panel" style="background-color: #049372;">
 				<div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-flower-alt zmdi-hc-2x" style="color: white;"></i></div>
-		    <div style="text-align: center; padding-bottom: 20px;"><i class="zmdi zmdi-layers zmdi-hc-2x" style="color: white;"></i></div>
+		    <div style="text-align: center; padding-bottom: 20px;"><a href="#about" data-transition="slide"><i class="zmdi zmdi-layers zmdi-hc-2x" style="color: white;"></i></a></div>
 		    <div style="text-align: center;"><a href="#settings" data-transition="slide"><i class="zmdi zmdi-settings zmdi-hc-2x" style="color: white;"></i></a></div>
 		</div>
-		<div data-role="header" style="background-color: rgba(255,255,255,1); border: none;" data-position="inline">
-				<h1><img src="img/logo1.svg"></h1>
+		<div data-role="header" style="background-color: rgba(255,255,255,1); border: none; box-shadow: 0 0 10px 0 rgba(9,10,10,0.3);" data-position="inline">
+				<h1><img src="img/logoh.svg" height="40px"></h1>
 				<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
 				<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-menu"></i></a>
 		</div>
@@ -57,36 +57,36 @@
 					<input id="equalbtn" class="eqa" value="=" type="submit" data-role="none">
 				<div id="console" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
 					<div id="console-error" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a">Error</div>
-						<div id="value-error" class="ui-body ui-body-a console-scrollable">
+						<div class="ui-bar ui-bar-a ui-bar-a-box">Error</div>
+						<div id="value-error" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-input" class="" style="display: none">
-						<div style="" class="">Input</div>
+						<div class="ui-bar ui-bar-a ui-bar-a-box">Input</div>
 						<div id="value-input" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-result" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a">Result</div>
-						<div id="value-result" class="ui-body ui-body-a console-scrollable">
+						<div class="ui-bar ui-bar-a ui-bar-a-box">Result</div>
+						<div id="value-result" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-derivative" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a">Derivative</div>
-						<div id="value-derivative" class="ui-body ui-body-a console-scrollable">
+						<div class="ui-bar ui-bar-a ui-bar-a-box">Derivative</div>
+						<div id="value-derivative" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 						<a href="#" id="derivative-step-btn" class="ui-btn ui-btn-inline ui-mini">Step-by-step solution</a>
-						<div id="value-derivative-step" class="ui-body ui-body-a console-scrollable" style="display: none">
+						<div id="value-derivative-step" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable" style="display: none">
 						</div>
 					</div>
 					<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
-						<div id="header-plot" class="ui-bar ui-bar-a">
+						<div id="header-plot" class="ui-bar ui-bar-a ui-bar-a-box">
 							<h3>Plot</h3>
 						</div>
-						<div id="canvas-plot" class="ui-body ui-body-a" style="display: none;">
+						<div id="canvas-plot" class="ui-body ui-body-a ui-body-a-box ui-corner-all" style="display: none;">
 						</div>
 					</div>
 				</div>
@@ -140,6 +140,21 @@
 
 					 <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov3">Pulp Fiction</label><input data-cacheval="false" name="mov3" id="mov3" type="checkbox"></div>
 					 </div>
+				</div>
+		</div>
+	</div>
+	<div data-role="page" id="about">
+		<div data-role="header" data-position="inline">
+			<h1>Sobre</h1>
+			<a data-rel="back" style="background-color: transparent; box-shadow: none; border-color: transparent; color: white; text-shadow: 0 1px 0 #fff;"><i class="zmdi zmdi-chevron-left"></i></a>
+		</div>
+		<div data-role="content" data-theme="a" style="background-color: #34a299;">
+				<div class="ui-body ui-body-a ui-body-a-box ui-corner-all" style="background-color: rgba(0, 0, 0, 0.3); color: #fff; text-shadow: none">
+					Este produto utiliza 'jQuery Mobile' (Copyright 2010-2014 Google, Inc. All rights reserved.), sob os termos da licença MIT.
+<br><br>
+Este produto utiliza 'PhoneGap' (Copyright 2014 The AngularUI Team, Karsten Sperling. All rights reserved.), sob os termos da licença MIT.
+<br><br>
+Este produto utiliza 'jQuery' (Copyright 2014 The jQuery Foundation. All rights reserved.), sob os termos da licença MIT.
 				</div>
 		</div>
 	</div>
