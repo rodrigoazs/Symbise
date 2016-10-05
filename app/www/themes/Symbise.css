@@ -13,6 +13,7 @@
 /* Globals */
 /* Font
 -----------------------------------------------------------------------------------------------------------*/
+
 html {
 	font-size: 100%;
 }
@@ -419,12 +420,15 @@ button[disabled],
 
 .ui-body-a-box {
 	border: none;
-	box-shadow: 0 0 10px 0 rgba(9,10,10,0.3);
+	border-top-color: rgba(0,0,0,.15);
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-radius: 0px;
+	/*box-shadow: 0 0 10px 0 rgba(9,10,10,0.3);*/
 }
 
 .ui-bar-a-box {
 	background-color: transparent;
 	border: none;
-	color: #fff;
 	text-shadow: none;
 }

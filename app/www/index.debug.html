@@ -47,14 +47,27 @@
 		    <div style="text-align: center;"><a href="#settings" data-transition="slide"><i class="zmdi zmdi-settings zmdi-hc-2x" style="color: white;"></i></a></div>
 		</div> -->
 		<div data-role="header" style="background-color: #fff; border: none; box-shadow: 0 0 10px 0 rgba(9,10,10,0.3);" data-position="fixed">
-				<h1><img src="img/logoh.svg" height="22px"></h1>
+				<h1><img src="img/logoh.svg" height="20px"></h1>
 				<a href="#settings" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>
 				<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
 		</div>
 		<div data-role="content" data-theme="a" style="background-color: #fff;">
 				<form onSubmit="return false;">
-					<input name="text-basic" style="padding-right: 35px;" id="textinpt" value="" autocapitalize="none" autocomplete="off" type="text">
-					<input id="equalbtn" class="eqa" value="=" type="submit" data-role="none">
+						<table style="width:100%; border-style: solid; border-width: 1px;     border-spacing: 0px">
+							<tr>
+							    <td>
+											<div class="ui-input-text" style="border-style: none">
+							        	<input name="text-basic" data-role="none" id="textinpt" value="" autocapitalize="none" autocomplete="off" type="text">
+											</div>
+							    </td>
+							    <td style='font-size:80%; width:1em'>
+											<div class="ui-btn ui-input-btn">=
+							         	<input id="equalbtn" data-role="none" value="=" type="submit">
+										 	</div>
+							    </td>
+							</tr>
+						</table>
+				</form>
 				<div id="console" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
 					<div id="console-error" class="ui-corner-all custom-corners" style="display: none">
 						<div class="ui-bar ui-bar-a ui-bar-a-box">Error</div>
