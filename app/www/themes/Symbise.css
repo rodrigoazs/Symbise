@@ -431,4 +431,11 @@ button[disabled],
 	background-color: transparent;
 	border: none;
 	text-shadow: none;
+	text-transform: uppercase;
+	font-size: 11px;
+	color: #353e35;
+}
+
+.ui-uppercase {
+	text-transform: uppercase;
 }

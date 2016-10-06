@@ -11,7 +11,7 @@ function step_diff(node)
     n.expression = n.step_diff_rec(n.expression);
     if(n.diff_found == false)
     {
-      n.ret += "The result is:"
+      n.ret += "<translate tkey='the_result_is'>The result is</translate>:"
     }
     n.ret += "$$="+toTex(n.expression)+"$$";
     n.remove_box();
@@ -31,7 +31,7 @@ function step_diff(node)
 function step_diff_obj(node)
 {
   this.expression = createNode(NODE_FUNC, FUNC_DIFF, automatic_simplify(node));
-  this.ret = "Possible derivation:$$"+toTex(this.expression)+"$$";
+  this.ret = "<translate tkey='possible_derivation'>Possible derivation</translate>:$$"+toTex(this.expression)+"$$";
   this.diff_found = false;
   this.box = 0;
 };
@@ -104,7 +104,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
   // if constant
   if(free_of_symbol(node, "x"))
   {
-    this.ret += "The derivative of a constant is zero:";
+    this.ret += "<translate tkey='derivative_constant'>The derivative of a constant is zero</translate>:";
     ret = createNode(NODE_INT, 0);
     return ret;
   }
@@ -115,7 +115,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
       switch(node.value)
       {
         case OP_ADD:
-          this.ret += "Differentiate the sum term by term:";
+          this.ret += "<translate tkey='derivative_sum'>Differentiate the sum term by term</translate>:";
           var children = new Array();
           for(var i = 0; i < node.children.length; i++)
           {
@@ -147,20 +147,20 @@ step_diff_obj.prototype.step_diff_execute = function(node)
               {
                 var v = construct(OP_MUL, fac[1].children.slice(1));
               }
-              this.ret += "Use the product rule, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
+              this.ret += "<translate tkey='derivative_mul'>Use the product rule</translate>, $d/{dx}(u v)=v {du}/{dx}+u {dv}/{dx}$, <translate tkey='where'>where</translate> $u="+toTex(u)+"$ <translate tkey='and'>and</translate> $v="+toTex(v)+"$";
               ret = construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)));
             }
             else
             {
               var u = quo[0];
               var v = quo[1];
-              this.ret += "Use the quotient rule, $d/{dx}(u/v)={v {du}/{dx}-u {dv}/{dx}}/{v^{2}}$, where $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
+              this.ret += "<translate tkey='derivative_div'>Use the quotient rule</translate>, $d/{dx}(u/v)={v {du}/{dx}-u {dv}/{dx}}/{v^{2}}$, <translate tkey='where'>where</translate> $u="+toTex(u)+"$ and $v="+toTex(v)+"$";
               ret = construct(OP_MUL, construct(OP_ADD, construct(OP_MUL, v, createNode(NODE_FUNC, FUNC_DIFF, u)), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_MUL, u, createNode(NODE_FUNC, FUNC_DIFF, v)))), construct(OP_POW, v, createNode(NODE_INT, -2)));
             }
           }
           else
           {
-            this.ret += "Factor out constants:";
+            this.ret += "<translate tkey='factor_out'>Factor out constants</translate>:";
             ret = construct(OP_MUL, fac[0], createNode(NODE_FUNC, FUNC_DIFF, fac[1]));
           }
           break;
@@ -172,25 +172,25 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // power x^(constant)
           if(is_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
-            this.ret += "Use the power rule, $d/{dx}(x^{n})=n x^{n-1}$, where $n="+toTex(node.children[1])+"$";
+            this.ret += "<translate tkey='use_power_rule'>Use the power rule</translate>, $d/{dx}(x^{n})=n x^{n-1}$, <translate tkey='where'>where</translate> $n="+toTex(node.children[1])+"$";
             ret = construct(OP_MUL, node.children[1], automatic_simplify(construct(OP_POW, node.children[0], construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))));
           }
           // power (variable)^(constant)
           else if(!free_of_symbol(node.children[0], "x") && free_of_symbol(node.children[1], "x"))
           {
             var dev = automatic_simplify(construct(OP_MUL, node.children[1], construct(OP_POW, createNode(NODE_SYM, "u"), construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))));
-            this.ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(u^{"+toTex(node.children[1])+"}) d/{dx}("+toTex(node.children[0])+")$, where $u="+toTex(node.children[0])+"$ and $d/{du}(u^{"+toTex(node.children[1])+"})="+toTex(dev)+"$:";
+            this.ret += "<translate tkey='use_chain_rule'>Use the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{du}(u^{"+toTex(node.children[1])+"}) d/{dx}("+toTex(node.children[0])+")$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(u^{"+toTex(node.children[1])+"})="+toTex(dev)+"$:";
             ret = construct(OP_MUL, [node.children[1], automatic_simplify(construct(OP_POW, node.children[0], construct(OP_ADD, node.children[1], createNode(NODE_INT, -1)))), createNode(NODE_FUNC, FUNC_DIFF, node.children[0])]);
           }
           // power (e)^(x)
           else if(is_symbol(node.children[0], SYM_EULER) && is_symbol(node.children[1], "x"))
           {
-            this.ret = "The derivative of $e^x$ is $e^x$:";
+            this.ret = "<translate tkey='derivative_of'>The derivative of</translate> $e^x$ <translate tkey='is'>is</translate> $e^x$:";
             ret = node;
           }
           else if(is_symbol(node.children[0], SYM_EULER) && !free_of_symbol(node.children[1], "x"))
           {
-            this.ret += "Use the chain rule, $d/{dx}("+toTex(node)+")=d/{du}(e^{u}) d/{dx}("+toTex(node.children[1])+")$, where $u="+toTex(node.children[1])+"$ and $d/{du}(e^{u})=e^{u}$:";
+            this.ret += "<translate tkey='use_chain_rule'>Use the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{du}(e^{u}) d/{dx}("+toTex(node.children[1])+")$, <translate tkey='where'>where</translate> $u="+toTex(node.children[1])+"$ <translate tkey='and'>and</translate> $d/{du}(e^{u})=e^{u}$:";
             ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, node.children[1]));
           }
           // power (constant)^(x)
@@ -198,7 +198,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // {
           //   var exp = construct(OP_MUL, createNode(NODE_SYM, "x"), createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
           //   var rew = construct(OP_POW, createNode(NODE_SYM, SYM_EULER), exp);
-          //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
+          //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$ <translate tkey='and'>and</translate> using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, <translate tkey='where'>where</translate> $u="+toTex(exp)+"$ <translate tkey='and'>and</translate> $d/{du}(e^u)=e^u$:";
           //   ret = automatic_simplify(construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
           // }
           // power (variable)^(variable)
@@ -206,7 +206,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           {
             var exp = construct(OP_MUL, node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0]));
             var rew = construct(OP_POW, createNode(NODE_SYM, SYM_EULER), exp);
-            this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, where $u="+toTex(exp)+"$ and $d/{du}(e^u)=e^u$:";
+            this.ret += "<translate tkey='rewriting'>Rewriting</translate> $"+toTex(node)+"$ <translate tkey='as'>as</translate> $"+toTex(rew)+"$ and using the chain rule, $d/{dx}("+toTex(rew)+")=d/{du}(e^u) d/{dx}("+toTex(exp)+")$, <translate tkey='where'>where</translate> $u="+toTex(exp)+"$ <translate tkey='and'>and</translate> $d/{du}(e^u)=e^u$:";
             //ret = automatic_simplify(construct(OP_ADD, construct(OP_MUL, construct(OP_MUL, node.children[1], construct(OP_POW, node.children[0], construct(OP_SUB, node.children[1], createNode(NODE_INT, 1)))), symbolic_diff(node.children[0])), construct(OP_MUL, construct(OP_MUL, construct(OP_POW, node.children[0], node.children[1]), createNode(NODE_FUNC, FUNC_NLOG, node.children[0])), symbolic_diff(node.children[1]))));
             ret = construct(OP_MUL, node, createNode(NODE_FUNC, FUNC_DIFF, exp));
             // only rewriting
@@ -223,294 +223,294 @@ step_diff_obj.prototype.step_diff_execute = function(node)
         case FUNC_SIN:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of sin, $d/{dx}(sin(x))=cos(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> sin, $d/{dx}(sin(x))=cos(x)$";
             ret = createNode(NODE_FUNC, FUNC_COS, node.children[0]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sin(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(sin(u))=cos(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sin(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(sin(u))=cos(u)$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_COS, node.children[0]));
           }
           break;
         case FUNC_COS:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of cos, $d/{dx}(cos(x))=-sin(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> cos, $d/{dx}(cos(x))=-sin(x)$";
             ret = construct(OP_MUL, createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_SIN, node.children[0]));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cos(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(cos(u))=-sin(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cos(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(cos(u))=-sin(u)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_SIN, node.children[0])]);
           }
           break;
         case FUNC_ASINH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of asinh, $d/{dx}(asinh(x))=1/{√{1+x^2}}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> asinh, $d/{dx}(asinh(x))=1/{√{1+x^2}}$";
             ret = construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asinh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asinh(u))=1/{√{1+x^2}}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asinh(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(asinh(u))=1/{√{1+x^2}}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD,createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
           }
           break;
         case FUNC_SINH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of sinh, $d/{dx}(sinh(x))=cosh(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> sinh, $d/{dx}(sinh(x))=cosh(x)$";
             ret = createNode(NODE_FUNC, FUNC_COSH, node.children[0]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sinh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(sinh(u))=cosh(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sinh(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(sinh(u))=cosh(u)$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_COSH, node.children[0]));
           }
           break;
         case FUNC_ASIN:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of asin, $d/{dx}(asin(x))={1}/{√{1-x^2}}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> asin, $d/{dx}(asin(x))={1}/{√{1-x^2}}$";
             ret = construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_SUB, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asin(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asin(u))={1}/{√{1-u^2}}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asin(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(asin(u))={1}/{√{1-u^2}}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_SUB, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
           }
           break;
         case FUNC_ACOSH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acosh, $d/{dx}(acosh(x))={1}/{√{1-x}√{1+x}}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acosh, $d/{dx}(acosh(x))={1}/{√{1-x}√{1+x}}$";
             ret = construct(OP_MUL, construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, node.children[0], createNode(NODE_INT, -1))), createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, node.children[0], createNode(NODE_INT, 1))), createNode(NODE_INT, -1)));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asin(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asin(u))={1}/{√{1-u^2}}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asin(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(asin(u))={1}/{√{1-u^2}}$:";
             ret = construct(OP_MUL, [createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, node.children[0], createNode(NODE_INT, -1))), createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, node.children[0], createNode(NODE_INT, 1))), createNode(NODE_INT, -1))]);
           }
           break;
         case FUNC_COSH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of cosh, $d/{dx}(cosh(x))=sinh(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> cosh, $d/{dx}(cosh(x))=sinh(x)$";
             ret = createNode(NODE_FUNC, FUNC_SINH, node.children[0]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cosh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(cosh(u))=sinh(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cosh(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(cosh(u))=sinh(u)$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_SINH, node.children[0]));
           }
           break;
         case FUNC_ACOS:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acos, $d/{dx}(acos(x))=-{1}/{1-x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acos, $d/{dx}(acos(x))=-{1}/{1-x^2}$";
             ret = construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acos(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(acos(u))=-{1}/{1-u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acos(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(acos(u))=-{1}/{1-u^2}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1))]);
           }
           break;
         case FUNC_ATANH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of atanh, $d/{dx}(atanh(x))={1}/{1-x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> atanh, $d/{dx}(atanh(x))={1}/{1-x^2}$";
             ret = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(atanh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(atanh(u))={1}/{1-u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(atanh(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(atanh(u))={1}/{1-u^2}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
           }
           break;
         case FUNC_TANH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of tanh, $d/{dx}(tanh(x))=sech^2(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> tanh, $d/{dx}(tanh(x))=sech^2(x)$";
             ret = construct(OP_POW, createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_INT, 2));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(tanh(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(atanh(u))=sech^2(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(tanh(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(atanh(u))=sech^2(u)$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SECH, node.children[0]), createNode(NODE_INT, 2)));
           }
           break;
         case FUNC_ATAN:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of atan, $d/{dx}(atan(x))=1/{1+x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> atan, $d/{dx}(atan(x))=1/{1+x^2}$";
             ret = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2))), createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(atan(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(atan(u))=1/{1+u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(atan(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(atan(u))=1/{1+u^2}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2))), createNode(NODE_INT, -1)));
           }
           break;
         case FUNC_TAN:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of tan, $d/{dx}(tanh(x))=sec^2(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> tan, $d/{dx}(tanh(x))=sec^2(x)$";
             ret = construct(OP_POW, createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_INT, 2));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(tan(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(tan(u))=sec^2(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(tan(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(tan(u))=sec^2(u)$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SEC, node.children[0]), createNode(NODE_INT, 2)));
           }
           break;
         case FUNC_ASECH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of asech, $d/{dx}(asech(x))=-1/{x √{{1-x}/{1+x}} (1+x)}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> asech, $d/{dx}(asech(x))=-1/{x √{{1-x}/{1+x}} (1+x)}$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, -1)), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_MUL, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), node.children[0])), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)))), createNode(NODE_INT, -1))]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asech(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asech(u))=-1/{u √{{1-u}/{1+u}} (1+u)}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asech(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(asech(u))=-1/{u √{{1-u}/{1+u}} (1+u)}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, node.children[0], createNode(NODE_INT, -1)), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_MUL, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), node.children[0])), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), node.children[0]), createNode(NODE_INT, -1)))), createNode(NODE_INT, -1))]);
           }
           break;
         case FUNC_SECH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of sech, $d/{dx}(sech(x))=-tanh(x)sech(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> sech, $d/{dx}(sech(x))=-tanh(x)sech(x)$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_TANH, node.children[0]), createNode(NODE_FUNC, FUNC_SECH, node.children[0])]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sech(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(sech(u))=-tanh(u)sech(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sech(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(sech(u))=-tanh(u)sech(u)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_TANH, node.children[0]), createNode(NODE_FUNC, FUNC_SECH, node.children[0])]);
           }
           break;
         case FUNC_ASEC:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of asec, $d/{dx}(asec(x))=1/{√{1-1/{x^2}} x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> asec, $d/{dx}(asec(x))=1/{√{1-1/{x^2}} x^2}$";
             ret = construct(OP_MUL, [construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asec(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(asec(u))=1/{√{1-1/{u^2}} u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(asec(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(asec(u))=1/{√{1-1/{u^2}} u^2}$:";
             ret = construct(OP_MUL, [createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           break;
         case FUNC_SEC:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of sec, $d/{dx}(sech(x))=tan(x)sec(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> sec, $d/{dx}(sech(x))=tan(x)sec(x)$";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_TAN, node.children[0]), createNode(NODE_FUNC, FUNC_SEC, node.children[0]));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sec(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(sec(u))=tan(u)sec(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(sec(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(sec(u))=tan(u)sec(u)$:";
             ret = construct(OP_MUL, [createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_TAN, node.children[0]), createNode(NODE_FUNC, FUNC_SEC, node.children[0])]);
           }
           break;
         case FUNC_ACSCH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acsch, $d/{dx}(acsch(x))=-1/{√{1+1/{x^2}} x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acsch, $d/{dx}(acsch(x))=-1/{√{1+1/{x^2}} x^2}$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2)))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acsch(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(acsch(u))=1/{√{1+1/{u^2}} u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acsch(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(acsch(u))=1/{√{1+1/{u^2}} u^2}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2)))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           break;
         case FUNC_CSCH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of csch, $d/{dx}(csch(x))=-csch(x)coth(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> csch, $d/{dx}(csch(x))=-csch(x)coth(x)$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_FUNC, FUNC_COTH, node.children[0])]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(csch(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(csch(u))=-csch(u)coth(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(csch(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(csch(u))=-csch(u)coth(u)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_FUNC, FUNC_COTH, node.children[0])]);
           }
           break;
 		    case FUNC_ACSC:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acsc, $d/{dx}(acsc(x))=-1/{√{1-1/{x^2}} x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acsc, $d/{dx}(acsc(x))=-1/{√{1-1/{x^2}} x^2}$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acsc(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(acsc(u))=-1/{√{1-1/{u^2}} u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acsc(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(acsc(u))=-1/{√{1-1/{u^2}} u^2}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_SQRT, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))))), createNode(NODE_INT, -1)), construct(OP_POW, node.children[0], createNode(NODE_INT, -2))]);
           }
           break;
         case FUNC_CSC:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of csc, $d/{dx}(csc(x))=-csc(x)cot(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> csc, $d/{dx}(csc(x))=-csc(x)cot(x)$";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_FUNC, FUNC_COT, node.children[0])]);
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(csc(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(csc(u))=-csc(u)cot(u)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(csc(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(csc(u))=-csc(u)cot(u)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_FUNC, FUNC_COT, node.children[0])]);
           }
           break;
         case FUNC_ACOTH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acoth, $d/{dx}(acoth(x))=1/{1-x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acoth, $d/{dx}(acoth(x))=1/{1-x^2}$";
             ret = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acoth(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(acoth(u))=1/{1-u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acoth(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(acoth(u))=1/{1-u^2}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2)))), createNode(NODE_INT, -1)));
           }
           break;
         case FUNC_COTH:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of coth, $d/{dx}(coth(x))=-csch^{2}(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> coth, $d/{dx}(coth(x))=-csch^{2}(x)$";
             ret = construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_INT, 2)));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(coth(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(coth(u))=-csch^{2}(x)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(coth(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(coth(u))=-csch^{2}(x)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_CSCH, node.children[0]), createNode(NODE_INT, 2))]);
           }
           break;
         case FUNC_ACOT:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of acot, $d/{dx}(acoth(x))=-1/{1+x^2}$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> acot, $d/{dx}(acoth(x))=-1/{1+x^2}$";
             ret = construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2))), createNode(NODE_INT, -1)));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acot(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(acot(u))=-1/{1+u^2}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(acot(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(acot(u))=-1/{1+u^2}$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), construct(OP_POW, node.children[0], createNode(NODE_INT, 2))), createNode(NODE_INT, -1))]);
           }
           break;
         case FUNC_COT:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of cot, $d/{dx}(coth(x))=-csc^{2}(x)$";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> cot, $d/{dx}(coth(x))=-csc^{2}(x)$";
             ret = construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_POW, createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_INT, 2)));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cot(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(cot(u))=-csc^{2}(x)$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(cot(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(cot(u))=-csc^{2}(x)$:";
             ret = construct(OP_MUL, [createNode(NODE_INT, -1), createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, createNode(NODE_FUNC, FUNC_CSC, node.children[0]), createNode(NODE_INT, 2))]);
           }
           break;
         case FUNC_SQRT:
           var rew = construct(OP_POW, node.children[0], construct(OP_DIV, createNode(NODE_INT, 1), createNode(NODE_INT, 2)));
-          this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$:";
+          this.ret += "<translate tkey='rewriting'>Rewriting</translate> $"+toTex(node)+"$ <translate tkey='as'>as</translate> $"+toTex(rew)+"$:";
           ret = createNode(NODE_FUNC, FUNC_DIFF, rew);
           //ret = construct(OP_DIV, symbolic_diff(node.children[0]), construct(OP_MUL,createNode(NODE_INT, 2), createNode(NODE_FUNC, FUNC_SQRT, node.children[0])));
           break;
@@ -520,12 +520,12 @@ step_diff_obj.prototype.step_diff_execute = function(node)
         case FUNC_NLOG:
           if(is_symbol(node.children[0], "x"))
           {
-            this.ret += "Use the derivative of log(x), $d/{dx}(log(x))={1}/{x}$:";
+            this.ret += "<translate tkey='use_derivative_of'>Use the derivative of</translate> log(x), $d/{dx}(log(x))={1}/{x}$:";
             ret = construct(OP_POW, node.children[0], createNode(NODE_INT, -1));
           }
           else
           {
-            this.ret += "Using the chain rule, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(log(u))$, where $u="+toTex(node.children[0])+"$ and $d/{du}(log(u))={1}/{u}$:";
+            this.ret += "<translate tkey='using_chaing_rule'>Using the chain rule</translate>, $d/{dx}("+toTex(node)+")=d/{dx}("+toTex(node.children[0])+")d/{du}(log(u))$, <translate tkey='where'>where</translate> $u="+toTex(node.children[0])+"$ <translate tkey='and'>and</translate> $d/{du}(log(u))={1}/{u}$:";
             ret = construct(OP_MUL, createNode(NODE_FUNC, FUNC_DIFF, node.children[0]), construct(OP_POW, node.children[0], createNode(NODE_INT, -1)));
           }
           break;
@@ -540,11 +540,11 @@ step_diff_obj.prototype.step_diff_execute = function(node)
           // else
           // {
           //   var den = createNode(NODE_FUNC, FUNC_NLOG, node.children[1]);
-          //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$, factoring out constants and using the chain rule, $"+toTex(cons)+" d/{dx}("+toTex(den)+")=d/{du}(e^u) d/{dx}("+toTex(den)+")$, where $u="+toTex(den)+"$ and $d/{du}(e^u)=e^u$:";
+          //   this.ret += "Rewriting $"+toTex(node)+"="+toTex(rew)+"$, factoring out constants and using the chain rule, $"+toTex(cons)+" d/{dx}("+toTex(den)+")=d/{du}(e^u) d/{dx}("+toTex(den)+")$, <translate tkey='where'>where</translate> $u="+toTex(den)+"$ and $d/{du}(e^u)=e^u$:";
           //   ret = construct(OP_MUL, [createNode() ,construct(OP_POW, node.children[1], createNode(NODE_INT, -1)), construct(OP_POW, createNode(NODE_FUNC, FUNC_NLOG, node.children[0]), createNode(NODE_INT, -1))]);
           // }
           //ret = construct(OP_DIV, symbolic_diff(node.children[1]), construct(OP_MUL,node.children[1], createNode(NODE_FUNC, FUNC_NLOG, node.children[0])));
-          this.ret += "Rewriting $"+toTex(node)+"$ as $"+toTex(rew)+"$:";
+          this.ret += "<translate tkey='rewriting'>Rewriting</translate> $"+toTex(node)+"$ <translate tkey='as'>as</translate> $"+toTex(rew)+"$:";
           ret = createNode(NODE_FUNC, FUNC_DIFF, rew);
           break;
       }
@@ -553,7 +553,7 @@ step_diff_obj.prototype.step_diff_execute = function(node)
     case NODE_SYM:
       if(node.value == "x")
       {
-        this.ret += "The derivative of a $x$ is $1$:";
+        this.ret += "<translate tkey='derivative_of'>The derivative of</translate> $x$ <translate tkey='is'>is</translate> $1$:";
         ret = createNode(NODE_INT, 1);
       }
       // else

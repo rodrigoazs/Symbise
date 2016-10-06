@@ -47,35 +47,48 @@
 		    <div style="text-align: center;"><a href="#settings" data-transition="slide"><i class="zmdi zmdi-settings zmdi-hc-2x" style="color: white;"></i></a></div>
 		</div> -->
 		<div data-role="header" style="background-color: #fff; border: none; box-shadow: 0 0 10px 0 rgba(9,10,10,0.3);" data-position="fixed">
-				<h1><img src="img/logoh.svg"></h1>
+				<h1><img src="img/logoh.svg" height="23px"></h1>
 				<a href="#settings" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>
 				<!--<a href="#panel" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-bars">Menu</a>-->
 		</div>
 		<div data-role="content" data-theme="a" style="background-color: #fff;">
 				<form onSubmit="return false;">
-					<input name="text-basic" style="padding-right: 35px;" id="textinpt" value="" autocapitalize="none" autocomplete="off" type="text">
-					<input id="equalbtn" class="eqa" value="=" type="submit" data-role="none">
+						<table style="width:100%;"> <!-- border-style: solid; border-width: 1px;     border-spacing: 0px-->
+							<tr>
+							    <td>
+											<div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset" style="border-style: none"> <!--ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset-->
+							        	<input data-role="none" name="text-basic" id="textinpt" value="" autocapitalize="none" autocomplete="off" type="text">
+											</div>
+							    </td>
+							    <td style='font-size:80%; width:1em'>
+											<div class="ui-btn ui-input-btn">=
+							         	<input id="equalbtn" data-role="none" value="=" type="submit">
+										 	</div>
+							    </td>
+							</tr>
+						</table>
+				</form>
 				<div id="console" style="display: none"> <!--class="ui-body ui-body-a ui-corner-all"-->
 					<div id="console-error" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a ui-bar-a-box">Error</div>
+						<div class="ui-bar ui-bar-a ui-bar-a-box" tkey="error">Error</div>
 						<div id="value-error" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-input" class="" style="display: none">
-						<div class="ui-bar ui-bar-a ui-bar-a-box">Input</div>
+						<div class="ui-bar ui-bar-a ui-bar-a-box" tkey="input">Input</div>
 						<div id="value-input" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-result" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a ui-bar-a-box">Result</div>
+						<div class="ui-bar ui-bar-a ui-bar-a-box" tkey="result">Result</div>
 						<div id="value-result" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 					</div>
 					<br>
 					<div id="console-derivative" class="ui-corner-all custom-corners" style="display: none">
-						<div class="ui-bar ui-bar-a ui-bar-a-box">Derivative</div>
+						<div class="ui-bar ui-bar-a ui-bar-a-box" tkey="derivative">Derivative</div>
 						<div id="value-derivative" class="ui-body ui-body-a ui-body-a-box ui-corner-all console-scrollable">
 						</div>
 						<a href="#" id="derivative-step-btn" class="ui-btn ui-btn-inline ui-mini">Step-by-step solution</a>
@@ -84,7 +97,7 @@
 					</div>
 					<div id="content-plot" style="display: none;" class="ui-corner-all custom-corners">
 						<div id="header-plot" class="ui-bar ui-bar-a ui-bar-a-box">
-							<h3>Plot</h3>
+							<h3 tkey="plot">Plot</h3>
 						</div>
 						<div id="canvas-plot" class="ui-body ui-body-a ui-body-a-box ui-corner-all" style="display: none;">
 						</div>
@@ -93,47 +106,45 @@
 		</div>
 	</div>
 	<div data-role="page" id="settings">
-		<div data-role="header" style="background-color: #fff" data-position="fixed">
-			<h1>Configurações</h1>
+		<div data-role="header" style="background-color: #fff; border: none; box-shadow: 0 0 10px 0 rgba(9,10,10,0.3)" data-position="fixed">
+			<h1 tkey="settings">Settings</h1>
 			<!--<a data-rel="back" style="background-color: transparent; box-shadow: none; border-color: transparent; text-shadow: 0 1px 0 #fff;"></a>-->
 			<!-- <a data-rel="back"></a> -->
 			<a data-rel="back" style="background-color: transparent; box-shadow: none; border-color: transparent;" class="ui-btn ui-btn-left ui-alt-icon ui-nodisc-icon ui-corner-all ui-btn-icon-notext ui-icon-carat-l">Menu</a>
 		</div>
 		<div data-role="content" data-theme="a" style="background-color: #fff;">
-				<!--<div class="ui-body ui-body-a ui-body-a-box ui-corner-all">-->
-					<div class="ui-field-contain">
+					<!-- <div class="ui-field-contain">
 						<label for="name">Full Name:</label>
 						<input name="text" id="name" value="" placeholder="What's Your Name?" type="text">
-						</div>
+						</div> -->
 
-						<div class="ui-field-contain">
+						<!-- <div class="ui-field-contain">
 						<label for="search">Looking for anything?</label>
 						<input name="search" id="search" value="" placeholder="Search for content" data-type="search" type="text">
-					</div>
+					</div> -->
 
-					<div class="ui-field-contain">
+					<!-- <div class="ui-field-contain">
 						<label for="date">Today's date:</label>
 					 <input name="date" id="date" value="" type="date">
-					</div>
+					</div> -->
 
 					<div class="ui-field-contain">
-						<label for="colors">Choose Favorite Color:</label>
-					 <select id="colors" name="colors">
-							<option value="red">Red</option>
-							<option value="green">Green</option>
-							<option value="blue">Blue</option>
+						<label for="colors"><translate tkey="language">Language</translate>:</label>
+					 <select id="colors" onchange="changeLanguage(this.selectedIndex)" name="colors">
+							<option>English</option>
+							<option>Português</option>
 						</select>
 					</div>
 
-					<div class="ui-field-contain">
+					<!-- <div class="ui-field-contain">
 					<label for="switch">Flip Switch:</label>
 						<select name="slider2" id="slider2" data-role="slider">
 								<option value="off">Off</option>
 								<option value="on">On</option>
 						</select>
-					</div>
+					</div> -->
 
-					 <div class="ui-field-contain">
+					 <!-- <div class="ui-field-contain">
 					 <legend>Choose Favorite Movies:</legend>
 
 					 <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov1">The Shawshank Redemption</label><input data-cacheval="false" name="mov1" id="mov1" type="checkbox"></div>
@@ -141,8 +152,7 @@
 					 <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-off" for="mov2">The Godfather</label><input name="mov2" id="mov2" type="checkbox"></div>
 
 					 <div class="ui-checkbox"><label class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-checkbox-on" for="mov3">Pulp Fiction</label><input data-cacheval="false" name="mov3" id="mov3" type="checkbox"></div>
-					 </div>
-				<!--</div>-->
+					 </div> -->
 		</div>
 	</div>
 	<div data-role="page" id="about">
@@ -160,6 +170,7 @@ Este produto utiliza 'jQuery' (Copyright 2014 The jQuery Foundation. All rights 
 				</div>
 		</div>
 	</div>
+<script src="js/lang.js"></script>
 <script src="js/function-plot/d3.js"></script>
 <script src="js/function-plot/function-plot.js"></script>
 <script src="js/jsym.app.js"></script>

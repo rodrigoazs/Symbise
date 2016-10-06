@@ -1,0 +1,28 @@
+{
+    "error": "Error",
+    "input": "Input",
+    "result": "Result",
+    "derivative": "Derivative",
+    "plot": "Plot",
+    "language": "Language",
+    "settings": "Settings",
+    "the_result_is": "The result is",
+    "possible_derivation": "Possible derivation",
+    "use_power_rule": "Use the power rule",
+    "where": "where",
+    "and": "and",
+    "is": "is",
+    "as": "as",
+    "derivative_constant": "The derivative of a constant is zero",
+    "derivative_of": "The derivative of",
+    "derivative_sum": "Differentiate the sum term by term",
+    "derivative_mul": "Use the product rule",
+    "derivative_div": "Use the quotient rule",
+    "factor_out": "Factor out constants",
+    "use_chain_rule": "Use the chain rule",
+    "rewriting": "Rewriting",
+    "and_chain_rule": "and using the chain rule",
+    "use_derivative_of": "Use the derivative of",
+    "using_chaing_rule": "Using the chain rule"
+
+}
