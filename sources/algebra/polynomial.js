@@ -268,11 +268,11 @@ function bhaskara(a, b, c)
 // r: root found (integer node)
 function briot_ruffini(c, r)
 {
-  var new_c = [];
+  var new_c = c.slice();
   var temp = [];
   var new_pol = [];
 
-  for(var i=c.length-1; i>=0; i--) { new_c.push(c[i]); }
+  new_c.reverse();
   new_pol.push(new_c[0]);
   temp = temp.concat([null, createInteger(new_c[0].value*r.value)]);
   for(var i=1; i<new_c.length; i++)
