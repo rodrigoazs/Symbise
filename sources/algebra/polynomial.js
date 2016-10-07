@@ -70,7 +70,7 @@ function get_polynomial_root(coefficients)
     }
     if(kind(coefficients[1]) == NODE_INT && coefficients[1].value == 0)
     {
-      return [construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
+      return [automatic_simplify(construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2)))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
     }
     var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
     return roots;
