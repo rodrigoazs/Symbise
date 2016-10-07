@@ -3,13 +3,40 @@
 // the roots found
 function solve_polynomial(node)
 {
+  // verify if it is a simple polynomial with one element
+  if(kind(node) == OP_POW && is_symbol(node.children[0], "x"))
+  {
+    return [createInteger(0)];
+  }
+  var hash = {};
   var roots = [];
   var coefficients = coefficients_of_polynomial(node);
+  // maximum of x^100 in polynomial_degree
   while(coefficients != null && coefficients.length > 0)
   {
     var root = get_polynomial_root(coefficients);
     if(root == null) return roots;
-    roots = roots.concat(root);
+    if(Array.isArray(root))
+    {
+      for(var i=0; i<root.length; i++)
+      {
+        var s = stringEquation(root[i]);
+        if(!(s in hash))
+        {
+          hash[s] = 1;
+          roots = roots.concat(root[i]);
+        }
+      }
+    }
+    else
+    {
+      var s = stringEquation(root);
+      if(!(s in hash))
+      {
+        hash[s] = 1;
+        roots = roots.concat(root);
+      }
+    }
     if(coefficients.length == 2) return roots;
     coefficients = briot_ruffini(coefficients, root);
   }
@@ -37,7 +64,14 @@ function get_polynomial_root(coefficients)
 {
   if(coefficients.length == 3)
   {
-    console.log('aqui po');
+    if(kind(coefficients[0]) == NODE_INT && coefficients[0].value == 0)
+    {
+      return createInteger(0);
+    }
+    if(kind(coefficients[1]) == NODE_INT && coefficients[1].value == 0)
+    {
+      return [construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
+    }
     var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
     return roots;
   }
@@ -50,7 +84,7 @@ function get_polynomial_root(coefficients)
       {
         var node = form_polynomial_from_coefficients(coefficients);
         var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i])); //automatic_simplify(algebraic_expand
-        console.log('substitute' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
+        //console.log('substitute' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
         if(compare(a, createInteger(0)) == 0)
         {
           return possible_roots[i];
@@ -194,6 +228,8 @@ function allPossibleCases(arr) {
 function coefficients_of_polynomial(node)
 {
   var degree = identify_polynomial_degree(node);
+  // maximum of polynomial x^100
+  if(degree > 100) return null;
   if(degree != null)
   {
     var coefficients = [];
