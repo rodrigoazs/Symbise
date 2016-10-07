@@ -84,7 +84,7 @@ function get_polynomial_root(coefficients)
       {
         var node = form_polynomial_from_coefficients(coefficients);
         var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i])); //automatic_simplify(algebraic_expand
-        //console.log('substitute' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
+        //console.log('substitute ' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
         if(compare(a, createInteger(0)) == 0)
         {
           return possible_roots[i];
