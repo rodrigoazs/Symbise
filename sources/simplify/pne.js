@@ -13,7 +13,6 @@ function PNE_transform(n)
       {
         case OP_MUL:
           var quot = form_quotient(node);
-          console.log('quot', quot);
           if(kind(quot[1]) == NODE_INT && quot[1].value == 1)
           {
             ret = node;

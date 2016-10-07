@@ -159,9 +159,15 @@ function construct(operator, expressions)
 }
 
 // Short function to construct sub as ASAE
+function construct_neg(a)
+{
+	return construct(OP_MUL, createNode(NODE_INT, -1), a);
+}
+
+// Short function to construct sub as ASAE
 function construct_sub(a, b)
 {
-	return construct(OP_ADD, a, construct(OP_MUL, createNode(NODE_INT, 1), b));
+	return construct(OP_ADD, a, construct(OP_MUL, createNode(NODE_INT, -1), b));
 }
 
 // Short function to construct div as ASAE

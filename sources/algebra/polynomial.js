@@ -49,7 +49,8 @@ function get_polynomial_root(coefficients)
       for(var i=0; i<possible_roots.length; i++)
       {
         var node = form_polynomial_from_coefficients(coefficients);
-        var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i]));
+        var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i])); //automatic_simplify(algebraic_expand
+        console.log('substitute' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
         if(compare(a, createInteger(0)) == 0)
         {
           return possible_roots[i];
@@ -70,7 +71,7 @@ function possible_roots_of_polynomial(cf)
   {
     var first = cf[cf.length-1];
     var last = cf[0];
-    if(kind(last) == NODE_INT)
+    if(kind(last) == NODE_INT && kind(first) == NODE_INT)
     {
       var d = [];
       var hash = {};
@@ -81,19 +82,109 @@ function possible_roots_of_polynomial(cf)
         var a2 = createInteger(divisors[i]);
         hash[stringEquation(a1)] = 1;
         hash[stringEquation(a2)] = 1;
-        d.push(createInteger(-divisors[i]));
-        d.push(createInteger(divisors[i]));
+        d.push(a1);
+        d.push(a2);
         var a3 = automatic_simplify(construct(OP_DIV, createInteger(-divisors[i]), createInteger(first.value)));
         var a4 = automatic_simplify(construct(OP_DIV, createInteger(divisors[i]), createInteger(first.value)));
         var s3 = stringEquation(a3);
         var s4 = stringEquation(a4);
-        if(!(s3 in hash)) d.push(a3);
-        if(!(s4 in hash)) d.push(a4);
+        if(!(s3 in hash))
+        {
+          d.push(a3);
+          hash[s3] = 1;
+        }
+        if(!(s4 in hash))
+        {
+          d.push(a4);
+          hash[s4] = 1;
+        }
       }
     }
+    // else{
+    //   var d = [];
+    //   var hash = {};
+    //   var last_m = (kind(last) != OP_MUL) ?  construct(OP_MUL, last) : last; //If it is just one term, construct mul of it
+    //   var divisors = [];
+    //   for(var i=0; i<last_m.children.length; i++)
+    //   {
+    //     divisors[i] = [createInteger(1)];
+    //     var n = operand(last_m, i);
+    //     if(kind(n) == NODE_INT)
+    //     {
+    //       var divisors_int = divisors_of(Math.abs(n.value));
+    //       for(var k=0; k<divisors_int.length; k++)
+    //       {
+    //         divisors[i].push(createInteger(divisors_int[k]));
+    //       }
+    //     }
+    //     else if(kind(n) == OP_POW && kind(n.children[1]) == NODE_INT)
+    //     {
+    //       var exp = n.children[1].value;
+    //       for(var j=exp-1; j>=1; j--)
+    //       {
+    //         divisors[i].push(automatic_simplify(construct_div(n, construct(OP_POW, n.children[0], createInteger(j)))));
+    //       }
+    //       divisors[i].push(n);
+    //     }
+    //     else
+    //     {
+    //       divisors[i].push(n);
+    //     }
+    //   }
+    //   var cases = allPossibleCases(divisors);
+    //   for(var i=0; i<cases.length; i++)
+    //   {
+    //     var a1 = automatic_simplify(construct_neg(cases[i]));
+    //     var a2 = automatic_simplify(cases[i]);
+    //     var s1 = stringEquation(a1);
+    //     var s2 = stringEquation(a2);
+    //     if(!(s1 in hash))
+    //     {
+    //       d.push(a1);
+    //       hash[s1] = 1;
+    //     }
+    //     if(!(s2 in hash))
+    //     {
+    //       d.push(a2);
+    //       hash[s2] = 1;
+    //     }
+    //     var a3 = automatic_simplify(construct_div(a1, first));
+    //     var a4 = automatic_simplify(construct_div(a2, first));
+    //     var s3 = stringEquation(a3);
+    //     var s4 = stringEquation(a4);
+    //     if(!(s3 in hash))
+    //     {
+    //       d.push(a3);
+    //       hash[s3] = 1;
+    //     }
+    //     if(!(s4 in hash))
+    //     {
+    //       d.push(a4);
+    //       hash[s4] = 1;
+    //     }
+    //   }
+    // }
     return d;
   }
   return null;
+
+}
+
+// All Possible cases
+// return divisors of symbols (used in possible roots)
+function allPossibleCases(arr) {
+  if (arr.length == 1) {
+    return arr[0];
+  } else {
+    var result = [];
+    var allCasesOfRest = allPossibleCases(arr.slice(1));  // recur with the rest of array
+    for (var i = 0; i < allCasesOfRest.length; i++) {
+      for (var j = 0; j < arr[0].length; j++) {
+        result.push(automatic_simplify(construct(OP_MUL, arr[0][j], allCasesOfRest[i])));
+      }
+    }
+    return result;
+  }
 
 }
 
