@@ -108,7 +108,7 @@ function simplify_power(node)
 		return simplify_integer_power(v, w);
 	}
 	// added - verify if it is a square root of integer
-	else if(kind(v) == NODE_INT && is_fraction(w))
+	else if(kind(v) == NODE_INT && v.value > 0 && is_fraction(w))
 	{
 		return simplify_square_root_power(v, w);
 	}

@@ -13,7 +13,7 @@ function solve_polynomial(node)
     if(coefficients.length == 2) return roots;
     coefficients = briot_ruffini(coefficients, root);
   }
-  return roots;
+  return roots.sort(compare);
 }
 
 // Form polynomial from coefficients (cf)
@@ -37,6 +37,7 @@ function get_polynomial_root(coefficients)
 {
   if(coefficients.length == 3)
   {
+    console.log('aqui po');
     var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
     return roots;
   }
@@ -105,19 +106,37 @@ function coefficients_of_polynomial(node)
   if(degree != null)
   {
     var coefficients = [];
-    for(var i=0; i<=degree; i++){ coefficients[i] = []; }
-    for(var i=0; i<node.children.length; i++)
+    for(var i=0; i<=degree; i++){ coefficients[i] = [createInteger(0)]; }
+    if(kind(node) == OP_ADD)
     {
-      if(free_of_symbol(node.children[i], "x"))
+      for(var i=0; i<node.children.length; i++)
       {
-        coefficients[0].push(node.children[i]);
+        if(free_of_symbol(node.children[i], "x"))
+        {
+          coefficients[0].push(node.children[i]);
+        }
+        else
+        {
+          coefficients[1].push(term_of(node.children[i], createNode(NODE_SYM, "x")));
+          for(var j=2; j<=degree; j++)
+          {
+            coefficients[j].push(term_of(node.children[i], construct(OP_POW, createNode(NODE_SYM, "x"), createNode(NODE_INT, j))));
+          }
+        }
+      }
+    }
+    else
+    {
+      if(free_of_symbol(node, "x"))
+      {
+        coefficients[0].push(node);
       }
       else
       {
-        coefficients[1].push(term_of(node.children[i], createNode(NODE_SYM, "x")));
+        coefficients[1].push(term_of(node, createNode(NODE_SYM, "x")));
         for(var j=2; j<=degree; j++)
         {
-          coefficients[j].push(term_of(node.children[i], construct(OP_POW, createNode(NODE_SYM, "x"), createNode(NODE_INT, j))));
+          coefficients[j].push(term_of(node, construct(OP_POW, createNode(NODE_SYM, "x"), createNode(NODE_INT, j))));
         }
       }
     }
@@ -144,6 +163,26 @@ function identify_polynomial_degree(node)
       {
         degree = d;
       }
+    }
+    return degree;
+  }
+  else if(kind(node) == OP_MUL)
+  {
+    var d = identify_polynomial_mul(node);
+    if(d == null) return null;
+    if(d > degree)
+    {
+      degree = d;
+    }
+    return degree;
+  }
+  else
+  {
+    var d = identify_polynomial_power(node);
+    if(d == null) return null;
+    if(d > degree)
+    {
+      degree = d;
     }
     return degree;
   }

@@ -3,6 +3,8 @@ $( "#equalbtn" ).click(function() {
 	$("#console-error").css("display", "none");
 	$("#console-input").css("display", "none");
 	$("#console-result").css("display", "none");
+	$("#console-expanded").css("display", "none");
+	$("#console-roots").css("display", "none");
 	$("#console-derivative").css("display", "none");
 	$("#content-plot").css("display", "none");
 	$("#value-derivative-step").css("display", "none");
@@ -67,18 +69,27 @@ function initparser( node )
 
   var BAE_node = BAE_transform(node);
   var simplified = automatic_simplify(node);
-  console.log('execute', execute(simplified, {"x": 2, "a": 3}));
-  console.log('automatic_diff', automatic_diff(simplified, {"x": 2, "a": 3}));
-  //var teste = group_product_terms(simplified.children[0], simplified.children[1])
-  //var a1 = construct(OP_POW, construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x")), createNode(NODE_INT, 3));
-  //var a2 = construct(OP_ADD, createNode(NODE_INT, 1), createNode(NODE_SYM, "x"));
-  //var a3 = createNode(NODE_INT, 2);
-  //var aaa = construct(OP_ADD, new Array(createNode(NODE_INT, 1), createNode(NODE_INT, 4), createNode(NODE_INT, 2), createNode(NODE_INT, 3), createNode(NODE_INT, 2)));
-  var aaa = construct(OP_ADD, new Array(createNode(NODE_SYM, "y"), createNode(NODE_SYM, "x")));
-  aaa.children.sort(compare);
-  //alert(compare(a3, a2));
-  //alert(toMathML( diff ) );
-  //$("#console").html("<p>$$d/{dx}("+toTex(node)+") = "+toTex( diff )+"$$</p><br><br>"+toTex( diff )+"<br>"+stringEquation(diff));
+
+	// algorithm to find roots (in development)
+	var expanded = automatic_simplify(algebraic_expand(simplified));
+	if(compare(expanded, simplified) != 0)
+	{
+		$("#value-expanded").html("<p>$$"+toTex(expanded)+"$$</p>");
+		$("#console-expanded").css("display", "block");
+	}
+
+	var roots = solve_polynomial(expanded);
+
+	if(roots.length)
+	{
+		var text = "";
+		for(var root of roots)
+		{
+			text += "<p>$$x="+toTex(root)+"$$</p>";
+		}
+		$("#value-roots").html(text);
+		$("#console-roots").css("display", "block");
+	}
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
 	$("#value-input").html("<p>$$"+toTex(BAE_node)+"$$</p>");
