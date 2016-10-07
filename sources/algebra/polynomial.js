@@ -287,3 +287,90 @@ function briot_ruffini(c, r)
   for(var i=new_pol.length-2; i>=0; i--) { ret_pol.push(new_pol[i]); }
   return ret_pol;
 }
+
+// Numeric Solve polynomial quadratic (coef)
+// c: array of coefficients (type float or integer)
+// return: array of complex roots [a, b, c, d] -> a+bi, c+di
+function numeric_solvep2(coef) {
+  var delta;
+  var s = new Array(4);
+
+  delta = coef[1] * coef[1] - 4 * coef[2] * coef[0];
+  s[0] = -coef[1] / 2 / coef[2];
+  s[2] = s[0];
+
+  if(delta < 0)
+  {
+     s[1] = Math.sqrt(-delta) / 2 / coef[2];
+     s[3] = -s[1];
+  }
+  else
+  {
+     s[1] = 0;
+     s[3] = 0;
+
+     s[0] = s[0] + Math.sqrt(delta) / 2 / coef[2];
+     s[2] = s[2] - Math.sqrt(delta) / 2 / coef[2];
+  }
+
+  return s;
+}
+
+// Bairstow's method (coef)
+// c: array of coefficients (type float or integer)
+// return: array of pairs of floats that represents its roots
+// [0, 1, 2, 3] - > 0+1i, 2+3i
+ function bairstow(coef) {
+  var a = coef.slice();
+  var i;
+  var N = a.length;
+  var h, k;
+  var result = new Array();
+
+  var r = Math.random();
+  var s = Math.random();
+
+  var b = new Array(N);
+  var c = new Array(N);
+
+  a.reverse();
+
+  while (N > 3) {
+
+   b[N - 1] = 1;
+   b[N - 2] = 1;
+
+   while ((Math.abs(b[N - 1]) + Math.abs(b[N - 2])) > 1e-6) {
+
+    b[0] = a[0];
+    b[1] = a[1] + r * b[0];
+
+    for(i = 2; i < N; i++) b[i] = a[i] + r * b[i - 1] + s * b[i - 2];
+
+    c[0] = b[0];
+    c[1] = b[1] + r * c[0];
+
+    for(i = 2; i < N - 1; i++) c[i] = b[i] + r * c[i - 1] + s * c[i - 2];
+
+    h = (-b[N - 2] * c[N - 3] + b[N - 1] * c[N - 4]) / (c[N - 3] * c[N - 3] - c[N - 2] * c[N - 4]);
+    k = (-b[N - 1] * c[N - 3] + b[N - 2] * c[N - 2]) / (c[N - 3] * c[N - 3] - c[N - 2] * c[N - 4]);
+
+    r = r + h;
+    s = s + k;
+   }
+
+   result = result.concat(numeric_solvep2([-s, -r, 1]));
+
+   a = b.slice(0, N - 2);
+   N = a.length;
+  }
+
+  if (N == 3) {
+   result = result.concat(numeric_solvep2(a.reverse()));
+  }
+  else {
+   result = result.concat([-a[1] / a[0], 0]);
+  }
+
+  return result;
+ }
