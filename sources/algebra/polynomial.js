@@ -15,7 +15,12 @@ function solve_polynomial(node)
   while(coefficients != null && coefficients.length > 0)
   {
     var root = get_polynomial_root(coefficients);
-    if(root == null) return roots;
+    // if fails with symbolic method, uses bairstows
+    if(root == null)
+    {
+      roots = roots.concat(numeric_solve_polynomial(coefficients));
+      return roots;
+    }
     if(Array.isArray(root))
     {
       for(var i=0; i<root.length; i++)
@@ -540,3 +545,32 @@ function numeric_solvep2(coef) {
 
   return result;
  }
+
+// Numeric solve polynomial (coefficients)
+// Uses Bairstow's method to bring all approximated roots
+// returns at object with type: 1 (aproximated) and value as
+// children
+function numeric_solve_polynomial(coefficients)
+{
+  // guarantee all coefficients are number and numeric evaluate them
+  var new_coefficients = coefficients.slice();
+  for(var i=0; i<new_coefficients.length; i++)
+  {
+    if(free_of_variables(new_coefficients[i]))
+    {
+      new_coefficients[i] = numeric_evaluate(new_coefficients[i]);
+    }
+    else
+    {
+      return null;
+    }
+  }
+  var get_roots = bairstow(new_coefficients);
+  var roots = [];
+  for(var i=0; i<get_roots.length; i=i+2)
+  {
+    var r = automatic_simplify(construct(OP_ADD, createInteger(Math.round(get_roots[i] * 1000000)/1000000), construct(OP_MUL, createInteger(Math.round(get_roots[i+1] * 1000000)/1000000), createSymbol(SYM_IMAGINARY))));
+    roots.push({type: 1, children: r});
+  }
+  return roots.sort(compare);
+}

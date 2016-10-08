@@ -85,7 +85,13 @@ function initparser( node )
 		var text = "";
 		for(var root of roots)
 		{
-			text += "<p>$$x="+toTex(root)+"$$</p>";
+			if(root.type == 1)
+			{
+				text += "<p>$$x≈"+toTex(root.children)+"$$</p>";
+			}
+			else {
+				text += "<p>$$x="+toTex(root)+"$$</p>";
+			}
 		}
 		$("#value-roots").html(text);
 		$("#console-roots").css("display", "block");
