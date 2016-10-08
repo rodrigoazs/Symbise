@@ -169,7 +169,7 @@ function symbolic_diff(node)
 // respect values, including the value of the derivative point,
 // derivate and evaluate the expression
 // The output is a numeric value
-function automatic_diff(node, sub)
+function automatic_diff(node, sub={})
 {
   var ret = 0;
 
@@ -199,18 +199,18 @@ function automatic_diff(node, sub)
           }
           else
           {
-            ret = (automatic_diff(node.children[0], sub) * execute(node.children[1], sub) - automatic_diff(node.children[1], sub) * execute(node.children[0], sub)) / Math.pow(execute(node.children[1], sub), 2);
+            ret = (automatic_diff(node.children[0], sub) * numeric_evaluate(node.children[1], sub) - automatic_diff(node.children[1], sub) * numeric_evaluate(node.children[0], sub)) / Math.pow(numeric_evaluate(node.children[1], sub), 2);
           }
           break
         case OP_MUL:
           if(node.children.length == 2)
           {
-            ret = automatic_diff(node.children[0], sub) * execute(node.children[1], sub) + execute(node.children[0], sub) * automatic_diff(node.children[1], sub);
+            ret = automatic_diff(node.children[0], sub) * numeric_evaluate(node.children[1], sub) + numeric_evaluate(node.children[0], sub) * automatic_diff(node.children[1], sub);
           }
           else
           {
             var children = node.children.slice(1);
-            ret = automatic_diff(node.children[0], sub) * execute(construct(OP_MUL, children), sub) + execute(node.children[0], sub) * automatic_diff(construct(OP_MUL, children), sub);
+            ret = automatic_diff(node.children[0], sub) * numeric_evaluate(construct(OP_MUL, children), sub) + numeric_evaluate(node.children[0], sub) * automatic_diff(construct(OP_MUL, children), sub);
           }
           break;
         case OP_NEG:
@@ -218,14 +218,14 @@ function automatic_diff(node, sub)
           break;
         case OP_POW:
           // prevents NaN in log(). It happens because 0*NaN = NaN instead of 0.
-          var term1 = Math.pow(execute(node.children[0], sub),execute(node.children[1], sub));
-          var term2 = Math.log(execute(node.children[0], sub));
+          var term1 = Math.pow(numeric_evaluate(node.children[0], sub),numeric_evaluate(node.children[1], sub));
+          var term2 = Math.log(numeric_evaluate(node.children[0], sub));
           var term3 = automatic_diff(node.children[1], sub);
           if(term1 == 0 || term2 == 0 || term3 == 0)
           {
             term1 = term2 = term3 = 0;
           }
-          ret = (execute(node.children[1], sub)*Math.pow(execute(node.children[0], sub),(execute(node.children[1], sub)-1))*automatic_diff(node.children[0], sub))+(term1 * term2 * term3);
+          ret = (numeric_evaluate(node.children[1], sub)*Math.pow(numeric_evaluate(node.children[0], sub),(numeric_evaluate(node.children[1], sub)-1))*automatic_diff(node.children[0], sub))+(term1 * term2 * term3);
           break;
       }
       break;
@@ -234,96 +234,96 @@ function automatic_diff(node, sub)
       switch(node.value)
       {
         case FUNC_SIN:
-          ret = automatic_diff(node.children[0], sub) * Math.cos(execute(node.children[0], sub));
+          ret = automatic_diff(node.children[0], sub) * Math.cos(numeric_evaluate(node.children[0], sub));
           break;
         case FUNC_COS:
-          ret = - automatic_diff(node.children[0], sub) * Math.sin(execute(node.children[0], sub));
+          ret = - automatic_diff(node.children[0], sub) * Math.sin(numeric_evaluate(node.children[0], sub));
           break;
         case FUNC_ASINH:
-          ret = automatic_diff(node.children[0], sub) / (Math.sqrt(Math.pow(execute(node.children[0], sub), 2) + 1));
+          ret = automatic_diff(node.children[0], sub) / (Math.sqrt(Math.pow(numeric_evaluate(node.children[0], sub), 2) + 1));
           break;
         case FUNC_SINH:
-          ret = automatic_diff(node.children[0], sub) * Math.cosh(execute(node.children[0], sub));
+          ret = automatic_diff(node.children[0], sub) * Math.cosh(numeric_evaluate(node.children[0], sub));
           break;
         case FUNC_ASIN:
-          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(execute(node.children[0], sub), 2));
+          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_ACOSH:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = automatic_diff(node.children[0], sub) / (Math.sqrt(ex - 1) * Math.sqrt(ex + 1));
           break;
         case FUNC_COSH:
-          ret = automatic_diff(node.children[0], sub) * Math.sinh(execute(node.children[0], sub));
+          ret = automatic_diff(node.children[0], sub) * Math.sinh(numeric_evaluate(node.children[0], sub));
           break;
         case FUNC_ACOS:
-          ret = - automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(execute(node.children[0], sub), 2));
+          ret = - automatic_diff(node.children[0], sub) / Math.sqrt(1 - Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_ATANH:
-          ret = automatic_diff(node.children[0], sub) / (1 - Math.pow(execute(node.children[0], sub), 2));
+          ret = automatic_diff(node.children[0], sub) / (1 - Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_TANH:
-          ret = automatic_diff(node.children[0], sub) * (1 / Math.pow(Math.cosh(execute(node.children[0], sub)), 2));
+          ret = automatic_diff(node.children[0], sub) * (1 / Math.pow(Math.cosh(numeric_evaluate(node.children[0], sub)), 2));
           break;
         case FUNC_ATAN:
-          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 + Math.pow(execute(node.children[0], sub), 2));
+          ret = automatic_diff(node.children[0], sub) / Math.sqrt(1 + Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_TAN:
-          ret = automatic_diff(node.children[0], sub) / (1 / Math.pow(Math.cos(execute(node.children[0], sub)), 2));
+          ret = automatic_diff(node.children[0], sub) / (1 / Math.pow(Math.cos(numeric_evaluate(node.children[0], sub)), 2));
           break;
         case FUNC_ASECH:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) / (ex * Math.sqrt((1-ex)/(1+ex)) * (1+x));
           break;
         case FUNC_SECH:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) * Math.tanh(ex) * (1/Math.cosh(ex));
           break;
         case FUNC_ASEC:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = automatic_diff(node.children[0], sub) * (1/(Math.sqrt(1-1/Math.pow(ex, 2)) * Math.pow(ex, 2)));
           break;
         case FUNC_SEC:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = automatic_diff(node.children[0], sub) * Math.tan(ex) * (1/Math.cos(ex));
           break;
         case FUNC_ACSCH:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) / (Math.sqrt(1+1/Math.pow(ex, 2)) * Math.pow(ex, 2));
           break;
         case FUNC_CSCH:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) * (1/Math.sinh(ex)) * (1/Math.tanh(ex));
           break;
 		    case FUNC_ACSC:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) / (Math.sqrt(1-1/Math.pow(ex, 2)) * Math.pow(ex, 2));
           break;
         case FUNC_CSC:
-          var ex = execute(node.children[0], sub);
+          var ex = numeric_evaluate(node.children[0], sub);
           ret = - automatic_diff(node.children[0], sub) * (1/Math.sin(ex)) * (1/Math.tan(ex));
           break;
         case FUNC_ACOTH:
-          ret = automatic_diff(node.children[0], sub) / (1- Math.pow(execute(node.children[0], sub), 2));
+          ret = automatic_diff(node.children[0], sub) / (1- Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_COTH:
-          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sinh(execute(node.children[0], sub)), 2);
+          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sinh(numeric_evaluate(node.children[0], sub)), 2);
           break;
         case FUNC_ACOT:
-          ret = - automatic_diff(node.children[0], sub) / (1 + Math.pow(execute(node.children[0], sub), 2));
+          ret = - automatic_diff(node.children[0], sub) / (1 + Math.pow(numeric_evaluate(node.children[0], sub), 2));
           break;
         case FUNC_COT:
-          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sin(execute(node.children[0], sub)), 2);
+          ret = - automatic_diff(node.children[0], sub) * Math.pow(1/Math.sin(numeric_evaluate(node.children[0], sub)), 2);
           break;
         case FUNC_SQRT:
-          ret = automatic_diff(node.children[0], sub) / (2 * Math.sqrt(execute(node.children[0], sub)));
+          ret = automatic_diff(node.children[0], sub) / (2 * Math.sqrt(numeric_evaluate(node.children[0], sub)));
           break;
         // case FUNC_EXP:
         //   break;
         case FUNC_NLOG:
-          ret = automatic_diff(node.children[0], sub) / execute(node.children[0], sub);
+          ret = automatic_diff(node.children[0], sub) / numeric_evaluate(node.children[0], sub);
           break;
         case FUNC_BLOG:
-          ret = automatic_diff(node.children[1], sub) / (execute(node.children[1], sub) * Math.log(execute(node.children[0], sub)));
+          ret = automatic_diff(node.children[1], sub) / (numeric_evaluate(node.children[1], sub) * Math.log(numeric_evaluate(node.children[0], sub)));
           break;
       }
       break;
