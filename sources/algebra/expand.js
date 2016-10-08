@@ -64,9 +64,9 @@ function expand_power(u, n)
     var s = createNode(NODE_INT, 0);
     for(var i=0; i <= n; i++)
     {
-      var fat=n=>(n<2)?1:fat(n-1)*n;
-      var c = fat(n) / (fat(i) * fat(n-i));
-      s = construct(OP_ADD, s, expand_product(construct(OP_MUL, createInteger(c), construct(OP_POW, f, createInteger(n-i))), expand_power(r, i)));
+      //var fat=n=>(n<2)?1:fat(n-1)*n;
+      var c = combination(n, i); //fat(n) / (fat(i) * fat(n-i));
+      s = construct(OP_ADD, s, expand_product(construct(OP_MUL, c, construct(OP_POW, f, createInteger(n-i))), expand_power(r, i)));
     }
     return s;
   }

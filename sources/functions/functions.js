@@ -556,3 +556,25 @@ function divisors_of(u)
 	}
   return divisors.sort(function (a, b) { return a - b; });
 }
+
+// Combination (n, k)
+// n!/(k! (n-k)!)
+// This functions ignores symbolic manipulation of fatorials
+// n and k should be non-negative integers
+function combination(n, k)
+{
+	var s = n - k;
+	var max = Math.max(s, k);
+	var min = Math.min(s, k);
+	var num = 1;
+	var dem = 1;
+	for(var i=max+1; i<=n; i++)
+	{
+		num *= i;
+	}
+	for(var i=2; i<=min; i++)
+	{
+		dem *= i;
+	}
+	return automatic_simplify(construct(OP_DIV, createInteger(num), createInteger(dem)));
+}
