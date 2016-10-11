@@ -101,7 +101,7 @@ function initparser( node )
 	}
 	// ----------------------------------------
 
-	if(free_of_variables_and_non_real_numbers(simplified))
+	if(kind(simplified) != NODE_INT && free_of_variables_and_non_real_numbers(simplified))
 	{
 		var numeric = numeric_evaluate(simplified);
 		$("#value-numeric-result").html("<p>$$"+numeric+"$$</p>");

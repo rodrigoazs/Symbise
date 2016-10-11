@@ -193,7 +193,18 @@ function toTex_rec( node )
       break;
 
     case NODE_SYM:
-      ret = node.value;
+      if(node.value == SYM_PI)
+      {
+        ret = "π";
+      }
+      else if(node.value == SYM_INFINITY)
+      {
+        ret = "∞";
+      }
+      else
+      {
+        ret = node.value;
+      }
       break;
 
     case NODE_INT:
