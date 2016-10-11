@@ -16,7 +16,7 @@ function solve_polynomial(node)
   {
     var root = get_polynomial_root(coefficients);
     // if fails with symbolic method, uses bairstows
-    if(root == null)
+    if(!root.length)
     {
       roots = roots.concat(numeric_solve_polynomial(coefficients));
       return roots;
@@ -67,15 +67,19 @@ function form_polynomial_from_coefficients(coefficients)
 // look for a possible root, evaluate and return it
 function get_polynomial_root(coefficients)
 {
-  if(coefficients.length == 3)
+  if(coefficients.length <= 3)
   {
     if(kind(coefficients[0]) == NODE_INT && coefficients[0].value == 0)
     {
-      return createInteger(0);
+      return [createInteger(0)];
     }
     if(kind(coefficients[1]) == NODE_INT && coefficients[1].value == 0)
     {
       return [automatic_simplify(construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2)))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
+    }
+    if(coefficients.length == 2)
+    {
+      return [automatic_simplify(construct_div(construct_neg(coefficients[0]), coefficients[1]))];
     }
     var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
     return roots;
@@ -97,7 +101,7 @@ function get_polynomial_root(coefficients)
       }
     }
   }
-  return null;
+  return [];
 }
 
 // Possible roots of polynomial (cf)
@@ -206,7 +210,6 @@ function possible_roots_of_polynomial(cf)
     return d;
   }
   return null;
-
 }
 
 // All Possible cases
@@ -548,7 +551,7 @@ function numeric_solvep2(coef) {
 
 // Numeric solve polynomial (coefficients)
 // Uses Bairstow's method to bring all approximated roots
-// returns at object with type: 1 (aproximated) and value as
+// returns at object with type: approximated and value as
 // children
 function numeric_solve_polynomial(coefficients)
 {
@@ -562,7 +565,7 @@ function numeric_solve_polynomial(coefficients)
     }
     else
     {
-      return null;
+      return [];
     }
   }
   var get_roots = bairstow(new_coefficients);
@@ -570,7 +573,7 @@ function numeric_solve_polynomial(coefficients)
   for(var i=0; i<get_roots.length; i=i+2)
   {
     var r = automatic_simplify(construct(OP_ADD, createInteger(Math.round(get_roots[i] * 1000000)/1000000), construct(OP_MUL, createInteger(Math.round(get_roots[i+1] * 1000000)/1000000), createSymbol(SYM_IMAGINARY))));
-    roots.push({type: 1, children: r});
+    roots.push({type: "approximated", children: r});
   }
   return roots.sort(compare);
 }

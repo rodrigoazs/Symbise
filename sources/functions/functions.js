@@ -471,6 +471,22 @@ function free_of_variables(node)
 	return true;
 }
 
+// Free of Variables and Non Real Numbers (u)
+// Return true if the node u does not contain any variable or non real numbers, otherwise returns false
+function free_of_variables_and_non_real_numbers(node)
+{
+	var symbols = list_of_symbols_rec(node);
+	for(var i=0; i<symbols.length; i++)
+	{
+		if(symbols[i].value != SYM_EULER &&
+			 symbols[i].value != SYM_PI)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 // Term of (node, u)
 // Given ASAE node and u, factor out the term not u from node.
 // Example: node = ax^2 and u = x^2, returns a.

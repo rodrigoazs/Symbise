@@ -2,6 +2,7 @@
     "error": "Error",
     "input": "Input",
     "result": "Result",
+    "numeric_result": "Numeric Result",
     "derivative": "Derivative",
     "plot": "Plot",
     "roots": "Roots",

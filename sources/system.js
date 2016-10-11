@@ -3,6 +3,7 @@ $( "#equalbtn" ).click(function() {
 	$("#console-error").css("display", "none");
 	$("#console-input").css("display", "none");
 	$("#console-result").css("display", "none");
+	$("#console-numeric-result").css("display", "none");
 	$("#console-expanded").css("display", "none");
 	$("#console-roots").css("display", "none");
 	$("#console-derivative").css("display", "none");
@@ -70,6 +71,7 @@ function initparser( node )
   var BAE_node = BAE_transform(node);
   var simplified = automatic_simplify(node);
 
+  // ----------------------------------------
 	// algorithm to find roots (in development)
 	var expanded = automatic_simplify(algebraic_expand(simplified));
 	if(compare(expanded, simplified) != 0)
@@ -79,13 +81,14 @@ function initparser( node )
 	}
 
 	var roots = solve_polynomial(expanded);
+	console.log(roots);
 
 	if(roots.length)
 	{
 		var text = "";
 		for(var root of roots)
 		{
-			if(root.type == 1)
+			if(root.type == "approximated")
 			{
 				text += "<p>$$x≈"+toTex(root.children)+"$$</p>";
 			}
@@ -95,6 +98,14 @@ function initparser( node )
 		}
 		$("#value-roots").html(text);
 		$("#console-roots").css("display", "block");
+	}
+	// ----------------------------------------
+
+	if(free_of_variables_and_non_real_numbers(simplified))
+	{
+		var numeric = numeric_evaluate(simplified);
+		$("#value-numeric-result").html("<p>$$"+numeric+"$$</p>");
+		$("#console-numeric-result").css("display", "block");
 	}
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
