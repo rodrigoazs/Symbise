@@ -252,6 +252,8 @@ function execute( node )
     'log'
     '\('
     '\)'
+    'pi'
+    'infinity'
     '[A-Za-z]'        IDENTIFIER
     '[0-9]+'                        INT   [* %match = parseInt( %match ); *]
     '[0-9]+\.[0-9]*|[0-9]*\.[0-9]+' FLOAT [* %match = parseFloat( %match ); *]
@@ -299,6 +301,8 @@ NegExp:     '-' Value           [* %% = createNode( NODE_OP, OP_NEG, %2 ); *]
             ;
 
 Value:      NumericValue
+            | 'pi'              [* %% = createNode( NODE_SYM, %1 ); *]
+            | 'infinity'        [* %% = createNode( NODE_SYM, %1 ); *]
             | IDENTIFIER        [* %% = createNode( NODE_SYM, %1 ); *]
             | ParenExp
             ;
