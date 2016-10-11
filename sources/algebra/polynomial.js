@@ -6,23 +6,24 @@ function solve_polynomial(node)
   // verify if it is a simple polynomial with one element
   if(kind(node) == OP_POW && is_symbol(node.children[0], "x"))
   {
-    return [createInteger(0)];
+    return { symbolic: [createInteger(0)], numeric: [] };
   }
   var hash = {};
   var roots = [];
+  var numeric_roots = [];
   var coefficients = coefficients_of_polynomial(node);
   // maximum of x^100 in polynomial_degree
   while(coefficients != null && coefficients.length > 0)
   {
     var root = get_polynomial_root(coefficients);
-    // if fails with symbolic method, uses bairstows
-    if(!root.length)
-    {
-      roots = roots.concat(numeric_solve_polynomial(coefficients));
-      return roots;
-    }
     if(Array.isArray(root))
     {
+      // if fails with symbolic method, uses bairstows
+      if(root.length == 0)
+      {
+        numeric_roots = numeric_roots.concat(numeric_solve_polynomial(coefficients));
+        return { symbolic: roots, numeric: numeric_roots };
+      }
       for(var i=0; i<root.length; i++)
       {
         var s = stringEquation(root[i]);
@@ -42,10 +43,10 @@ function solve_polynomial(node)
         roots = roots.concat(root);
       }
     }
-    if(coefficients.length == 2) return roots;
+    if(coefficients.length == 2) return { symbolic: roots, numeric: numeric_roots };
     coefficients = briot_ruffini(coefficients, root);
   }
-  return roots.sort(compare);
+  return { symbolic: roots.sort(compare), numeric: numeric_roots };
 }
 
 // Form polynomial from coefficients (cf)
@@ -143,70 +144,70 @@ function possible_roots_of_polynomial(cf)
         }
       }
     }
-    // else{
-    //   var d = [];
-    //   var hash = {};
-    //   var last_m = (kind(last) != OP_MUL) ?  construct(OP_MUL, last) : last; //If it is just one term, construct mul of it
-    //   var divisors = [];
-    //   for(var i=0; i<last_m.children.length; i++)
-    //   {
-    //     divisors[i] = [createInteger(1)];
-    //     var n = operand(last_m, i);
-    //     if(kind(n) == NODE_INT)
-    //     {
-    //       var divisors_int = divisors_of(Math.abs(n.value));
-    //       for(var k=0; k<divisors_int.length; k++)
-    //       {
-    //         divisors[i].push(createInteger(divisors_int[k]));
-    //       }
-    //     }
-    //     else if(kind(n) == OP_POW && kind(n.children[1]) == NODE_INT)
-    //     {
-    //       var exp = n.children[1].value;
-    //       for(var j=exp-1; j>=1; j--)
-    //       {
-    //         divisors[i].push(automatic_simplify(construct_div(n, construct(OP_POW, n.children[0], createInteger(j)))));
-    //       }
-    //       divisors[i].push(n);
-    //     }
-    //     else
-    //     {
-    //       divisors[i].push(n);
-    //     }
-    //   }
-    //   var cases = allPossibleCases(divisors);
-    //   for(var i=0; i<cases.length; i++)
-    //   {
-    //     var a1 = automatic_simplify(construct_neg(cases[i]));
-    //     var a2 = automatic_simplify(cases[i]);
-    //     var s1 = stringEquation(a1);
-    //     var s2 = stringEquation(a2);
-    //     if(!(s1 in hash))
-    //     {
-    //       d.push(a1);
-    //       hash[s1] = 1;
-    //     }
-    //     if(!(s2 in hash))
-    //     {
-    //       d.push(a2);
-    //       hash[s2] = 1;
-    //     }
-    //     var a3 = automatic_simplify(construct_div(a1, first));
-    //     var a4 = automatic_simplify(construct_div(a2, first));
-    //     var s3 = stringEquation(a3);
-    //     var s4 = stringEquation(a4);
-    //     if(!(s3 in hash))
-    //     {
-    //       d.push(a3);
-    //       hash[s3] = 1;
-    //     }
-    //     if(!(s4 in hash))
-    //     {
-    //       d.push(a4);
-    //       hash[s4] = 1;
-    //     }
-    //   }
-    // }
+    else{
+      var d = [];
+      var hash = {};
+      var last_m = (kind(last) != OP_MUL) ?  construct(OP_MUL, last) : last; //If it is just one term, construct mul of it
+      var divisors = [];
+      for(var i=0; i<last_m.children.length; i++)
+      {
+        divisors[i] = [createInteger(1)];
+        var n = operand(last_m, i);
+        if(kind(n) == NODE_INT)
+        {
+          var divisors_int = divisors_of(Math.abs(n.value));
+          for(var k=0; k<divisors_int.length; k++)
+          {
+            divisors[i].push(createInteger(divisors_int[k]));
+          }
+        }
+        else if(kind(n) == OP_POW && kind(n.children[1]) == NODE_INT)
+        {
+          var exp = n.children[1].value;
+          for(var j=exp-1; j>=1; j--)
+          {
+            divisors[i].push(automatic_simplify(construct_div(n, construct(OP_POW, n.children[0], createInteger(j)))));
+          }
+          divisors[i].push(n);
+        }
+        else
+        {
+          divisors[i].push(n);
+        }
+      }
+      var cases = allPossibleCases(divisors);
+      for(var i=0; i<cases.length; i++)
+      {
+        var a1 = automatic_simplify(construct_neg(cases[i]));
+        var a2 = automatic_simplify(cases[i]);
+        var s1 = stringEquation(a1);
+        var s2 = stringEquation(a2);
+        if(!(s1 in hash))
+        {
+          d.push(a1);
+          hash[s1] = 1;
+        }
+        if(!(s2 in hash))
+        {
+          d.push(a2);
+          hash[s2] = 1;
+        }
+        var a3 = automatic_simplify(construct_div(a1, first));
+        var a4 = automatic_simplify(construct_div(a2, first));
+        var s3 = stringEquation(a3);
+        var s4 = stringEquation(a4);
+        if(!(s3 in hash))
+        {
+          d.push(a3);
+          hash[s3] = 1;
+        }
+        if(!(s4 in hash))
+        {
+          d.push(a4);
+          hash[s4] = 1;
+        }
+      }
+    }
     return d;
   }
   return null;
@@ -573,7 +574,7 @@ function numeric_solve_polynomial(coefficients)
   for(var i=0; i<get_roots.length; i=i+2)
   {
     var r = automatic_simplify(construct(OP_ADD, createInteger(Math.round(get_roots[i] * 1000000)/1000000), construct(OP_MUL, createInteger(Math.round(get_roots[i+1] * 1000000)/1000000), createSymbol(SYM_IMAGINARY))));
-    roots.push({type: "approximated", children: r});
+    roots.push(r);
   }
   return roots.sort(compare);
 }

@@ -82,18 +82,16 @@ function initparser( node )
 
 	var roots = solve_polynomial(expanded);
 
-	if(roots.length)
+	if(roots.symbolic.length || roots.numeric.length)
 	{
 		var text = "";
-		for(var root of roots)
+		for(var root of roots.symbolic)
 		{
-			if(root.type == "approximated")
-			{
-				text += "<p>$$x≈"+toTex(root.children)+"$$</p>";
-			}
-			else {
-				text += "<p>$$x="+toTex(root)+"$$</p>";
-			}
+			text += "<p>$$x="+toTex(root)+"$$</p>";
+		}
+		for(var root of roots.numeric)
+		{
+			text += "<p>$$x≈"+toTex(root)+"$$</p>";
 		}
 		$("#value-roots").html(text);
 		$("#console-roots").css("display", "block");
