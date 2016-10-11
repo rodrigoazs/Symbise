@@ -238,7 +238,7 @@ function coefficients_of_polynomial(node)
   var degree = identify_polynomial_degree(node);
   // maximum of polynomial x^100
   if(degree > 100) return null;
-  if(degree != null)
+  if(degree != null && degree)
   {
     var coefficients = [];
     for(var i=0; i<=degree; i++){ coefficients[i] = [createInteger(0)]; }

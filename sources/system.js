@@ -81,7 +81,6 @@ function initparser( node )
 	}
 
 	var roots = solve_polynomial(expanded);
-	console.log(roots);
 
 	if(roots.length)
 	{
