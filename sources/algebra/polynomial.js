@@ -22,7 +22,7 @@ function solve_polynomial(node)
       if(root.length == 0)
       {
         numeric_roots = numeric_roots.concat(numeric_solve_polynomial(coefficients));
-        return { symbolic: roots, numeric: numeric_roots };
+        return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
       }
       for(var i=0; i<root.length; i++)
       {
@@ -43,10 +43,10 @@ function solve_polynomial(node)
         roots = roots.concat(root);
       }
     }
-    if(coefficients.length == 2) return { symbolic: roots, numeric: numeric_roots };
+    if(coefficients.length == 3) return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
     coefficients = briot_ruffini(coefficients, root);
   }
-  return { symbolic: roots.sort(compare), numeric: numeric_roots };
+  return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
 }
 
 // Form polynomial from coefficients (cf)
@@ -93,8 +93,8 @@ function get_polynomial_root(coefficients)
       for(var i=0; i<possible_roots.length; i++)
       {
         var node = form_polynomial_from_coefficients(coefficients);
-        var a = automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i])); //automatic_simplify(algebraic_expand
-        //console.log('substitute ' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
+        var a = automatic_simplify(algebraic_expand(automatic_simplify(substitute(node, createSymbol("x"), possible_roots[i])))); //automatic_simplify(algebraic_expand
+        // console.log('substitute ' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
         if(compare(a, createInteger(0)) == 0)
         {
           return possible_roots[i];
@@ -449,19 +449,40 @@ function briot_ruffini(c, r)
 
   new_c.reverse();
   new_pol.push(new_c[0]);
-  temp = temp.concat([null, createInteger(new_c[0].value*r.value)]);
+  temp = temp.concat([null, automatic_simplify(algebraic_expand(automatic_simplify(construct(OP_MUL, new_c[0], r))))]); //createInteger(new_c[0].value*r.value)
   for(var i=1; i<new_c.length; i++)
   {
-    var n = createInteger(new_c[i].value + temp[i].value);
+    var n = automatic_simplify(construct(OP_ADD, new_c[i], temp[i])); //createInteger(new_c[i].value + temp[i].value)
     new_pol.push(n);
-    temp.push(createInteger(n.value*r.value));
+    temp.push(automatic_simplify(algebraic_expand(automatic_simplify(construct(OP_MUL, n, r))))); //createInteger(n.value*r.value)
   }
 
-  if(new_pol[new_pol.length-1].value != 0) return null;
+  if(compare(new_pol[new_pol.length-1], createInteger(0)) != 0) return null; //new_pol[new_pol.length-1].value != 0
   var ret_pol = [];
-  for(var i=new_pol.length-2; i>=0; i--) { ret_pol.push(new_pol[i]); }
+  for(var i=new_pol.length-2; i>=0; i--) { ret_pol.push(automatic_simplify(new_pol[i])); }
   return ret_pol;
 }
+// function briot_ruffini(c, r)
+// {
+//   var new_c = c.slice();
+//   var temp = [];
+//   var new_pol = [];
+//
+//   new_c.reverse();
+//   new_pol.push(new_c[0]);
+//   temp = temp.concat([null, createInteger(new_c[0].value*r.value)]);
+//   for(var i=1; i<new_c.length; i++)
+//   {
+//     var n = createInteger(new_c[i].value + temp[i].value);
+//     new_pol.push(n);
+//     temp.push(createInteger(n.value*r.value));
+//   }
+//
+//   if(new_pol[new_pol.length-1].value != 0) return null;
+//   var ret_pol = [];
+//   for(var i=new_pol.length-2; i>=0; i--) { ret_pol.push(new_pol[i]); }
+//   return ret_pol;
+// }
 
 // Numeric Solve polynomial quadratic (coef)
 // c: array of coefficients (type float or integer)
