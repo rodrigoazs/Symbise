@@ -108,7 +108,7 @@ function simplify_power(node)
 		return simplify_integer_power(v, w);
 	}
 	// added - verify if it is a square root of integer
-	else if(kind(v) == NODE_INT && v.value > 0 && is_fraction(w))
+	else if(kind(v) == NODE_INT && is_fraction(w))
 	{
 		return simplify_square_root_power(v, w);
 	}
@@ -119,15 +119,57 @@ function simplify_power(node)
 }
 
 // Simplify Square Root Power (v, w)
-// Not found on book. (Should it be implemented here?)
+// (Should it be implemented here?)
 function simplify_square_root_power(v, w)
 {
 	if(operand(w, 0).value == 1 && operand(w, 1).value == 2)
 	{
-		var s = Math.sqrt(v.value);
+		// var positive = v.value > 0;
+		// var fac = factorization_of(Math.abs(v.value));
+		// var hash = {};
+		// for(var f of fac)
+		// {
+		// 	if(f in hash)
+		// 	{
+		// 		hash[f] += 1;
+		// 	}
+		// 	else
+		// 	{
+		// 		hash[f] = 1;
+		// 	}
+		// }
+		// var out_ = 1;
+		// var in_ = 1;
+		// for(f in hash)
+		// {
+		// 	var n = Math.floor(hash[f]/2);
+		// 	var m = hash[f]%2;
+		// 	if(n > 0)
+		// 	{
+		// 		out_ *= Math.pow(f, n);
+		// 	}
+		// 	if(m > 0)
+		// 	{
+		// 		in_ *= f;
+		// 	}
+		// }
+		// var in__ = (in_ == 1) ? createInteger(1) : construct(OP_POW, createInteger(in_), construct(OP_DIV, createInteger(1), createInteger(2)));
+		// var out__ = (out_ == 1) ? [] : createInteger(out_);
+		// var im = positive ? [] : createSymbol(SYM_IMAGINARY);
+		// var c = construct(OP_MUL, [out__, im,  in__] );
+		// return c;
+
+		var positive = v.value > 0;
+		var s = Math.sqrt(Math.abs(v.value));
 		if(!(s % 1))
 		{
-			return createInteger(s);
+			if(positive)
+			{
+				return createInteger(s);
+			}
+			else {
+				return simplify_product(construct(OP_MUL, createInteger(s), createSymbol(SYM_IMAGINARY)));
+			}
 		}
 	}
 	return construct(OP_POW, v, w);
