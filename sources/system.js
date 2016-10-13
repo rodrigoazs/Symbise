@@ -112,7 +112,7 @@ function initparser( node )
 	$("#value-derivative-step").html("<p>"+step_diff(simplified)+"</p>");
   //$("#value-derivative").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolic_diff(simplified))+" -> "+toTex(automatic_simplify(symbolic_diff(simplified)))+" $$</p><br><br>"+step_diff(simplified)+"<br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
-  plot_value = stringEquation(diff);
+  plot_value = plotEquation(simplified);
   M.trustHtml = true;
   M.parseMath(document.getElementById("console"));
 }
