@@ -43,7 +43,7 @@ function solve_polynomial(node)
         roots = roots.concat(root);
       }
     }
-    if(coefficients.length == 3) return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
+    if(coefficients.length <= 3) return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
     coefficients = briot_ruffini(coefficients, root);
   }
   return { symbolic: roots.sort(compare), numeric: numeric_roots.sort(compare) };
