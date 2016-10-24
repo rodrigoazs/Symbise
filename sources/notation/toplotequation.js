@@ -153,7 +153,14 @@ function plotEquation_rec( node )
       break;
 
     case NODE_SYM:
-      ret = node.value;
+      if(node.value == SYM_EULER)
+      {
+        ret = "exp(1)";
+      }
+      else
+      {
+        ret = node.value;
+      }
       break;
 
     case NODE_INT:
