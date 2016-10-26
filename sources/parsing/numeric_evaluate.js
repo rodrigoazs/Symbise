@@ -1,8 +1,9 @@
 // numeric_evaluate (u)
 // Given a expression BAE or ASAE and a dictionary of variables with their
 // respect values, evaluate the expression and returns a numeric value
-function numeric_evaluate(node, sub={})
+function numeric_evaluate(node, sub)
 {
+  if(sub === undefined) sub = {};
   var ret = 0;
 
   if(!node)

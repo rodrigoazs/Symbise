@@ -169,8 +169,9 @@ function symbolic_diff(node)
 // respect values, including the value of the derivative point,
 // derivate and evaluate the expression
 // The output is a numeric value
-function automatic_diff(node, sub={})
+function automatic_diff(node, sub)
 {
+  if(sub === undefined) sub = {};
   var ret = 0;
 
   if(!node)
