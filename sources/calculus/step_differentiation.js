@@ -13,7 +13,7 @@ function step_diff(node)
     {
       n.ret += "<translate tkey='the_result_is'>The result is</translate>:"
     }
-    n.ret += "$$="+toTex(n.expression)+"$$";
+    n.ret += "<div style='padding: 15px 0px 15px 0px'>$$="+toTex(n.expression)+"$$</div>";
     n.remove_box();
     n.expression = automatic_simplify(n.expression);
     if(n.diff_found == false){
@@ -31,7 +31,7 @@ function step_diff(node)
 function step_diff_obj(node)
 {
   this.expression = createNode(NODE_FUNC, FUNC_DIFF, automatic_simplify(node));
-  this.ret = "<translate tkey='possible_derivation'>Possible derivation</translate>:$$"+toTex(this.expression)+"$$";
+  this.ret = "<translate tkey='possible_derivation'>Possible derivation</translate>:<div style='padding: 15px 0px 15px 0px'>$$"+toTex(this.expression)+"$$</div>";
   this.diff_found = false;
   this.box = 0;
 };
