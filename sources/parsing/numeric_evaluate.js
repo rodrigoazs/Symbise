@@ -18,9 +18,9 @@ function numeric_evaluate(node, sub)
           var sum = 0;
           for(var i = 0; i < node.children.length; i++)
           {
-            sum += numeric_evaluate(node.children[i], sub);
+            sum += numeric_evaluate(node.children[i], sub)*10; //javascript accuracy is not good
           }
-          ret = sum;
+          ret = sum/10; //javascript accuracy is not good
           break;
         case OP_SUB:
           ret = numeric_evaluate(node.children[0], sub) - numeric_evaluate(node.children[1], sub);

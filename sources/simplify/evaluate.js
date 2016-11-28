@@ -26,7 +26,7 @@ function evaluate_sum(v, w)
 		{
 			return construct(OP_DIV, createNode(NODE_INT, numerator_fun(v) * denominator_fun(w) + numerator_fun(w) * denominator_fun(v)), createNode(NODE_INT, denominator_fun(v) * denominator_fun(w)));
 		}	else {
-			return createNode(NODE_INT, numerator_fun(v) + numerator_fun(w));
+			return createNode(NODE_INT, (numerator_fun(v)*10 + numerator_fun(w)*10)/10); //javascript accuracy is not good
 		}
 }
 
