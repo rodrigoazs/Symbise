@@ -429,6 +429,15 @@ function univariate_quadratic(node)
 // returns its roots
 function bhaskara(a, b, c)
 {
+  // var b2 = construct_div(b, createInteger(2));
+  // var delta = construct(OP_POW, construct(OP_ADD, construct(OP_POW, b2, createInteger(2)), construct_neg(construct(OP_MUL, a, c))), construct_div(createInteger(1), createInteger(2)));
+  // if(signal(b2) == false)
+  // {
+  //   var x1 = construct(OP_DIV, construct(OP_ADD, construct_neg(b2), delta), a); //(-b2+d)/a;
+  // }else {
+  //   var x1 = construct(OP_DIV, construct_neg(c), construct(OP_ADD, b2, delta)); //-c/(b2+d);
+  // }
+  //   var x2 = construct(OP_DIV, c, construct(OP_MUL, x1, a));
   var l = construct(OP_MUL, createNode(NODE_INT, -1), b);
   var delta = construct(OP_ADD, construct(OP_POW, b, createNode(NODE_INT, 2)), construct(OP_MUL, createNode(NODE_INT, -1), construct(OP_MUL, [createNode(NODE_INT, 4), a, c])));
   var r = construct(OP_POW, delta, construct(OP_DIV, createNode(NODE_INT, 1), createNode(NODE_INT, 2)));
