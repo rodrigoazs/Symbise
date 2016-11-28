@@ -236,6 +236,23 @@ function simplify_integer_power(v, n)
 			ret[i] = simplify_product(r[i]);
 		}
 		return construct(OP_MUL, ret);
+	}
+	// added - transforming i^2 to -1
+	// (Should it be implemented here?)
+	else if(is_symbol(v, SYM_IMAGINARY) && kind(n) == NODE_INT)
+	{
+		if(n.value == 2) {
+			return createNode(NODE_INT, -1);
+		}
+		else {
+			if(n.value % 2)
+			{
+				return construct(OP_MUL, createInteger(Math.pow(-1, (n.value-1)/2)), createSymbol(SYM_IMAGINARY));
+			}
+			else {
+				return createInteger(Math.pow(-1, n.value/2));
+			}
+		}
 	} else {
 		return construct(OP_POW, v, n);
 	}
