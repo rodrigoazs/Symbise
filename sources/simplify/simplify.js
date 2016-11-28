@@ -124,8 +124,12 @@ function simplify_square_root_power(v, w)
 {
 	if(operand(w, 0).value == 1 && operand(w, 1).value == 2)
 	{
-		// var positive = v.value > 0;
 		// var fac = factorization_of(Math.abs(v.value));
+		// if(fac.length <= 1)
+		// {
+		// 	return construct(OP_POW, v, w);
+		// }
+		// var positive = v.value > 0;
 		// var hash = {};
 		// for(var f of fac)
 		// {
@@ -153,10 +157,12 @@ function simplify_square_root_power(v, w)
 		// 		in_ *= f;
 		// 	}
 		// }
-		// var in__ = (in_ == 1) ? createInteger(1) : construct(OP_POW, createInteger(in_), construct(OP_DIV, createInteger(1), createInteger(2)));
-		// var out__ = (out_ == 1) ? [] : createInteger(out_);
-		// var im = positive ? [] : createSymbol(SYM_IMAGINARY);
-		// var c = construct(OP_MUL, [out__, im,  in__] );
+		// var im = positive ? createInteger(1) : createSymbol(SYM_IMAGINARY);
+		// return construct(OP_MUL, [createInteger(out_), construct(OP_POW, createInteger(in_), construct(OP_DIV, createInteger(1), createInteger(2))), im]);
+		// // var in__ = (in_ == 1) ? createInteger(1) : construct(OP_POW, createInteger(in_), construct(OP_DIV, createInteger(1), createInteger(2)));
+		// // var out__ = (out_ == 1) ? [] : createInteger(out_);
+		// // var im = positive ? [] : createSymbol(SYM_IMAGINARY);
+		// // var c = construct(OP_MUL, [out__, im,  in__] );
 		// return c;
 
 		var positive = v.value > 0;
@@ -170,6 +176,9 @@ function simplify_square_root_power(v, w)
 			else {
 				return simplify_product(construct(OP_MUL, createInteger(s), createSymbol(SYM_IMAGINARY)));
 			}
+		}else if(!positive)
+		{
+			return simplify_product(construct(OP_MUL, construct(OP_POW, createInteger(Math.abs(v.value)), w), createSymbol(SYM_IMAGINARY)));
 		}
 	}
 	return construct(OP_POW, v, w);
