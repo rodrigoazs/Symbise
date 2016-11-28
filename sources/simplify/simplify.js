@@ -167,7 +167,9 @@ function simplify_square_root_power(v, w)
 
 		var positive = v.value > 0;
 		var s = Math.sqrt(Math.abs(v.value));
-		if(!(s % 1))
+		var s2 = (s*s)%10;
+		var lsd = ((s%10)*(s%10))%10; //javascript accuracy is not good
+		if(!(s % 1) && s2 == lsd)
 		{
 			if(positive)
 			{
