@@ -62,9 +62,16 @@ $( "#header-plot" ).click(function() {
 // Global var for the function plot
 var plot_value;
 
-function initparser( node )
+function initparser( param )
 {
-  console.log(node);
+  if("diff" in param)
+	{
+		var node = param.diff[0];
+		var where = param.diff[1];
+		var only_diff = true;
+	}	else {
+		var node = param;
+	}
   var func = stringEquation( node );
   var diff = symbolic_diff( node );
 
@@ -73,32 +80,35 @@ function initparser( node )
 
   // ----------------------------------------
 	// algorithm to find roots (in development)
-	var expanded = automatic_simplify(algebraic_expand(simplified));
-	if(compare(expanded, simplified) != 0)
+	if(only_diff != true)
 	{
-		$("#value-expanded").html("<p>$$"+toTex(expanded)+"$$</p>");
-		$("#console-expanded").css("display", "block");
-	}
-
-	var roots = solve_polynomial(expanded);
-
-	if(roots.symbolic.length || roots.numeric.length)
-	{
-		var text = "";
-		for(var root of roots.symbolic)
+		var expanded = automatic_simplify(algebraic_expand(simplified));
+		if(compare(expanded, simplified) != 0)
 		{
-			text += "<p>$$x="+toTex(root)+"$$</p>";
+			$("#value-expanded").html("<p>$$"+toTex(expanded)+"$$</p>");
+			$("#console-expanded").css("display", "block");
 		}
-		for(var root of roots.numeric)
+
+		var roots = solve_polynomial(expanded);
+
+		if(roots.symbolic.length || roots.numeric.length)
 		{
-			text += "<p>$$x≈"+toTex(root)+"$$</p>";
+			var text = "";
+			for(var root of roots.symbolic)
+			{
+				text += "<p>$$x="+toTex(root)+"$$</p>";
+			}
+			for(var root of roots.numeric)
+			{
+				text += "<p>$$x≈"+toTex(root)+"$$</p>";
+			}
+			$("#value-roots").html(text);
+			$("#console-roots").css("display", "block");
 		}
-		$("#value-roots").html(text);
-		$("#console-roots").css("display", "block");
 	}
 	// ----------------------------------------
 
-	if(kind(simplified) != NODE_INT && free_of_variables_and_non_real_numbers(simplified))
+	if(only_diff != true && kind(simplified) != NODE_INT && free_of_variables_and_non_real_numbers(simplified))
 	{
 		var numeric = numeric_evaluate(simplified);
 		$("#value-numeric-result").html("<p>$$"+numeric+"$$</p>");
@@ -106,9 +116,23 @@ function initparser( node )
 	}
 
   //[ "+toTex(construct(OP_MUL, simplified))+"]
-	$("#value-input").html("<p>$$"+toTex(BAE_node)+"$$</p>");
-	$("#value-result").html("<p>$$"+toTex(simplified)+"$$</p>");
-	$("#value-derivative").html("<p>$$d/{dx}("+toTex(simplified)+")="+toTex(automatic_simplify(symbolic_diff(simplified)))+"$$</p>");
+	if(only_diff == true)
+	{
+		var a = automatic_simplify(symbolic_diff(simplified));
+		var b = automatic_simplify(substitute(a, where[0], where[1]));
+		if(kind(b) != NODE_INT && free_of_variables_and_non_real_numbers(b))
+		{
+			var numeric = numeric_evaluate(b);
+			$("#value-numeric-result").html("<p>$$"+numeric+"$$</p>");
+			$("#console-numeric-result").css("display", "block");
+		}
+		$("#value-input").html("<p>$$d/{dx}("+toTex(BAE_node)+")\\,\\,where\\,\\,"+toTex(where[0])+"="+toTex(where[1])+"$$</p>");
+		$("#value-result").html("<p>$$"+toTex(b)+"$$</p>");
+	}else{
+		$("#value-input").html("<p>$$"+toTex(BAE_node)+"$$</p>");
+		$("#value-result").html("<p>$$"+toTex(simplified)+"$$</p>");
+	}
+	if(only_diff != true) $("#value-derivative").html("<p>$$d/{dx}("+toTex(simplified)+")="+toTex(automatic_simplify(symbolic_diff(simplified)))+"$$</p>");
 	$("#value-derivative-step").html("<p>"+step_diff(simplified)+"</p>");
   //$("#value-derivative").html("<p>$$d/{dx}("+toTex(BAE_node)+") -> "+toTex( simplified )+" -> "+toTex(symbolic_diff(simplified))+" -> "+toTex(automatic_simplify(symbolic_diff(simplified)))+" $$</p><br><br>"+step_diff(simplified)+"<br><br>"+toTex( BAE_node )+"<br>"+stringEquation( BAE_node )+"<br>"+toTex( simplified )+"<br>"+stringEquation(simplified));
   // Set the global plot value as the strin equation of the differentiation (it is necessary to fix some functios as sec, cot..)
@@ -128,6 +152,11 @@ function initsubstitute(node, array)
 		node = substitute(node, sub_array[i].assign[0], sub_array[i].assign[1]);
 	}
 	return node;
+}
+
+function initderivative(node, array)
+{
+	return {diff: [node, array]};
 }
 
 function sub_rec(array)
