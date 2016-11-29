@@ -116,3 +116,33 @@ function initparser( node )
   M.trustHtml = true;
   M.parseMath(document.getElementById("console"));
 }
+
+function initsubstitute(node, array)
+{
+	console.log(array);
+	var sub_array = sub_rec(array);
+	var n = node;
+
+	for(var i=0; i<sub_array.length; i++)
+	{
+		node = substitute(node, sub_array[i].assign[0], sub_array[i].assign[1]);
+	}
+	return node;
+}
+
+function sub_rec(array)
+{
+	var t = [];
+	if(!Array.isArray(array)) return [array];
+	for(var i=0; i<array.length; i++)
+	{
+		if(Array.isArray(array[i]))
+		{
+			var a = sub_rec(array[i]);
+			t = t.concat(a);
+		}else {
+			t = t.concat(array[i]);
+		}
+	}
+	return t;
+}
