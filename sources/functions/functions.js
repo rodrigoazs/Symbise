@@ -645,7 +645,7 @@ function copy_matrix(matrix)
 
 function cranmer(matrix, ind)
 {
-  var det = determinant(matrix);
+  var det = automatic_simplify(algebraic_expand(automatic_simplify(determinant(matrix))));
   var result = [];
   for(var i=0; i<matrix.length; i++)
   {
@@ -654,7 +654,7 @@ function cranmer(matrix, ind)
     {
       m[j][i] = ind[j];
     }
-    var detm = determinant(m);
+    var detm = automatic_simplify(algebraic_expand(automatic_simplify(determinant(m))));
     result.push(automatic_simplify(construct_div(detm, det)));
   }
   return result;
