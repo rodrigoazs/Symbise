@@ -594,3 +594,68 @@ function combination(n, k)
 	}
 	return automatic_simplify(construct(OP_DIV, createInteger(num), createInteger(dem)));
 }
+
+function determinant(node)
+{
+  var matrix = copy_matrix(node);
+  if(matrix.length == 2 && matrix[0].length == 2 && matrix[1].length == 2)
+  {
+    var d = construct(OP_ADD, construct(OP_MUL, matrix[0][0], matrix[1][1]), construct_neg(construct(OP_MUL, matrix[0][1], matrix[1][0])));
+    return automatic_simplify(d);
+  }else {
+    var n = matrix.length;
+    var det = createInteger(0);
+    for(var i=0; i<n; i++)
+    {
+      var j = 1;
+      var m1 = Math.pow(-1, i+j);
+      var a = matrix[i][j];
+      var m = remove_row_collumn_from_matrix(matrix, i, j);
+      det = construct(OP_ADD, det, automatic_simplify(construct(OP_MUL, [createInteger(m1), a, determinant(m)])));
+    }
+    return automatic_simplify(det);
+  }
+}
+
+function remove_row_collumn_from_matrix(matrix, i, j)
+{
+  var a = copy_matrix(matrix);
+  a.splice(i, 1);
+  for(var i=0; i<a.length; i++)
+  {
+    a[i].splice(j, 1);
+  }
+  return a;
+}
+
+function copy_matrix(matrix)
+{
+  var new_matrix = [];
+  for(var i=0; i<matrix.length; i++)
+  {
+    var new_line = [];
+    for(var j=0; j<matrix[i].length; j++)
+    {
+      new_line.push(matrix[i][j]);
+    }
+    new_matrix.push(new_line);
+  }
+  return new_matrix;
+}
+
+function cranmer(matrix, ind)
+{
+  var det = determinant(matrix);
+  var result = [];
+  for(var i=0; i<matrix.length; i++)
+  {
+    var m = copy_matrix(matrix);
+    for(var j=0; j<matrix.length; j++)
+    {
+      m[j][i] = ind[j];
+    }
+    var detm = determinant(m);
+    result.push(automatic_simplify(construct_div(detm, det)));
+  }
+  return result;
+}
