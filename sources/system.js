@@ -108,6 +108,11 @@ function initparser( param )
 		}
 
 		var partial_frac = partial_fractions(simplified);
+		if(partial_frac != null)
+		{
+			$("#value-partial-fractions").html("<p>$$"+toTex(partial_frac)+"$$</p>");
+			$("#console-partial-fractions").css("display", "block");
+		}
 	}
 	// ----------------------------------------
 
