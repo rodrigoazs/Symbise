@@ -643,6 +643,9 @@ function copy_matrix(matrix)
   return new_matrix;
 }
 
+// Cranmer (m, u)
+// m = matrix (quadratic)
+// u = row with values to substitute
 function cranmer(matrix, ind)
 {
   var det = automatic_simplify(algebraic_expand(automatic_simplify(determinant(matrix))));

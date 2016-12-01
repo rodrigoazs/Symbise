@@ -105,35 +105,25 @@ function get_polynomial_root(coefficients)
   return [];
 }
 
-// Get Polynomials Root (cf)
+// Get Rational Polynomials Root (cf)
 // Given the array of coefficients,
-// uses bhaskara if its is quadratic or
 // look for a possible root, evaluate and return it
 // Version that tests all the possible roots and
 // returns the correct ones
-function get_polynomials_root(coefficients)
+function get_rational_polynomials_roots(coef)
 {
-  if(coefficients.length <= 3)
-  {
-    if(kind(coefficients[0]) == NODE_INT && coefficients[0].value == 0)
-    {
-      return [createInteger(0)];
-    }
-    if(kind(coefficients[1]) == NODE_INT && coefficients[1].value == 0)
-    {
-      return [automatic_simplify(construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2)))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
-    }
-    if(coefficients.length == 2)
-    {
-      return [automatic_simplify(construct_div(construct_neg(coefficients[0]), coefficients[1]))];
-    }
-    var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
-    return roots;
-  }
-  else
-  {
-    var possible_roots = possible_roots_of_polynomial(coefficients).sort(compare);
+    var coefficients = coef;
     var collected = [];
+    // if a0 is 0 then the root is 0
+    while(compare(coefficients[0], createInteger(0)) == 0)
+    {
+      collected.push(createInteger(0));
+      coefficients = briot_ruffini(coefficients, createInteger(0));
+    }
+    console.log('coef',coefficients );
+    var possible_roots = possible_roots_of_polynomial(coefficients).sort(compare);
+    console.log('poss', possible_roots);
+
     if(possible_roots != null)
     {
       var arraySize = possible_roots.length;
@@ -151,8 +141,150 @@ function get_polynomials_root(coefficients)
       }
       return collected;
     }
+}
+
+// Partial Fractions (u)
+// Given an expression u,
+// check if it is possible to determine
+// the partial fractions and so returns it.
+// Returns null otherwise.
+function partial_fractions(node)
+{
+  var frac = form_quotient(node);
+  frac[0] = automatic_simplify(algebraic_expand(frac[0]));
+  frac[1] = automatic_simplify(algebraic_expand(frac[1]));
+
+  var coefs_den = coefficients_of_polynomial(frac[1]);
+  if(coefs_den == null || coefs_den.length == 2) return null; // cancels if its not polynomial or a linear equation
+  var coefs_num = coefficients_of_polynomial(frac[0]);
+  var cfrac = [];
+  if(coefs_num == null) {
+    cfrac.push(frac[0]);
   }
-  return [];
+  else {
+    cfrac.push(compressed_polynomial_form(coefs_num));
+  }
+  cfrac.push(compressed_polynomial_form(coefs_den));
+  //reconstruct the division in terms of compressed forms in order to
+  //cancelate terms if needs
+  var new_exp = automatic_simplify(construct_div(cfrac[0], cfrac[1]));
+  frac = form_quotient(new_exp); //reobtain the numerator and denominator
+
+  //verify if its denominator is a product
+  var pt_frac =[];
+  var theta = 0;
+  if(kind(frac[1]) == OP_MUL)
+  {
+    for(var i=0; i<frac[1].children.length; i++)
+    {
+      if(kind(frac[1].children[i]) == OP_POW)
+      {
+        if(kind(frac[1].children[i].children[1]) != NODE_INT) return null;
+        theta++;
+        pt_frac.push(construct_div(createSymbol("theta_"+theta), frac[1].children[i].children[0]));
+        for(j=2; j<=frac[1].children[i].children[1].value; j++)
+        {
+          theta++;
+          pt_frac.push(construct_div(createSymbol("theta_"+theta), construct(OP_POW, frac[1].children[i].children[0], createInteger(j))));
+        }
+      }else{
+        var ccof = coefficients_of_polynomial(frac[1].children[i]);
+        if(ccof.length < 3)
+        {
+          theta++;
+          pt_frac.push(construct_div(createSymbol("theta_"+theta), frac[1].children[i]));
+        }else {
+          var ths = [];
+          for(var k=0; k<ccof.length-1; k++)
+          {
+            theta++;
+            ths.push(createSymbol("theta_"+theta));
+          }
+          pt_frac.push(construct_div(form_polynomial_from_coefficients(ths), frac[1].children[i]));
+        }
+      }
+    }
+  }
+  var part_to_solve = construct(OP_ADD, pt_frac);
+
+  // multiply by denominator and obtain its numerator expanded
+  var expanded = [];
+  for(var i=0; i<part_to_solve.children.length; i++)
+  {
+    var aut = automatic_simplify(construct(OP_MUL, frac[1], part_to_solve.children[i]));
+    expanded.push(algebraic_expand(aut));
+  }
+  expanded = automatic_simplify(construct(OP_ADD, expanded));
+
+  // obtain matrix A to get determinant
+  var coef_expanded = coefficients_of_polynomial(expanded);
+  var det_matrix = [];
+  for(var i=0; i<coef_expanded.length; i++)
+  {
+    //console.log(stringEquation(coef_expanded[i]));
+    //console.log(form_determinant_row_by_theta(coef_expanded[i], theta));
+    det_matrix.push(form_determinant_row_by_theta(coef_expanded[i], theta));
+  }
+
+  // get theta values
+  var indrow = coefficients_of_polynomial(automatic_simplify(algebraic_expand(frac[0])));
+  if(indrow == null){
+    indrow = [automatic_simplify(frac[0])];
+    for(var i=1; i<theta; i++) indrow.push(createInteger(0));
+  }
+  var theta_values = cranmer(det_matrix, indrow);
+
+  //substitute theta values
+  var part_solved = part_to_solve;
+  for(var i=0; i<theta; i++)
+  {
+    part_solved = substitute(part_solved, createSymbol("theta_"+(i+1)), theta_values[i]);
+  }
+  return part_solved;
+}
+
+// Form determinant row by theta (u, max)
+// Its functions forms a determinant row to use in
+// Cranmer and determinant
+function form_determinant_row_by_theta(node, max)
+{
+  var expression = node;
+  var row = [];
+  if(kind(expression) != OP_ADD) expression = construct(OP_ADD, expression);
+  for(var i=0; i<max; i++) row.push(createInteger(0));
+  for(var i=0; i<expression.children.length; i++)
+  {
+    for(var j=1; j<=max; j++)
+    {
+      var a = term_of(expression.children[i], createSymbol("theta_"+j));
+      row[j-1] = construct(OP_ADD, row[j-1], a);
+    }
+  }
+  for(var i=0; i<max; i++) row[i] = automatic_simplify(row[i]);
+  return row;
+}
+
+// Compressed Polynomial Form (cf)
+// Given the coefficients of a polynomial
+// get its rational roots and returns
+// its expression in the following form
+// x^6-7x^4+x^3-49x-42 -> (x+1)(x+2)(x-3)(x^3+7)
+function compressed_polynomial_form(coef)
+{
+  var coefficients = coef.slice();
+  console.log(stringEquation(form_polynomial_from_coefficients(coef)));
+  var rational_roots = get_rational_polynomials_roots(coef);
+  console.log('r', rational_roots);
+  if(rational_roots == null) return null;
+  var exp = [];
+  for(var i=0; i<rational_roots.length; i++)
+  {
+    exp.push(construct(OP_ADD, createSymbol("x"), construct_neg(rational_roots[i])));
+    coefficients = briot_ruffini(coefficients, rational_roots[i]);
+  }
+  var left_polynomial = form_polynomial_from_coefficients(coefficients);
+  exp.push(left_polynomial);
+  return automatic_simplify(construct(OP_MUL, exp));
 }
 
 // Possible roots of polynomial (cf)
@@ -174,10 +306,18 @@ function possible_roots_of_polynomial(cf)
       {
         var a1 = createInteger(-divisors[i]);
         var a2 = createInteger(divisors[i]);
-        hash[stringEquation(a1)] = 1;
-        hash[stringEquation(a2)] = 1;
-        d.push(a1);
-        d.push(a2);
+        var s1 = stringEquation(a1);
+        var s2 = stringEquation(a2);
+        if(!(s1 in hash))
+        {
+          d.push(a1);
+          hash[stringEquation(a1)] = 1;
+        }
+        if(!(s2 in hash))
+        {
+          d.push(a2);
+          hash[stringEquation(a2)] = 1;
+        }
         var a3 = automatic_simplify(construct(OP_DIV, createInteger(-divisors[i]), createInteger(first.value)));
         var a4 = automatic_simplify(construct(OP_DIV, createInteger(divisors[i]), createInteger(first.value)));
         var s3 = stringEquation(a3);
