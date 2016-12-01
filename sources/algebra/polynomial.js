@@ -105,6 +105,56 @@ function get_polynomial_root(coefficients)
   return [];
 }
 
+// Get Polynomials Root (cf)
+// Given the array of coefficients,
+// uses bhaskara if its is quadratic or
+// look for a possible root, evaluate and return it
+// Version that tests all the possible roots and
+// returns the correct ones
+function get_polynomials_root(coefficients)
+{
+  if(coefficients.length <= 3)
+  {
+    if(kind(coefficients[0]) == NODE_INT && coefficients[0].value == 0)
+    {
+      return [createInteger(0)];
+    }
+    if(kind(coefficients[1]) == NODE_INT && coefficients[1].value == 0)
+    {
+      return [automatic_simplify(construct_neg(automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2)))))), automatic_simplify(construct(OP_POW, construct_div(construct_neg(coefficients[0]), coefficients[2]), construct(OP_DIV, createInteger(1), createInteger(2))))];
+    }
+    if(coefficients.length == 2)
+    {
+      return [automatic_simplify(construct_div(construct_neg(coefficients[0]), coefficients[1]))];
+    }
+    var roots = bhaskara(coefficients[2], coefficients[1], coefficients[0]);
+    return roots;
+  }
+  else
+  {
+    var possible_roots = possible_roots_of_polynomial(coefficients).sort(compare);
+    var collected = [];
+    if(possible_roots != null)
+    {
+      var arraySize = possible_roots.length;
+      var start = Math.round(arraySize/2);
+      for(var i=0; i<arraySize; i++)
+      {
+        var index = (start+((i%2==0)?i/2:arraySize-(i+1)/2))%arraySize;
+        var node = form_polynomial_from_coefficients(coefficients);
+        var a = automatic_simplify(algebraic_expand(automatic_simplify(substitute(node, createSymbol("x"), possible_roots[index])))); //automatic_simplify(algebraic_expand
+        // console.log('substitute ' + stringEquation(node) + ' por '+ stringEquation(possible_roots[i]) + ' resulta em '+ stringEquation(a));
+        if(compare(a, createInteger(0)) == 0)
+        {
+          collected.push(possible_roots[index]);
+        }
+      }
+      return collected;
+    }
+  }
+  return [];
+}
+
 // Possible roots of polynomial (cf)
 // Given the array of coefficients of a polynomial, find its
 // possible roots by guessing divisors of coefficient

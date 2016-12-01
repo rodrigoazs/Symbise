@@ -6,6 +6,7 @@ $( "#equalbtn" ).click(function() {
 	$("#console-numeric-result").css("display", "none");
 	$("#console-expanded").css("display", "none");
 	$("#console-roots").css("display", "none");
+	$("#console-partial-fractions").css("display", "none");
 	$("#console-derivative").css("display", "none");
 	$("#content-plot").css("display", "none");
 	$("#value-derivative-step").css("display", "none");
@@ -105,6 +106,13 @@ function initparser( param )
 			$("#value-roots").html(text);
 			$("#console-roots").css("display", "block");
 		}
+
+		var frac = form_quotient(simplified);
+		frac[0] = automatic_simplify(algebraic_expand(frac[0]));
+		frac[1] = automatic_simplify(algebraic_expand(frac[1]));
+
+		console.log(stringEquation(frac[0]));
+		console.log(stringEquation(frac[1]));
 	}
 	// ----------------------------------------
 
