@@ -7,7 +7,7 @@ For node use:
 
 1. make sure npm is installed
 2. ```npm install```
-3. ```npm run app```
+3. ```npm run app``` (or npm run test) 
 4. ```open app/www/index.html```
 
 # Screenshots
