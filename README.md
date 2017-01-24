@@ -10,6 +10,9 @@ For node use:
 3. ```npm run app```
 4. ```open app/www/index.html```
 
+# Screenshots
+![Working with polynomials](http://i.imgur.com/KSkg80A.png)
+
 # The MIT License (MIT)
 
 Copyright © `2016` `all Symbise contributors`
