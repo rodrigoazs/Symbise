@@ -1,5 +1,5 @@
 # Symbise
-Computer algebra system written in JavaScript - In Development
+Computer algebra system written in JavaScript
 
 # How to build
 
